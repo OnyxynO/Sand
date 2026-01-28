@@ -1,0 +1,7 @@
+"Donnees d'une equipe"
+input TeamInput {
+    nom: String! @rules(apply: ["required", "max:255"])
+    code: String! @rules(apply: ["required", "max:50"])
+    description: String
+    estActif: Boolean @rename(attribute: "est_actif")
+}

@@ -1,0 +1,16 @@
+extend type Mutation {
+    "Marquer une notification comme lue"
+    markNotificationRead(id: ID!): Notification!
+        @field(resolver: "App\\GraphQL\\Mutations\\NotificationMutator@markRead")
+        @guard
+
+    "Marquer toutes les notifications comme lues"
+    markAllNotificationsRead: Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\NotificationMutator@markAllRead")
+        @guard
+
+    "Supprimer une notification"
+    deleteNotification(id: ID!): Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\NotificationMutator@delete")
+        @guard
+}

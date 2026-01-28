@@ -1,0 +1,15 @@
+"Parametres d'export"
+input ExportInput {
+    format: ExportFormat!
+    dateDebut: Date! @rename(attribute: "date_debut") @rules(apply: ["required", "date"])
+    dateFin: Date! @rename(attribute: "date_fin") @rules(apply: ["required", "date", "after_or_equal:date_debut"])
+    projetId: ID @rename(attribute: "project_id")
+    equipeId: ID @rename(attribute: "team_id")
+    userId: ID @rename(attribute: "user_id")
+}
+
+"Parametre systeme"
+input SettingInput {
+    cle: String! @rules(apply: ["required"])
+    valeur: JSON! @rules(apply: ["required"])
+}

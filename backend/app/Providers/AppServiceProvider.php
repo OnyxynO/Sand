@@ -2,6 +2,21 @@
 
 namespace App\Providers;
 
+use App\Models\Absence;
+use App\Models\Activity;
+use App\Models\Project;
+use App\Models\Setting;
+use App\Models\Team;
+use App\Models\TimeEntry;
+use App\Models\User;
+use App\Policies\AbsencePolicy;
+use App\Policies\ActivityPolicy;
+use App\Policies\ProjectPolicy;
+use App\Policies\SettingPolicy;
+use App\Policies\TeamPolicy;
+use App\Policies\TimeEntryPolicy;
+use App\Policies\UserPolicy;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +34,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Enregistrer les policies
+        Gate::policy(User::class, UserPolicy::class);
+        Gate::policy(Team::class, TeamPolicy::class);
+        Gate::policy(Project::class, ProjectPolicy::class);
+        Gate::policy(Activity::class, ActivityPolicy::class);
+        Gate::policy(TimeEntry::class, TimeEntryPolicy::class);
+        Gate::policy(Absence::class, AbsencePolicy::class);
+        Gate::policy(Setting::class, SettingPolicy::class);
     }
 }

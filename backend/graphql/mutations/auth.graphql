@@ -1,0 +1,10 @@
+extend type Mutation {
+    "Connexion"
+    login(input: LoginInput! @spread): AuthPayload!
+        @field(resolver: "App\\GraphQL\\Mutations\\AuthMutator@login")
+
+    "Deconnexion"
+    logout: Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\AuthMutator@logout")
+        @guard
+}

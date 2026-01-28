@@ -1,0 +1,14 @@
+"Notification utilisateur"
+type Notification {
+    id: ID!
+    type: String!
+    titre: String!
+    message: String!
+    donnees: JSON
+    estLu: Boolean! @rename(attribute: "est_lu")
+    luLe: DateTime @rename(attribute: "lu_le")
+    createdAt: DateTime! @rename(attribute: "created_at")
+
+    "Utilisateur destinataire"
+    utilisateur: User! @belongsTo(relation: "utilisateur")
+}

@@ -1,0 +1,30 @@
+"Projet"
+type Project {
+    id: ID!
+    nom: String!
+    code: String!
+    description: String
+    dateDebut: Date @rename(attribute: "date_debut")
+    dateFin: Date @rename(attribute: "date_fin")
+    estActif: Boolean! @rename(attribute: "est_actif")
+    createdAt: DateTime! @rename(attribute: "created_at")
+    updatedAt: DateTime! @rename(attribute: "updated_at")
+
+    "Utilisateurs affectes au projet"
+    utilisateurs: [User!]! @belongsToMany(relation: "utilisateurs")
+
+    "Moderateurs du projet"
+    moderateurs: [User!]! @belongsToMany(relation: "moderateurs")
+
+    "Activites explicitement activees sur ce projet"
+    activitesActives: [Activity!]! @belongsToMany(relation: "activitesActives")
+
+    "Saisies sur ce projet"
+    saisies(
+        dateDebut: Date @where(key: "date", operator: ">=")
+        dateFin: Date @where(key: "date", operator: "<=")
+    ): [TimeEntry!]! @hasMany(relation: "saisies")
+
+    "Temps total sur une periode"
+    tempsTotal(dateDebut: Date!, dateFin: Date!): Float! @field(resolver: "App\\GraphQL\\Resolvers\\ProjectResolver@tempsTotal")
+}

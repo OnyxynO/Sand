@@ -1,0 +1,19 @@
+"Creation d'une activite"
+input CreateActivityInput {
+    nom: String! @rules(apply: ["required", "max:255"])
+    code: String @rules(apply: ["max:50"])
+    description: String
+    parentId: ID @rename(attribute: "parent_id")
+    ordre: Int
+    estActif: Boolean @rename(attribute: "est_actif")
+}
+
+"Modification d'une activite"
+input UpdateActivityInput {
+    nom: String @rules(apply: ["max:255"])
+    code: String @rules(apply: ["max:50"])
+    description: String
+    parentId: ID @rename(attribute: "parent_id")
+    ordre: Int
+    estActif: Boolean @rename(attribute: "est_actif")
+}

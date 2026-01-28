@@ -29,8 +29,20 @@
   - [x] SettingSeeder (parametres par defaut)
 
 #### En cours
-- [ ] Schema GraphQL complet
-- [ ] Policies d'autorisation
+- [x] Schema GraphQL complet
+  - [x] Types (User, Team, Project, Activity, TimeEntry, Absence, Notification, Setting)
+  - [x] Enums (UserRole, LogAction, NotificationType, etc.)
+  - [x] Inputs pour mutations
+  - [x] Queries (me, users, projets, saisies, etc.)
+  - [x] Mutations (auth, CRUD, bulk operations)
+- [x] Policies d'autorisation
+  - [x] UserPolicy, TeamPolicy, ProjectPolicy
+  - [x] ActivityPolicy, TimeEntryPolicy, AbsencePolicy, SettingPolicy
+- [x] Resolvers essentiels
+  - [x] AuthMutator (login/logout)
+  - [x] TimeEntryMutator (CRUD + bulk)
+  - [x] NotificationMutator
+  - [x] Queries (MesSaisiesSemaine, ActivitesDisponibles, etc.)
 
 ### 2026-01-28 - Initialisation du projet
 

@@ -1,0 +1,13 @@
+"Equipe ou service"
+type Team {
+    id: ID!
+    nom: String!
+    code: String!
+    description: String
+    estActif: Boolean! @rename(attribute: "est_actif")
+    createdAt: DateTime! @rename(attribute: "created_at")
+    updatedAt: DateTime! @rename(attribute: "updated_at")
+
+    "Membres de l'equipe"
+    membres: [User!]! @hasMany(relation: "membres")
+}

@@ -1,0 +1,55 @@
+extend type Mutation {
+    "Creer un projet (Admin)"
+    createProject(input: CreateProjectInput! @spread): Project!
+        @field(resolver: "App\\GraphQL\\Mutations\\ProjectMutator@create")
+        @guard
+        @can(ability: "create", model: "App\\Models\\Project")
+
+    "Modifier un projet (Admin)"
+    updateProject(id: ID!, input: UpdateProjectInput! @spread): Project!
+        @field(resolver: "App\\GraphQL\\Mutations\\ProjectMutator@update")
+        @guard
+        @can(ability: "update", find: "id", model: "App\\Models\\Project")
+
+    "Supprimer un projet (Admin, soft delete)"
+    deleteProject(id: ID!): Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\ProjectMutator@delete")
+        @guard
+        @can(ability: "delete", find: "id", model: "App\\Models\\Project")
+
+    "Restaurer un projet supprime (Admin)"
+    restoreProject(id: ID!): Project!
+        @field(resolver: "App\\GraphQL\\Mutations\\ProjectMutator@restore")
+        @guard
+        @can(ability: "restore", model: "App\\Models\\Project")
+
+    "Ajouter un moderateur au projet"
+    addProjectModerator(projetId: ID!, userId: ID!): Project!
+        @field(resolver: "App\\GraphQL\\Mutations\\ProjectMutator@addModerator")
+        @guard
+        @can(ability: "manageModerators", find: "projetId", model: "App\\Models\\Project")
+
+    "Retirer un moderateur du projet"
+    removeProjectModerator(projetId: ID!, userId: ID!): Project!
+        @field(resolver: "App\\GraphQL\\Mutations\\ProjectMutator@removeModerator")
+        @guard
+        @can(ability: "manageModerators", find: "projetId", model: "App\\Models\\Project")
+
+    "Affecter un utilisateur au projet"
+    addProjectUser(projetId: ID!, userId: ID!): Project!
+        @field(resolver: "App\\GraphQL\\Mutations\\ProjectMutator@addUser")
+        @guard
+        @can(ability: "manageUsers", find: "projetId", model: "App\\Models\\Project")
+
+    "Retirer un utilisateur du projet"
+    removeProjectUser(projetId: ID!, userId: ID!): Project!
+        @field(resolver: "App\\GraphQL\\Mutations\\ProjectMutator@removeUser")
+        @guard
+        @can(ability: "manageUsers", find: "projetId", model: "App\\Models\\Project")
+
+    "Definir les activites actives sur un projet"
+    setProjectActivities(projetId: ID!, activiteIds: [ID!]!): Project!
+        @field(resolver: "App\\GraphQL\\Mutations\\ProjectMutator@setActivities")
+        @guard
+        @can(ability: "manageActivities", find: "projetId", model: "App\\Models\\Project")
+}

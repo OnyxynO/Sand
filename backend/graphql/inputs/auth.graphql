@@ -1,0 +1,5 @@
+"Donnees de connexion"
+input LoginInput {
+    email: String! @rules(apply: ["required", "email"])
+    password: String! @rules(apply: ["required", "min:6"])
+}

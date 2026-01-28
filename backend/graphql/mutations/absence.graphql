@@ -1,0 +1,28 @@
+extend type Mutation {
+    "Synchroniser les absences depuis l'API RH"
+    syncAbsences(
+        userId: ID
+        dateDebut: Date!
+        dateFin: Date!
+    ): SyncResult!
+        @field(resolver: "App\\GraphQL\\Mutations\\AbsenceMutator@sync")
+        @guard
+        @can(ability: "sync", model: "App\\Models\\Absence")
+
+    "Creer une absence manuellement"
+    createAbsence(input: AbsenceInput! @spread): Absence!
+        @field(resolver: "App\\GraphQL\\Mutations\\AbsenceMutator@create")
+        @guard
+        @can(ability: "create", model: "App\\Models\\Absence")
+
+    "Supprimer une absence"
+    deleteAbsence(id: ID!): Boolean!
+        @delete(model: "App\\Models\\Absence")
+        @guard
+        @can(ability: "delete", find: "id", model: "App\\Models\\Absence")
+
+    "Resoudre un conflit d'absence"
+    resolveAbsenceConflict(absenceId: ID!, resolution: ConflictResolution!): Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\AbsenceMutator@resolveConflict")
+        @guard
+}

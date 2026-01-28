@@ -1,0 +1,9 @@
+"Parametre systeme"
+type Setting {
+    id: ID!
+    cle: String!
+    valeur: JSON!
+    description: String
+    createdAt: DateTime! @rename(attribute: "created_at")
+    updatedAt: DateTime! @rename(attribute: "updated_at")
+}

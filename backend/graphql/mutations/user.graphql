@@ -1,0 +1,25 @@
+extend type Mutation {
+    "Creer un utilisateur (Admin)"
+    createUser(input: CreateUserInput! @spread): User!
+        @field(resolver: "App\\GraphQL\\Mutations\\UserMutator@create")
+        @guard
+        @can(ability: "create", model: "App\\Models\\User")
+
+    "Modifier un utilisateur (Admin)"
+    updateUser(id: ID!, input: UpdateUserInput! @spread): User!
+        @field(resolver: "App\\GraphQL\\Mutations\\UserMutator@update")
+        @guard
+        @can(ability: "update", find: "id", model: "App\\Models\\User")
+
+    "Supprimer un utilisateur (Admin, soft delete)"
+    deleteUser(id: ID!): Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\UserMutator@delete")
+        @guard
+        @can(ability: "delete", find: "id", model: "App\\Models\\User")
+
+    "Restaurer un utilisateur supprime (Admin)"
+    restoreUser(id: ID!): User!
+        @field(resolver: "App\\GraphQL\\Mutations\\UserMutator@restore")
+        @guard
+        @can(ability: "restore", model: "App\\Models\\User")
+}

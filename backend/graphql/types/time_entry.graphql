@@ -1,0 +1,38 @@
+"Saisie de temps"
+type TimeEntry {
+    id: ID!
+    date: Date!
+    duree: Float!
+    commentaire: String
+    createdAt: DateTime! @rename(attribute: "created_at")
+    updatedAt: DateTime! @rename(attribute: "updated_at")
+
+    "Utilisateur qui a fait la saisie"
+    utilisateur: User! @belongsTo(relation: "utilisateur")
+
+    "Projet concerne"
+    projet: Project! @belongsTo(relation: "projet")
+
+    "Activite concernee"
+    activite: Activity! @belongsTo(relation: "activite")
+
+    "Historique des modifications"
+    historique: [TimeEntryLog!]! @hasMany(relation: "historique")
+}
+
+"Historique d'une saisie"
+type TimeEntryLog {
+    id: ID!
+    action: LogAction!
+    ancienneDuree: Float @rename(attribute: "ancienne_duree")
+    nouvelleDuree: Float @rename(attribute: "nouvelle_duree")
+    ancienCommentaire: String @rename(attribute: "ancien_commentaire")
+    nouveauCommentaire: String @rename(attribute: "nouveau_commentaire")
+    createdAt: DateTime! @rename(attribute: "created_at")
+
+    "Utilisateur ayant fait la modification"
+    auteur: User! @belongsTo(relation: "auteur")
+
+    "Saisie concernee"
+    saisie: TimeEntry! @belongsTo(relation: "saisie")
+}
