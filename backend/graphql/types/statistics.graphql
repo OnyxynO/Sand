@@ -57,4 +57,5 @@ type ExportJob {
 "Payload d'authentification"
 type AuthPayload {
     user: User!
+    token: String
 }

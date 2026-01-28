@@ -28,9 +28,16 @@ class AuthMutator
             ]);
         }
 
+        // Connexion session (pour SPA)
         Auth::login($user);
 
-        return ['user' => $user];
+        // Generer un token API (pour tests CLI / mobile)
+        $token = $user->createToken('api')->plainTextToken;
+
+        return [
+            'user' => $user,
+            'token' => $token,
+        ];
     }
 
     /**
@@ -38,7 +45,18 @@ class AuthMutator
      */
     public function logout(): bool
     {
-        Auth::logout();
+        $user = Auth::user();
+
+        if ($user) {
+            // Revoquer le token courant si auth via token Sanctum
+            $token = $user->currentAccessToken();
+            if ($token && method_exists($token, 'delete')) {
+                $token->delete();
+            }
+        }
+
+        // Note: Auth::logout() ne fonctionne pas avec le guard sanctum (stateless)
+        // La revocation du token suffit
 
         return true;
     }

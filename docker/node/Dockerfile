@@ -5,7 +5,10 @@ RUN npm install -g pnpm
 
 WORKDIR /app
 
-# L'installation des dépendances se fait au premier lancement
-# via le volume monté
+# Script d'entrypoint pour installer les dépendances au démarrage
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 5173
+
+ENTRYPOINT ["/entrypoint.sh"]

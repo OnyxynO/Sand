@@ -28,7 +28,7 @@ extend type Query {
     "Liste des projets"
     projets(
         actif: Boolean @where(key: "est_actif")
-        moderateurId: ID @whereHas(relation: "moderateurs", key: "users.id")
+        moderateurId: ID @builder(method: "App\\GraphQL\\Builders\\ProjectBuilder@filterByModerateur")
     ): [Project!]! @all(model: "App\\Models\\Project") @guard
 
     "Un projet par ID"
