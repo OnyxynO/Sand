@@ -1,0 +1,103 @@
+services:
+  # Application PHP (Laravel)
+  app:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: sand-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - sand-network
+    depends_on:
+      - db
+      - redis
+
+  # Serveur Web Nginx
+  nginx:
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+    container_name: sand-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./backend:/var/www/html
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - sand-network
+    depends_on:
+      - app
+
+  # Base de données PostgreSQL
+  db:
+    image: postgres:16-alpine
+    container_name: sand-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-sand}
+      POSTGRES_USER: ${DB_USERNAME:-sand}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+    ports:
+      - "5432:5432"
+    volumes:
+      - sand-db-data:/var/lib/postgresql/data
+    networks:
+      - sand-network
+
+  # Cache Redis
+  redis:
+    image: redis:7-alpine
+    container_name: sand-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - sand-redis-data:/data
+    networks:
+      - sand-network
+
+  # Frontend React (développement)
+  frontend:
+    build:
+      context: ./docker/node
+      dockerfile: Dockerfile
+    container_name: sand-frontend
+    restart: unless-stopped
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - sand-network
+    command: npm run dev -- --host
+    depends_on:
+      - nginx
+
+  # Mock API RH (développement)
+  mock-rh:
+    image: node:20-alpine
+    container_name: sand-mock-rh
+    restart: unless-stopped
+    working_dir: /app
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./docker/mock-rh:/app
+    networks:
+      - sand-network
+    command: node server.js
+
+networks:
+  sand-network:
+    driver: bridge
+
+volumes:
+  sand-db-data:
+  sand-redis-data:
