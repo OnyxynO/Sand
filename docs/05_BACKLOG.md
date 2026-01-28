@@ -1,0 +1,493 @@
+# SAND - Backlog
+
+> Phases de développement et user stories
+
+---
+
+## Vue d'ensemble des phases
+
+```mermaid
+gantt
+    title Phases de développement SAND
+    dateFormat  YYYY-MM-DD
+    section Phase 1
+    Fondations           :p1, 2025-02-01, 2w
+    section Phase 2
+    Core Features        :p2, after p1, 3w
+    section Phase 3
+    Intégrations         :p3, after p2, 2w
+    section Phase 4
+    Reporting            :p4, after p3, 2w
+    section Phase 5
+    Polish               :p5, after p4, 1w
+```
+
+---
+
+## Phase 1 - Fondations
+
+### Objectif
+Mettre en place l'infrastructure technique et l'authentification.
+
+### User Stories
+
+#### US-1.1 : Setup Docker
+> **En tant que** développeur
+> **Je veux** un environnement Docker fonctionnel
+> **Afin de** pouvoir développer en local sans configuration manuelle
+
+**Critères d'acceptation :**
+- [ ] `docker-compose up` démarre tous les services
+- [ ] Laravel accessible sur `localhost:8080`
+- [ ] React (Vite) accessible sur `localhost:5173`
+- [ ] PostgreSQL accessible sur `localhost:5432`
+- [ ] Redis accessible sur `localhost:6379`
+
+---
+
+#### US-1.2 : Modèles et migrations
+> **En tant que** développeur
+> **Je veux** les modèles Eloquent et migrations
+> **Afin d'** avoir la structure de base de données
+
+**Critères d'acceptation :**
+- [ ] Toutes les tables créées (voir 02_SPEC_TECHNIQUE.md)
+- [ ] Relations Eloquent définies
+- [ ] Soft delete sur User, Project, Activity, TimeEntry
+- [ ] Index de performance ajoutés
+- [ ] Seeder pour données de test
+
+---
+
+#### US-1.3 : Authentification
+> **En tant qu'** utilisateur
+> **Je veux** me connecter avec email/mot de passe
+> **Afin d'** accéder à l'application
+
+**Critères d'acceptation :**
+- [ ] Sanctum SPA auth configuré
+- [ ] Login/logout fonctionnels
+- [ ] Protection CSRF active
+- [ ] Rate limiting sur login (5/minute)
+- [ ] Redirection si non authentifié
+
+---
+
+#### US-1.4 : Setup GraphQL
+> **En tant que** développeur
+> **Je veux** l'API GraphQL de base
+> **Afin de** pouvoir requêter les données
+
+**Critères d'acceptation :**
+- [ ] Lighthouse installé et configuré
+- [ ] Query `me` retourne l'utilisateur connecté
+- [ ] GraphQL Playground accessible en dev
+- [ ] Types de base définis (User, Team, Project, Activity)
+
+---
+
+#### US-1.5 : Setup Frontend React
+> **En tant que** développeur
+> **Je veux** le frontend React configuré
+> **Afin de** pouvoir développer l'interface
+
+**Critères d'acceptation :**
+- [ ] Vite + React + TypeScript
+- [ ] Apollo Client configuré
+- [ ] Tailwind CSS installé
+- [ ] Routing (React Router)
+- [ ] Page de login fonctionnelle
+
+---
+
+## Phase 2 - Fonctionnalités Core
+
+### Objectif
+Implémenter la saisie des temps et l'administration.
+
+### User Stories
+
+#### US-2.1 : CRUD Utilisateurs
+> **En tant qu'** admin
+> **Je veux** gérer les utilisateurs
+> **Afin de** contrôler les accès
+
+**Critères d'acceptation :**
+- [ ] Liste des utilisateurs avec recherche
+- [ ] Création d'utilisateur (email, nom, rôle, équipe)
+- [ ] Modification d'utilisateur
+- [ ] Suppression (soft delete)
+- [ ] Attribution des rôles (user/moderator/admin)
+
+---
+
+#### US-2.2 : CRUD Équipes
+> **En tant qu'** admin
+> **Je veux** gérer les équipes
+> **Afin d'** organiser les utilisateurs par service
+
+**Critères d'acceptation :**
+- [ ] Liste des équipes
+- [ ] Création/modification/suppression
+- [ ] Voir les membres d'une équipe
+
+---
+
+#### US-2.3 : Gestion de l'arborescence des activités
+> **En tant qu'** admin
+> **Je veux** gérer l'arborescence des activités
+> **Afin de** définir les types de tâches disponibles
+
+**Critères d'acceptation :**
+- [ ] Affichage en arbre avec chevrons pliables
+- [ ] Création d'activité (nom, parent)
+- [ ] Modification/suppression
+- [ ] Réorganisation par drag & drop ou boutons
+- [ ] Path matérialisé mis à jour automatiquement
+- [ ] Activité "Absence" protégée (is_system)
+
+---
+
+#### US-2.4 : CRUD Projets avec activation tri-state
+> **En tant qu'** admin
+> **Je veux** gérer les projets et leurs activités
+> **Afin de** configurer ce qui est disponible pour chaque projet
+
+**Critères d'acceptation :**
+- [ ] Liste des projets (actifs/archivés)
+- [ ] Création/modification projet (nom, description)
+- [ ] Archivage (soft delete)
+- [ ] Arbre des activités avec checkboxes tri-state
+- [ ] Cycle : vide → tout → vide
+- [ ] État indéterminé calculé automatiquement
+- [ ] Attribution des modérateurs
+
+---
+
+#### US-2.5 : Toast d'annulation
+> **En tant qu'** admin
+> **Je veux** pouvoir annuler une désactivation massive
+> **Afin d'** éviter les erreurs
+
+**Critères d'acceptation :**
+- [ ] Toast affiché après désactivation de >3 activités
+- [ ] Message "X activités désactivées [Annuler]"
+- [ ] Barre de progression (délai configurable)
+- [ ] Clic sur Annuler restaure l'état précédent
+- [ ] Délai par défaut : 5 secondes
+
+---
+
+#### US-2.6 : Visibilité par utilisateur
+> **En tant qu'** admin
+> **Je veux** masquer certaines activités pour certains utilisateurs
+> **Afin de** restreindre l'accès
+
+**Critères d'acceptation :**
+- [ ] Section "Visibilité" dans config projet
+- [ ] Ajout de restriction (activité + utilisateurs)
+- [ ] Suppression de restriction
+- [ ] Scope par projet (pas global)
+
+---
+
+#### US-2.7 : Interface de saisie hebdomadaire
+> **En tant qu'** utilisateur
+> **Je veux** saisir mes temps sur une grille hebdomadaire
+> **Afin de** déclarer mon activité
+
+**Critères d'acceptation :**
+- [ ] Grille lundi-vendredi (configurable)
+- [ ] Navigation entre semaines
+- [ ] Sélection projet → arborescence activités filtrée
+- [ ] Saisie par cellule (0.01 à 1.00)
+- [ ] Validation 2 décimales max
+- [ ] Total par jour affiché
+- [ ] Warning si total ≠ 1.0 (jour passé/présent)
+- [ ] Commentaire par saisie
+
+---
+
+#### US-2.8 : Blocage semaines futures
+> **En tant qu'** utilisateur
+> **Je veux** voir les semaines futures en lecture seule
+> **Afin de** ne pas saisir par erreur
+
+**Critères d'acceptation :**
+- [ ] Navigation vers semaines futures possible
+- [ ] Cellules en lecture seule (grisées)
+- [ ] Message explicatif affiché
+
+---
+
+#### US-2.9 : Unicité des saisies
+> **En tant que** système
+> **Je veux** une seule ligne par user/date/activité/projet
+> **Afin d'** éviter les doublons
+
+**Critères d'acceptation :**
+- [ ] Contrainte unique en base
+- [ ] Mutation update si saisie existe
+- [ ] Mutation create sinon
+- [ ] Message d'erreur clair si conflit
+
+---
+
+#### US-2.10 : Historique des modifications
+> **En tant qu'** admin/modérateur
+> **Je veux** voir l'historique des modifications
+> **Afin de** tracer les changements
+
+**Critères d'acceptation :**
+- [ ] Log créé à chaque create/update/delete
+- [ ] Stockage old_value/new_value en JSON
+- [ ] Affichage dans détail d'une saisie
+- [ ] Qui a modifié + quand
+
+---
+
+## Phase 3 - Intégrations & Modération
+
+### Objectif
+Intégrer les absences et la modération.
+
+### User Stories
+
+#### US-3.1 : Mock service RH
+> **En tant que** développeur
+> **Je veux** un service simulant l'API RH
+> **Afin de** tester l'import des absences
+
+**Critères d'acceptation :**
+- [ ] Container Docker dédié
+- [ ] Endpoint GET /absences?user=X&start=Y&end=Z
+- [ ] Données configurables (JSON/seed)
+- [ ] Simule authentification LDAP (mock)
+
+---
+
+#### US-3.2 : Import des absences
+> **En tant qu'** utilisateur
+> **Je veux** que mes congés soient importés automatiquement
+> **Afin de** ne pas les saisir manuellement
+
+**Critères d'acceptation :**
+- [ ] Mutation `syncAbsences`
+- [ ] Appel au service RH (mock)
+- [ ] Création des absences en base
+- [ ] Support absence partielle (0.5 ETP)
+
+---
+
+#### US-3.3 : Gestion des conflits absences
+> **En tant qu'** utilisateur
+> **Je veux** être prévenu en cas de conflit absence/saisie
+> **Afin de** choisir comment le résoudre
+
+**Critères d'acceptation :**
+- [ ] Détection conflit à l'import
+- [ ] Notification créée
+- [ ] Interface de résolution (écraser/ignorer/ajuster)
+- [ ] Warning si total > 1.0
+
+---
+
+#### US-3.4 : Droits modérateur
+> **En tant que** modérateur
+> **Je veux** voir et modifier les saisies de mon équipe
+> **Afin de** corriger les erreurs
+
+**Critères d'acceptation :**
+- [ ] Accès aux saisies des users de ses projets
+- [ ] Création de saisie pour un autre user
+- [ ] Modification de saisie
+- [ ] Suppression de saisie
+- [ ] Log de qui a modifié
+
+---
+
+#### US-3.5 : Page de supervision
+> **En tant que** modérateur/admin
+> **Je veux** voir les anomalies de saisie
+> **Afin de** les traiter
+
+**Critères d'acceptation :**
+- [ ] Liste des anomalies (incomplet, dépassement, vide)
+- [ ] Filtres (projet, équipe, période)
+- [ ] Clic → accès à la saisie de l'utilisateur
+- [ ] Modérateur : ses projets uniquement
+- [ ] Admin : tous les projets
+
+---
+
+#### US-3.6 : Système de notifications
+> **En tant qu'** utilisateur
+> **Je veux** recevoir des notifications
+> **Afin d'** être informé des anomalies
+
+**Critères d'acceptation :**
+- [ ] Icône cloche dans le header
+- [ ] Badge compteur (non lues)
+- [ ] Panneau latéral listant les notifications
+- [ ] Marquage lu/non lu
+- [ ] Chargement au refresh (pas temps réel)
+
+---
+
+## Phase 4 - Reporting
+
+### Objectif
+Statistiques et exports.
+
+### User Stories
+
+#### US-4.1 : Dashboard statistiques
+> **En tant qu'** utilisateur
+> **Je veux** voir mes statistiques
+> **Afin de** suivre mon activité
+
+**Critères d'acceptation :**
+- [ ] Total temps par période
+- [ ] Répartition par projet (graphique)
+- [ ] Taux de complétion (jours complets)
+
+---
+
+#### US-4.2 : Stats projet (modérateur)
+> **En tant que** modérateur
+> **Je veux** voir les stats de mes projets
+> **Afin de** piloter l'activité
+
+**Critères d'acceptation :**
+- [ ] Temps total par projet
+- [ ] Répartition par activité
+- [ ] Répartition par utilisateur
+- [ ] Évolution mensuelle (courbe)
+
+---
+
+#### US-4.3 : Stats globales (admin)
+> **En tant qu'** admin
+> **Je veux** voir les stats globales
+> **Afin de** piloter l'organisation
+
+**Critères d'acceptation :**
+- [ ] Vue tous projets
+- [ ] Vue par équipe
+- [ ] Filtres période
+- [ ] Comparatif entre périodes
+
+---
+
+#### US-4.4 : Export CSV asynchrone
+> **En tant qu'** admin
+> **Je veux** exporter les données en CSV
+> **Afin de** faire des analyses externes
+
+**Critères d'acceptation :**
+- [ ] Bouton "Exporter"
+- [ ] Sélection filtres (période, projet, équipe)
+- [ ] Job asynchrone lancé
+- [ ] Notification quand prêt
+- [ ] Lien de téléchargement (expire après 24h)
+
+---
+
+#### US-4.5 : Configuration système
+> **En tant qu'** admin
+> **Je veux** configurer les paramètres système
+> **Afin de** personnaliser l'application
+
+**Critères d'acceptation :**
+- [ ] Page Config. Système
+- [ ] Délai d'annulation (undo)
+- [ ] Affichage weekends
+- [ ] Premier jour de semaine
+- [ ] Sauvegarde en base (settings)
+
+---
+
+## Phase 5 - Polish
+
+### Objectif
+Finalisation et qualité.
+
+### User Stories
+
+#### US-5.1 : Responsive design
+> **En tant qu'** utilisateur mobile
+> **Je veux** utiliser l'app sur téléphone
+> **Afin de** saisir en déplacement
+
+**Critères d'acceptation :**
+- [ ] Breakpoints Tailwind (sm, md, lg)
+- [ ] Mobile : vue jour par jour
+- [ ] Tablette : grille scrollable
+- [ ] Menu hamburger sur petit écran
+
+---
+
+#### US-5.2 : Tests backend
+> **En tant que** développeur
+> **Je veux** des tests automatisés
+> **Afin de** garantir la qualité
+
+**Critères d'acceptation :**
+- [ ] Tests unitaires (Models, Services)
+- [ ] Tests Feature (GraphQL mutations)
+- [ ] Tests Policy (autorisations)
+- [ ] Coverage > 70%
+
+---
+
+#### US-5.3 : Tests frontend
+> **En tant que** développeur
+> **Je veux** des tests frontend
+> **Afin de** garantir l'UI
+
+**Critères d'acceptation :**
+- [ ] Tests composants (Vitest)
+- [ ] Tests hooks
+- [ ] Tests intégration (formulaires)
+
+---
+
+#### US-5.4 : Documentation API
+> **En tant que** développeur
+> **Je veux** une documentation API
+> **Afin de** faciliter le développement
+
+**Critères d'acceptation :**
+- [ ] GraphQL Playground accessible
+- [ ] Descriptions sur tous les types/champs
+- [ ] Exemples de requêtes
+
+---
+
+#### US-5.5 : Optimisations performance
+> **En tant qu'** utilisateur
+> **Je veux** une app rapide
+> **Afin d'** avoir une bonne expérience
+
+**Critères d'acceptation :**
+- [ ] Cache arborescence activités
+- [ ] Lazy loading composants React
+- [ ] Pagination sur les listes longues
+- [ ] Index DB optimisés
+
+---
+
+## Évolutions futures (hors scope v1)
+
+| Feature | Description |
+|---------|-------------|
+| LDAP/SSO | Authentification entreprise |
+| Mobile app | React Native |
+| Notifications push | Rappel de saisie hebdo |
+| Calendrier | Import Outlook/Google |
+| PWA | Mode hors-ligne |
+| Multi-org | Plusieurs instances/organisations |
+
+---
+
+*Document v1.0 - Janvier 2025*
