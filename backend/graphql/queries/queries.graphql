@@ -1,0 +1,119 @@
+extend type Query {
+    # ─── Auth ───────────────────────────────────────
+    "Utilisateur connecte"
+    me: User @auth
+
+    # ─── Users ──────────────────────────────────────
+    "Liste des utilisateurs"
+    users(
+        equipeId: ID @where(key: "equipe_id")
+        role: UserRole @where(key: "role")
+        search: String @where(key: "nom", operator: "like")
+        actifSeulement: Boolean @scope(name: "actif")
+    ): [User!]! @paginate(defaultCount: 20, model: "App\\Models\\User") @guard
+
+    "Un utilisateur par ID"
+    user(id: ID! @eq): User @find(model: "App\\Models\\User") @guard
+
+    # ─── Teams ──────────────────────────────────────
+    "Liste des equipes"
+    equipes(
+        actifSeulement: Boolean @scope(name: "actif")
+    ): [Team!]! @all(model: "App\\Models\\Team") @guard
+
+    "Une equipe par ID"
+    equipe(id: ID! @eq): Team @find(model: "App\\Models\\Team") @guard
+
+    # ─── Projects ───────────────────────────────────
+    "Liste des projets"
+    projets(
+        actif: Boolean @where(key: "est_actif")
+        moderateurId: ID @whereHas(relation: "moderateurs", key: "users.id")
+    ): [Project!]! @all(model: "App\\Models\\Project") @guard
+
+    "Un projet par ID"
+    projet(id: ID! @eq): Project @find(model: "App\\Models\\Project") @guard
+
+    # ─── Activities ─────────────────────────────────
+    "Arborescence complete des activites"
+    arbreActivites: [Activity!]!
+        @all(model: "App\\Models\\Activity", scopes: ["racine", "ordreHierarchique"])
+        @guard
+
+    "Activites disponibles pour un projet"
+    activitesDisponibles(projetId: ID!): [Activity!]!
+        @field(resolver: "App\\GraphQL\\Queries\\ActivitesDisponiblesQuery")
+        @guard
+
+    "Une activite par ID"
+    activite(id: ID! @eq): Activity @find(model: "App\\Models\\Activity") @guard
+
+    # ─── Time Entries ───────────────────────────────
+    "Saisies de temps"
+    saisies(
+        userId: ID @where(key: "user_id")
+        projetId: ID @where(key: "project_id")
+        activiteId: ID @where(key: "activity_id")
+        dateDebut: Date! @where(key: "date", operator: ">=")
+        dateFin: Date! @where(key: "date", operator: "<=")
+    ): [TimeEntry!]! @all(model: "App\\Models\\TimeEntry") @guard
+
+    "Mes saisies de la semaine"
+    mesSaisiesSemaine(semaine: String!): [TimeEntry!]!
+        @field(resolver: "App\\GraphQL\\Queries\\MesSaisiesSemaineQuery")
+        @guard
+
+    # ─── Absences ───────────────────────────────────
+    "Absences"
+    absences(
+        userId: ID @where(key: "user_id")
+        dateDebut: Date! @where(key: "date_debut", operator: ">=")
+        dateFin: Date! @where(key: "date_fin", operator: "<=")
+    ): [Absence!]! @all(model: "App\\Models\\Absence", scopes: ["valide"]) @guard
+
+    # ─── Notifications ──────────────────────────────
+    "Mes notifications"
+    mesNotifications(
+        nonLuSeulement: Boolean @scope(name: "nonLu")
+        limite: Int
+    ): [Notification!]!
+        @field(resolver: "App\\GraphQL\\Queries\\MesNotificationsQuery")
+        @guard
+
+    "Nombre de notifications non lues"
+    nombreNotificationsNonLues: Int!
+        @field(resolver: "App\\GraphQL\\Queries\\NombreNotificationsNonLuesQuery")
+        @guard
+
+    # ─── Statistics ─────────────────────────────────
+    "Statistiques"
+    statistiques(
+        projetId: ID
+        equipeId: ID
+        userId: ID
+        dateDebut: Date!
+        dateFin: Date!
+    ): Statistics!
+        @field(resolver: "App\\GraphQL\\Queries\\StatistiquesQuery")
+        @guard
+
+    # ─── Anomalies ──────────────────────────────────
+    "Anomalies detectees"
+    anomalies(
+        projetId: ID
+        equipeId: ID
+        userId: ID
+        dateDebut: Date!
+        dateFin: Date!
+        types: [AnomalyType!]
+    ): [Anomaly!]!
+        @field(resolver: "App\\GraphQL\\Queries\\AnomaliesQuery")
+        @guard
+
+    # ─── Settings ───────────────────────────────────
+    "Liste des parametres systeme"
+    parametres: [Setting!]! @all(model: "App\\Models\\Setting") @guard
+
+    "Un parametre par cle"
+    parametre(cle: String! @eq): Setting @find(model: "App\\Models\\Setting") @guard
+}

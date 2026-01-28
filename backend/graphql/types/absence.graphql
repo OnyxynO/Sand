@@ -1,0 +1,30 @@
+"Absence d'un utilisateur"
+type Absence {
+    id: ID!
+    type: String!
+    typeLibelle: String! @rename(attribute: "type_libelle")
+    dateDebut: Date! @rename(attribute: "date_debut")
+    dateFin: Date! @rename(attribute: "date_fin")
+    dureeJournaliere: Float! @rename(attribute: "duree_journaliere")
+    statut: String!
+    referenceExterne: String @rename(attribute: "reference_externe")
+    importeLe: DateTime @rename(attribute: "importe_le")
+    createdAt: DateTime! @rename(attribute: "created_at")
+    updatedAt: DateTime! @rename(attribute: "updated_at")
+
+    "Nombre de jours d'absence"
+    nombreJours: Int! @rename(attribute: "nombre_jours")
+
+    "Total ETP de l'absence"
+    totalEtp: Float! @rename(attribute: "total_etp")
+
+    "Utilisateur concerne"
+    utilisateur: User! @belongsTo(relation: "utilisateur")
+}
+
+"Resultat d'une synchronisation d'absences"
+type SyncResult {
+    importes: Int!
+    conflits: Int!
+    erreurs: [String!]!
+}

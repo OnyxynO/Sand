@@ -1,0 +1,27 @@
+"Activite (arborescence)"
+type Activity {
+    id: ID!
+    nom: String!
+    code: String
+    description: String
+    chemin: String!
+    niveau: Int!
+    ordre: Int!
+    estFeuille: Boolean! @rename(attribute: "est_feuille")
+    estSysteme: Boolean! @rename(attribute: "est_systeme")
+    estActif: Boolean! @rename(attribute: "est_actif")
+    createdAt: DateTime! @rename(attribute: "created_at")
+    updatedAt: DateTime! @rename(attribute: "updated_at")
+
+    "Activite parente"
+    parent: Activity @belongsTo(relation: "parent")
+
+    "Activites enfants"
+    enfants: [Activity!]! @hasMany(relation: "enfants")
+
+    "Chemin complet avec noms"
+    cheminComplet: String! @rename(attribute: "chemin_complet")
+
+    "Projets sur lesquels cette activite est activee"
+    projets: [Project!]! @belongsToMany(relation: "projets")
+}

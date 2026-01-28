@@ -1,0 +1,50 @@
+"Role d'un utilisateur dans le systeme"
+enum UserRole {
+    UTILISATEUR @enum(value: "utilisateur")
+    MODERATEUR @enum(value: "moderateur")
+    ADMIN @enum(value: "admin")
+}
+
+"Type d'action dans l'historique"
+enum LogAction {
+    CREATION @enum(value: "creation")
+    MODIFICATION @enum(value: "modification")
+    SUPPRESSION @enum(value: "suppression")
+}
+
+"Type de notification"
+enum NotificationType {
+    SAISIE_INCOMPLETE @enum(value: "saisie_incomplete")
+    ABSENCE_IMPORTEE @enum(value: "absence_importee")
+    CONFLIT_ABSENCE @enum(value: "conflit_absence")
+    EXPORT_PRET @enum(value: "export_pret")
+    SYSTEME @enum(value: "systeme")
+}
+
+"Type d'anomalie detectee"
+enum AnomalyType {
+    JOUR_INCOMPLET
+    JOUR_DEPASSE
+    SEMAINE_VIDE
+    CONFLIT_ABSENCE
+}
+
+"Resolution d'un conflit d'absence"
+enum ConflictResolution {
+    ECRASER
+    IGNORER
+    AJUSTER
+}
+
+"Format d'export"
+enum ExportFormat {
+    CSV
+}
+
+"Statut d'un job d'export"
+enum ExportStatus {
+    EN_ATTENTE
+    EN_COURS
+    TERMINE
+    ECHEC
+}

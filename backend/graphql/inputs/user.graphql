@@ -1,0 +1,22 @@
+"Creation d'un utilisateur"
+input CreateUserInput {
+    matricule: String @rules(apply: ["nullable", "unique:users,matricule"])
+    nom: String! @rules(apply: ["required", "max:255"])
+    prenom: String! @rules(apply: ["required", "max:255"])
+    email: String! @rules(apply: ["required", "email", "unique:users,email"])
+    password: String! @rules(apply: ["required", "min:8"])
+    role: UserRole! @rules(apply: ["required"])
+    equipeId: ID @rename(attribute: "equipe_id")
+}
+
+"Modification d'un utilisateur"
+input UpdateUserInput {
+    matricule: String
+    nom: String @rules(apply: ["max:255"])
+    prenom: String @rules(apply: ["max:255"])
+    email: String @rules(apply: ["email"])
+    password: String @rules(apply: ["min:8"])
+    role: UserRole
+    equipeId: ID @rename(attribute: "equipe_id")
+    estActif: Boolean @rename(attribute: "est_actif")
+}

@@ -1,0 +1,19 @@
+extend type Mutation {
+    "Creer une equipe (Admin)"
+    createTeam(input: TeamInput! @spread): Team!
+        @create(model: "App\\Models\\Team")
+        @guard
+        @can(ability: "create", model: "App\\Models\\Team")
+
+    "Modifier une equipe (Admin)"
+    updateTeam(id: ID!, input: TeamInput! @spread): Team!
+        @update(model: "App\\Models\\Team")
+        @guard
+        @can(ability: "update", find: "id", model: "App\\Models\\Team")
+
+    "Supprimer une equipe (Admin)"
+    deleteTeam(id: ID!): Boolean!
+        @delete(model: "App\\Models\\Team")
+        @guard
+        @can(ability: "delete", find: "id", model: "App\\Models\\Team")
+}

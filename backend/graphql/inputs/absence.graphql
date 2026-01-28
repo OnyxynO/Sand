@@ -1,0 +1,8 @@
+"Donnees d'une absence"
+input AbsenceInput {
+    userId: ID! @rename(attribute: "user_id") @rules(apply: ["required", "exists:users,id"])
+    type: String! @rules(apply: ["required"])
+    dateDebut: Date! @rename(attribute: "date_debut") @rules(apply: ["required", "date"])
+    dateFin: Date! @rename(attribute: "date_fin") @rules(apply: ["required", "date", "after_or_equal:date_debut"])
+    dureeJournaliere: Float @rename(attribute: "duree_journaliere") @rules(apply: ["numeric", "min:0.5", "max:1"])
+}

@@ -1,0 +1,6 @@
+extend type Mutation {
+    "Demander un export"
+    requestExport(input: ExportInput! @spread): ExportJob!
+        @field(resolver: "App\\GraphQL\\Mutations\\ExportMutator@request")
+        @guard
+}

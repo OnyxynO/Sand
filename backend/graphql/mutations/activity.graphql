@@ -1,0 +1,37 @@
+extend type Mutation {
+    "Creer une activite (Admin)"
+    createActivity(input: CreateActivityInput! @spread): Activity!
+        @field(resolver: "App\\GraphQL\\Mutations\\ActivityMutator@create")
+        @guard
+        @can(ability: "create", model: "App\\Models\\Activity")
+
+    "Modifier une activite (Admin)"
+    updateActivity(id: ID!, input: UpdateActivityInput! @spread): Activity!
+        @field(resolver: "App\\GraphQL\\Mutations\\ActivityMutator@update")
+        @guard
+        @can(ability: "update", find: "id", model: "App\\Models\\Activity")
+
+    "Supprimer une activite (Admin, soft delete)"
+    deleteActivity(id: ID!): Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\ActivityMutator@delete")
+        @guard
+        @can(ability: "delete", find: "id", model: "App\\Models\\Activity")
+
+    "Restaurer une activite supprimee (Admin)"
+    restoreActivity(id: ID!): Activity!
+        @field(resolver: "App\\GraphQL\\Mutations\\ActivityMutator@restore")
+        @guard
+        @can(ability: "restore", model: "App\\Models\\Activity")
+
+    "Deplacer une activite dans l'arborescence"
+    moveActivity(id: ID!, parentId: ID, ordre: Int!): Activity!
+        @field(resolver: "App\\GraphQL\\Mutations\\ActivityMutator@move")
+        @guard
+        @can(ability: "update", find: "id", model: "App\\Models\\Activity")
+
+    "Reordonner des activites"
+    reorderActivities(ids: [ID!]!): [Activity!]!
+        @field(resolver: "App\\GraphQL\\Mutations\\ActivityMutator@reorder")
+        @guard
+        @can(ability: "update", model: "App\\Models\\Activity")
+}

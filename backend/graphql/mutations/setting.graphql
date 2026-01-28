@@ -1,0 +1,13 @@
+extend type Mutation {
+    "Modifier un parametre systeme (Admin)"
+    updateSetting(cle: String!, valeur: JSON!): Setting!
+        @field(resolver: "App\\GraphQL\\Mutations\\SettingMutator@update")
+        @guard
+        @can(ability: "update", model: "App\\Models\\Setting")
+
+    "Modifier plusieurs parametres (Admin)"
+    updateSettings(settings: [SettingInput!]!): [Setting!]!
+        @field(resolver: "App\\GraphQL\\Mutations\\SettingMutator@updateMultiple")
+        @guard
+        @can(ability: "update", model: "App\\Models\\Setting")
+}

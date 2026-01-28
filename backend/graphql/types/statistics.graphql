@@ -1,0 +1,60 @@
+"Statistiques agregees"
+type Statistics {
+    tempsTotal: Float!
+    parProjet: [ProjectStat!]!
+    parActivite: [ActivityStat!]!
+    parUtilisateur: [UserStat!]!
+    parJour: [DayStat!]!
+}
+
+"Statistiques par projet"
+type ProjectStat {
+    projet: Project!
+    tempsTotal: Float!
+    pourcentage: Float!
+}
+
+"Statistiques par activite"
+type ActivityStat {
+    activite: Activity!
+    tempsTotal: Float!
+    pourcentage: Float!
+}
+
+"Statistiques par utilisateur"
+type UserStat {
+    utilisateur: User!
+    tempsTotal: Float!
+    tauxCompletion: Float!
+}
+
+"Statistiques par jour"
+type DayStat {
+    date: Date!
+    tempsTotal: Float!
+    estComplet: Boolean!
+}
+
+"Anomalie detectee"
+type Anomaly {
+    id: ID!
+    type: AnomalyType!
+    utilisateur: User!
+    date: Date
+    semaine: String
+    detail: String!
+    projet: Project
+}
+
+"Job d'export"
+type ExportJob {
+    id: ID!
+    statut: ExportStatus!
+    urlTelechargement: String
+    expireLe: DateTime
+}
+
+"Payload d'authentification"
+type AuthPayload {
+    user: User!
+}

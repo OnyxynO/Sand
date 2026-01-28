@@ -1,0 +1,28 @@
+extend type Mutation {
+    "Creer une saisie de temps"
+    createTimeEntry(input: TimeEntryInput! @spread): TimeEntry!
+        @field(resolver: "App\\GraphQL\\Mutations\\TimeEntryMutator@create")
+        @guard
+
+    "Modifier une saisie de temps"
+    updateTimeEntry(id: ID!, input: TimeEntryInput! @spread): TimeEntry!
+        @field(resolver: "App\\GraphQL\\Mutations\\TimeEntryMutator@update")
+        @guard
+        @can(ability: "update", find: "id", model: "App\\Models\\TimeEntry")
+
+    "Supprimer une saisie de temps"
+    deleteTimeEntry(id: ID!): Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\TimeEntryMutator@delete")
+        @guard
+        @can(ability: "delete", find: "id", model: "App\\Models\\TimeEntry")
+
+    "Creer plusieurs saisies d'un coup"
+    bulkCreateTimeEntries(inputs: [TimeEntryInput!]!): [TimeEntry!]!
+        @field(resolver: "App\\GraphQL\\Mutations\\TimeEntryMutator@bulkCreate")
+        @guard
+
+    "Mettre a jour plusieurs saisies d'un coup"
+    bulkUpdateTimeEntries(entries: [BulkUpdateEntry!]!): [TimeEntry!]!
+        @field(resolver: "App\\GraphQL\\Mutations\\TimeEntryMutator@bulkUpdate")
+        @guard
+}

@@ -1,0 +1,40 @@
+"Utilisateur du systeme"
+type User {
+    id: ID!
+    matricule: String
+    nom: String!
+    prenom: String!
+    email: String!
+    role: UserRole!
+    estActif: Boolean! @rename(attribute: "est_actif")
+    createdAt: DateTime! @rename(attribute: "created_at")
+    updatedAt: DateTime! @rename(attribute: "updated_at")
+
+    "Nom complet (prenom + nom)"
+    nomComplet: String! @rename(attribute: "nom_complet")
+
+    "Equipe de l'utilisateur"
+    equipe: Team @belongsTo(relation: "equipe")
+
+    "Projets auxquels l'utilisateur est affecte"
+    projets: [Project!]! @belongsToMany(relation: "projets")
+
+    "Projets que l'utilisateur modere"
+    projetsModeres: [Project!]! @belongsToMany(relation: "projetsModeres")
+
+    "Saisies de l'utilisateur"
+    saisies(
+        dateDebut: Date @where(key: "date", operator: ">=")
+        dateFin: Date @where(key: "date", operator: "<=")
+        projectId: ID @where(key: "project_id")
+    ): [TimeEntry!]! @hasMany(relation: "saisies")
+
+    "Absences de l'utilisateur"
+    absences(
+        dateDebut: Date @where(key: "date_debut", operator: ">=")
+        dateFin: Date @where(key: "date_fin", operator: "<=")
+    ): [Absence!]! @hasMany(relation: "absences")
+
+    "Notifications de l'utilisateur"
+    notifications(nonLuSeulement: Boolean @scope(name: "nonLu")): [Notification!]! @hasMany(relation: "notifications")
+}
