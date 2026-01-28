@@ -1,0 +1,139 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature;
+
+use App\Models\User;
+use App\Models\Team;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+use Tests\Traits\GraphQLTestTrait;
+
+class AuthGraphQLTest extends TestCase
+{
+    use RefreshDatabase;
+    use GraphQLTestTrait;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Creer une equipe pour les utilisateurs
+        Team::factory()->create(['id' => 1, 'nom' => 'Test', 'code' => 'TEST']);
+    }
+
+    public function test_login_avec_identifiants_valides(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'test@example.com',
+            'password' => bcrypt('password'),
+            'est_actif' => true,
+        ]);
+
+        $response = $this->graphql('
+            mutation Login($input: LoginInput!) {
+                login(input: $input) {
+                    user {
+                        id
+                        email
+                    }
+                    token
+                }
+            }
+        ', [
+            'input' => [
+                'email' => 'test@example.com',
+                'password' => 'password',
+            ],
+        ]);
+
+        $this->assertGraphQLSuccess($response);
+        $data = $this->getGraphQLData($response, 'login');
+
+        $this->assertEquals($user->id, $data['user']['id']);
+        $this->assertEquals('test@example.com', $data['user']['email']);
+        $this->assertNotEmpty($data['token']);
+    }
+
+    public function test_login_avec_identifiants_invalides(): void
+    {
+        User::factory()->create([
+            'email' => 'test@example.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        $response = $this->graphql('
+            mutation Login($input: LoginInput!) {
+                login(input: $input) {
+                    user { id }
+                }
+            }
+        ', [
+            'input' => [
+                'email' => 'test@example.com',
+                'password' => 'wrong_password',
+            ],
+        ]);
+
+        $this->assertGraphQLError($response);
+    }
+
+    public function test_login_avec_compte_desactive(): void
+    {
+        User::factory()->create([
+            'email' => 'test@example.com',
+            'password' => bcrypt('password'),
+            'est_actif' => false,
+        ]);
+
+        $response = $this->graphql('
+            mutation Login($input: LoginInput!) {
+                login(input: $input) {
+                    user { id }
+                }
+            }
+        ', [
+            'input' => [
+                'email' => 'test@example.com',
+                'password' => 'password',
+            ],
+        ]);
+
+        $this->assertGraphQLError($response);
+    }
+
+    public function test_me_retourne_utilisateur_connecte(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->graphqlAsUser('{ me { id nom prenom email } }', [], $user);
+
+        $this->assertGraphQLSuccess($response);
+        $data = $this->getGraphQLData($response, 'me');
+
+        $this->assertEquals($user->id, $data['id']);
+        $this->assertEquals($user->nom, $data['nom']);
+        $this->assertEquals($user->email, $data['email']);
+    }
+
+    public function test_me_retourne_null_sans_authentification(): void
+    {
+        $response = $this->graphql('{ me { id } }');
+
+        $response->assertOk();
+        $this->assertNull($this->getGraphQLData($response, 'me'));
+    }
+
+    public function test_logout_fonctionne(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->graphqlAsUser('mutation { logout }', [], $user);
+
+        // Logout doit retourner true meme si pas de token actif
+        $response->assertOk();
+        $data = $response->json('data.logout');
+        $this->assertTrue($data);
+    }
+}
