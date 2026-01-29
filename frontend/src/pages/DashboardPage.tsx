@@ -5,9 +5,9 @@ export default function DashboardPage() {
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
-      case 'admin':
+      case 'ADMIN':
         return 'bg-purple-100 text-purple-800';
-      case 'moderateur':
+      case 'MODERATEUR':
         return 'bg-blue-100 text-blue-800';
       default:
         return 'bg-gray-100 text-gray-800';
@@ -16,9 +16,9 @@ export default function DashboardPage() {
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case 'admin':
+      case 'ADMIN':
         return 'Administrateur';
-      case 'moderateur':
+      case 'MODERATEUR':
         return 'Moderateur';
       default:
         return 'Utilisateur';

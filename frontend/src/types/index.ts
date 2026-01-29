@@ -1,11 +1,14 @@
 // Types metier
 
+// Roles en majuscules comme retournes par l'API GraphQL
+export type UserRole = 'UTILISATEUR' | 'MODERATEUR' | 'ADMIN';
+
 export interface Utilisateur {
   id: string;
   nom: string;
   prenom: string;
   email: string;
-  role: 'utilisateur' | 'moderateur' | 'admin';
+  role: UserRole;
   equipe?: Equipe;
 }
 

@@ -1,9 +1,11 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 
+import type { UserRole } from '../types';
+
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  roles?: ('utilisateur' | 'moderateur' | 'admin')[];
+  roles?: UserRole[];
 }
 
 export default function ProtectedRoute({ children, roles }: ProtectedRouteProps) {
