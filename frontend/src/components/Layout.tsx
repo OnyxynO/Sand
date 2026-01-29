@@ -28,12 +28,12 @@ export default function Layout() {
   ];
 
   // Navigation moderateur/admin
-  if (utilisateur?.role === 'moderateur' || utilisateur?.role === 'admin') {
+  if (utilisateur?.role === 'MODERATEUR' || utilisateur?.role === 'ADMIN') {
     navigation.push({ nom: 'Projets', href: '/projets' });
   }
 
   // Navigation admin
-  if (utilisateur?.role === 'admin') {
+  if (utilisateur?.role === 'ADMIN') {
     navigation.push({ nom: 'Administration', href: '/admin' });
   }
 
