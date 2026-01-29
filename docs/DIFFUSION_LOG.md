@@ -133,12 +133,12 @@ Ce document repertorie les problemes rencontres lors du developpement et leurs s
   - `backend/config/cors.php` - ajout ports 5174, 5175
   - `backend/.env` - ajout dans SANCTUM_STATEFUL_DOMAINS
 
-#### 16. Hot reload Vite non fiable
+#### 16. Hot reload Vite non fiable (BUG-001)
 - **Probleme** : Modifications de code non appliquees malgre le HMR
 - **Symptome** : Le log Vite montre "hmr update" mais le navigateur garde l'ancien code
 - **Statut** : Non resolu
 - **Workaround** : Hard refresh (Ctrl+Shift+R) ou relancer le serveur
-- **Voir** : `TODO_BUGS.md`
+- **Ref** : `TODO_BUGS.md#BUG-001`
 
 ---
 
