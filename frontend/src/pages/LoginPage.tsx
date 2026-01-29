@@ -32,14 +32,17 @@ export default function LoginPage() {
     e.preventDefault();
     setErreur('');
 
-    if (!email || !password) {
+    const emailTrimmed = email.trim();
+    const passwordTrimmed = password.trim();
+
+    if (!emailTrimmed || !passwordTrimmed) {
       setErreur('Veuillez remplir tous les champs');
       return;
     }
 
     await login({
       variables: {
-        input: { email, password },
+        input: { email: emailTrimmed, password: passwordTrimmed },
       },
     });
   };

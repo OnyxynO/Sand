@@ -1,3 +1,6 @@
+// Reexport des types utilitaires
+export type { JourSemaine } from '../utils/semaineUtils';
+
 // Types metier
 
 // Roles en majuscules comme retournes par l'API GraphQL
@@ -57,4 +60,76 @@ export interface LoginInput {
 export interface AuthPayload {
   user: Utilisateur;
   token: string;
+}
+
+// Types pour la saisie hebdomadaire
+
+export interface SaisieAPI {
+  id: string;
+  date: string;
+  duree: number;
+  commentaire?: string;
+  projet: {
+    id: string;
+    nom: string;
+    code: string;
+  };
+  activite: {
+    id: string;
+    nom: string;
+    chemin: string;
+    cheminComplet: string;
+  };
+}
+
+// Ligne de la grille : un couple projet+activite
+export interface LigneSaisie {
+  id: string; // Identifiant unique de la ligne (projet_activite)
+  projetId: string;
+  projetNom: string;
+  projetCode: string;
+  activiteId: string;
+  activiteNom: string;
+  activiteChemin: string;
+  // Map des saisies par date (YYYY-MM-DD)
+  saisies: Record<string, CelluleSaisieData>;
+}
+
+export interface CelluleSaisieData {
+  id?: string; // ID de la saisie existante (undefined si nouvelle)
+  duree: number | null;
+  commentaire?: string;
+  estModifiee: boolean; // True si modifiee localement
+}
+
+// Pour les mutations GraphQL
+export interface TimeEntryInput {
+  projetId: string;
+  activiteId: string;
+  date: string;
+  duree: number;
+  commentaire?: string;
+}
+
+export interface BulkUpdateEntry {
+  id: string;
+  duree: number;
+  commentaire?: string;
+}
+
+// Types pour les projets et activites
+export interface ProjetDisponible {
+  id: string;
+  nom: string;
+  code: string;
+  estActif: boolean;
+}
+
+export interface ActiviteDisponible {
+  id: string;
+  nom: string;
+  chemin: string;
+  cheminComplet: string;
+  estFeuille: boolean;
+  estActif: boolean;
 }

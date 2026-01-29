@@ -100,6 +100,48 @@ Ce document repertorie les problemes rencontres lors du developpement et leurs s
 
 ---
 
+### Phase 3 - Interface de saisie
+
+#### 13. Apollo Client 4.x - Imports des hooks React
+- **Probleme** : Erreur de compilation `Module '@apollo/client' has no exported member 'useQuery'`
+- **Cause** : Apollo Client 4.x a separe les hooks React dans un sous-module
+- **Solution** : Importer depuis `@apollo/client/react` au lieu de `@apollo/client`
+- **Exemple** :
+  ```typescript
+  // Avant (Apollo 3.x)
+  import { useQuery, useMutation } from '@apollo/client';
+  // Apres (Apollo 4.x)
+  import { useQuery, useMutation } from '@apollo/client/react';
+  ```
+
+#### 14. Apollo Client 4.x - useLazyQuery sans callbacks
+- **Probleme** : Erreur `'onCompleted' does not exist in type 'Options'`
+- **Cause** : Apollo Client 4.x a supprime les callbacks `onCompleted` et `onError` de `useLazyQuery`
+- **Solution** : Utiliser des `useEffect` pour reagir aux changements de `data` et `error`
+- **Exemple** :
+  ```typescript
+  const [fetch, { data, error }] = useLazyQuery(QUERY);
+  useEffect(() => { if (data) handleData(data); }, [data]);
+  useEffect(() => { if (error) handleError(error); }, [error]);
+  ```
+
+#### 15. CORS - Ports de dev alternatifs non autorises
+- **Probleme** : `NetworkError when attempting to fetch resource` lors du login
+- **Cause** : Vite utilise des ports alternatifs (5174, 5175...) si 5173 est occupe
+- **Solution** : Ajouter les ports alternatifs dans `backend/config/cors.php`
+- **Fichiers modifies** :
+  - `backend/config/cors.php` - ajout ports 5174, 5175
+  - `backend/.env` - ajout dans SANCTUM_STATEFUL_DOMAINS
+
+#### 16. Hot reload Vite non fiable
+- **Probleme** : Modifications de code non appliquees malgre le HMR
+- **Symptome** : Le log Vite montre "hmr update" mais le navigateur garde l'ancien code
+- **Statut** : Non resolu
+- **Workaround** : Hard refresh (Ctrl+Shift+R) ou relancer le serveur
+- **Voir** : `TODO_BUGS.md`
+
+---
+
 ## Phase Bonus - Documentation et facilite d'installation
 
 ### Idees a implementer
@@ -185,3 +227,7 @@ docker-compose exec app php artisan migrate --seed
 | 2026-01-28 | 2 | Validation Date | Retrait regle superflue |
 | 2026-01-28 | 2 | etp vs duree | Renommage |
 | 2026-01-28 | 2 | Auth::logout() | Suppression appel |
+| 2026-01-29 | 3 | Apollo Client 4.x imports | Hooks dans @apollo/client/react |
+| 2026-01-29 | 3 | Apollo Client 4.x useLazyQuery | Plus de onCompleted/onError |
+| 2026-01-29 | 3 | CORS port 5175 | Ajout ports alternatifs |
+| 2026-01-29 | 3 | Hot reload Vite | Non resolu (voir TODO_BUGS.md) |
