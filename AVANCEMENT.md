@@ -62,6 +62,31 @@ curl -s -X POST http://localhost:8080/graphql \
 
 ## Historique
 
+### 2026-01-29 - Phase 3 : Frontend (debut)
+
+#### Fait
+- [x] Page de connexion
+  - [x] Formulaire avec validation
+  - [x] Gestion des erreurs (identifiants invalides, compte desactive)
+  - [x] Affichage comptes de test en mode dev
+  - [x] Spinner de chargement
+- [x] Dashboard utilisateur
+  - [x] Message de bienvenue
+  - [x] Carte profil (nom, email, equipe, role)
+  - [x] Placeholders pour futures fonctionnalites
+- [x] Layout principal
+  - [x] Header avec navigation
+  - [x] Menu responsive (mobile)
+  - [x] Bouton deconnexion
+  - [x] Navigation conditionnelle selon role
+- [x] Architecture
+  - [x] Types TypeScript (types/index.ts)
+  - [x] Operations GraphQL (graphql/operations/auth.ts)
+  - [x] Store Zustand avec token (stores/authStore.ts)
+  - [x] Hook useAuthInit pour restaurer session
+  - [x] Composant ProtectedRoute avec verification roles
+  - [x] React Router configure
+
 ### 2026-01-28 - Phase 2 : Test & Integration
 
 #### Fait
@@ -153,9 +178,9 @@ curl -s -X POST http://localhost:8080/graphql \
 - [x] Resolvers manquants
 - [x] Tests PHPUnit de base (23 tests, 74 assertions)
 
-### Phase 3 - Frontend
-- [ ] Page de connexion
-- [ ] Dashboard utilisateur
+### Phase 3 - Frontend [EN COURS]
+- [x] Page de connexion
+- [x] Dashboard utilisateur
 - [ ] Interface de saisie hebdomadaire
 - [ ] Gestion des projets (moderateur)
 - [ ] Administration (admin)
