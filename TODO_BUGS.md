@@ -1,6 +1,6 @@
 # Bugs a corriger
 
-## Login - espaces non trimmes
+## BUG-001 : Login - espaces non trimmes
 - **Fichier** : `frontend/src/pages/LoginPage.tsx`
 - **Probleme** : Les espaces en fin d'email/mot de passe ne sont pas supprimes avant envoi
 - **Impact** : Erreur de connexion si l'utilisateur copie-colle avec des espaces
