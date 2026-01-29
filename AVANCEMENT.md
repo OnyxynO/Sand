@@ -166,6 +166,16 @@ curl -s -X POST http://localhost:8080/graphql \
 - [ ] Notifications temps reel (optionnel)
 - [ ] Tests Vitest
 
+### Phase Bonus - Documentation et facilite d'installation
+Voir `docs/DIFFUSION_LOG.md` pour le detail des problemes rencontres.
+
+- [ ] Mise a jour `.env.example` avec valeurs Docker
+- [ ] Creation `README.md` complet (installation, troubleshooting)
+- [ ] Script `scripts/install.sh` automatise
+- [ ] Fichier `.gitattributes` (LF sur scripts)
+- [ ] Healthchecks Docker
+- [ ] Documentation API (export schema GraphQL)
+
 ---
 
 ## Decisions techniques
