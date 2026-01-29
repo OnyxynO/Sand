@@ -5,6 +5,7 @@ import { useAuthStore } from './stores/authStore';
 // Pages
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import SaisiePage from './pages/SaisiePage';
 
 // Composants
 import Layout from './components/Layout';
@@ -46,8 +47,9 @@ function AppContent() {
       >
         <Route path="/" element={<DashboardPage />} />
 
+        {/* Page de saisie */}
+        <Route path="/saisie" element={<SaisiePage />} />
         {/* Placeholder pour les futures pages */}
-        <Route path="/saisie" element={<PlaceholderPage titre="Saisie hebdomadaire" />} />
         <Route path="/projets" element={<PlaceholderPage titre="Gestion des projets" />} />
         <Route path="/admin" element={<PlaceholderPage titre="Administration" />} />
       </Route>
