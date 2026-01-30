@@ -62,6 +62,46 @@ curl -s -X POST http://localhost:8080/graphql \
 
 ## Historique
 
+### 2026-01-30 - Phase 3 : Frontend (quasi-complete)
+
+#### Fait
+- [x] Interface de saisie hebdomadaire complete
+  - [x] GrilleSemaine.tsx - grille 7 jours editable
+  - [x] GrilleSemaineMobile.tsx - vue mobile en cartes
+  - [x] CelluleSaisie.tsx - cellule editable avec Tab/Enter
+  - [x] LigneSaisie.tsx - ligne projet+activite
+  - [x] TotauxJournaliers.tsx - warnings si != 1.0
+  - [x] SelecteurProjetActivite.tsx - modale ajout ligne
+  - [x] NavigationSemaine.tsx - prev/next/aujourd'hui
+  - [x] BoutonSauvegarde.tsx - barre fixe
+  - [x] useSaisieHebdo.ts - hook chargement/sauvegarde
+  - [x] saisieStore.ts - etat grille Zustand
+  - [x] semaineUtils.ts - calculs dates ISO
+- [x] CRUD Utilisateurs (UtilisateursPage.tsx)
+  - [x] Liste avec recherche
+  - [x] Filtres par role et equipe
+  - [x] Formulaire creation/edition
+  - [x] Soft delete
+- [x] CRUD Equipes (EquipesPage.tsx)
+  - [x] Cartes avec membres
+  - [x] Creation/edition/suppression
+- [x] Arborescence activites (ActivitesPage.tsx)
+  - [x] Affichage en arbre collapsible
+  - [x] Boutons monter/descendre
+  - [x] Badges feuille/systeme/inactif
+  - [x] Protection activite "Absence" (is_system)
+- [x] CRUD Projets (ProjetsPage.tsx)
+  - [x] Liste avec filtres actif/archive
+  - [x] Formulaire projet (dates, description)
+  - [x] Configuration tri-state des activites
+  - [x] Toast d'annulation si >3 desactivations
+- [x] Composant ToastAnnulation.tsx reutilisable
+
+#### Notes techniques
+- Apollo Client 4.x : imports depuis @apollo/client/react
+- Tailwind 4 avec @import "tailwindcss"
+- CORS configure pour ports 5173-5175
+
 ### 2026-01-29 - Phase 3 : Frontend (debut)
 
 #### Fait
@@ -181,9 +221,23 @@ curl -s -X POST http://localhost:8080/graphql \
 ### Phase 3 - Frontend [EN COURS]
 - [x] Page de connexion
 - [x] Dashboard utilisateur
-- [ ] Interface de saisie hebdomadaire
-- [ ] Gestion des projets (moderateur)
-- [ ] Administration (admin)
+- [x] Interface de saisie hebdomadaire
+  - [x] Grille 7 jours avec navigation semaine
+  - [x] Cellules editables avec validation
+  - [x] Totaux journaliers avec warnings
+  - [x] Selecteur projet/activite
+  - [x] Sauvegarde en lot
+  - [x] Vue mobile responsive
+  - [x] Blocage jours futurs
+- [x] Gestion des projets (admin)
+  - [x] CRUD projets
+  - [x] Configuration tri-state des activites
+  - [x] Toast d'annulation (>3 desactivations)
+- [x] Administration (admin)
+  - [x] CRUD Utilisateurs avec recherche/filtres
+  - [x] CRUD Equipes
+  - [x] Arborescence activites (creation, edition, reordonnancement)
+- [ ] Visibilite par utilisateur (backend non implemente)
 
 ### Phase 4 - Fonctionnalites avancees
 - [ ] Import des absences depuis API RH
