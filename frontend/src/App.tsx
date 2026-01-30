@@ -6,6 +6,10 @@ import { useAuthStore } from './stores/authStore';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import SaisiePage from './pages/SaisiePage';
+import UtilisateursPage from './pages/admin/UtilisateursPage';
+import EquipesPage from './pages/admin/EquipesPage';
+import ActivitesPage from './pages/admin/ActivitesPage';
+import ProjetsPage from './pages/ProjetsPage';
 
 // Composants
 import Layout from './components/Layout';
@@ -49,9 +53,15 @@ function AppContent() {
 
         {/* Page de saisie */}
         <Route path="/saisie" element={<SaisiePage />} />
-        {/* Placeholder pour les futures pages */}
-        <Route path="/projets" element={<PlaceholderPage titre="Gestion des projets" />} />
-        <Route path="/admin" element={<PlaceholderPage titre="Administration" />} />
+
+        {/* Administration */}
+        <Route path="/admin" element={<Navigate to="/admin/utilisateurs" replace />} />
+        <Route path="/admin/utilisateurs" element={<UtilisateursPage />} />
+        <Route path="/admin/equipes" element={<EquipesPage />} />
+        <Route path="/admin/activites" element={<ActivitesPage />} />
+
+        {/* Projets */}
+        <Route path="/projets" element={<ProjetsPage />} />
       </Route>
 
       {/* Redirection par defaut */}
