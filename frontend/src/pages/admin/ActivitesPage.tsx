@@ -21,6 +21,7 @@ import {
   DELETE_ACTIVITY,
   MOVE_ACTIVITY,
 } from '../../graphql/operations/activities';
+import NavAdmin from '../../components/admin/NavAdmin';
 
 interface Activite {
   id: string;
@@ -270,20 +271,24 @@ function FormulaireActivite({
         await updateActivity({
           variables: {
             id: formData.id,
-            nom: formData.nom.trim(),
-            code: formData.code.trim() || null,
-            description: formData.description.trim() || null,
-            estActif: formData.estActif,
+            input: {
+              nom: formData.nom.trim(),
+              code: formData.code.trim() || null,
+              description: formData.description.trim() || null,
+              estActif: formData.estActif,
+            },
           },
         });
       } else {
         await createActivity({
           variables: {
-            nom: formData.nom.trim(),
-            code: formData.code.trim() || null,
-            description: formData.description.trim() || null,
-            parentId: parentId || null,
-            estActif: formData.estActif,
+            input: {
+              nom: formData.nom.trim(),
+              code: formData.code.trim() || null,
+              description: formData.description.trim() || null,
+              parentId: parentId || null,
+              estActif: formData.estActif,
+            },
           },
         });
       }
@@ -540,6 +545,8 @@ export default function ActivitesPage() {
 
   return (
     <div className="space-y-4">
+      <NavAdmin />
+
       {/* En-tete */}
       <div className="flex items-center justify-between">
         <div>
