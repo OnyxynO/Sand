@@ -35,4 +35,20 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | API RH externe
+    |--------------------------------------------------------------------------
+    |
+    | Configuration pour l'API RH externe (système des absences).
+    | En développement, utilise le mock-rh Docker.
+    |
+    */
+
+    'rh_api' => [
+        'url' => env('RH_API_URL', 'http://mock-rh:3001/api'),
+        'key' => env('RH_API_KEY', ''),
+        'timeout' => env('RH_API_TIMEOUT', 30),
+    ],
+
 ];

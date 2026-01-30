@@ -1,14 +1,15 @@
 # Avancement du projet SAND
 
-## Phase actuelle : Phase 2 - Test & Integration (en cours)
+## Phase actuelle : Phase 3 - Integrations & Moderation (en cours)
 
 ---
 
 ## Prochaine session
 
 ### A faire en priorite
-1. **Tests PHPUnit** : ecrire des tests de base pour les mutations principales
-2. **Commencer le frontend** : page de connexion avec Apollo Client
+1. **Corriger BUG-003** : mutations GraphQL activites (voir TODO_BUGS.md)
+2. **Implementer US-3.3** : gestion des conflits absences (interface de resolution)
+3. **Implementer US-3.6** : systeme de notifications (UI cloche + panneau)
 
 ### Commandes utiles
 ```bash
@@ -62,7 +63,42 @@ curl -s -X POST http://localhost:8080/graphql \
 
 ## Historique
 
-### 2026-01-30 - Phase 3 : Frontend (quasi-complete)
+### 2026-01-30 - Phase 3 : Import absences (US-3.2)
+
+#### Fait
+- [x] US-3.2 : Import des absences depuis l'API RH
+  - [x] Configuration API RH dans `config/services.php`
+  - [x] Exception `RhApiException.php` pour erreurs API
+  - [x] Client HTTP `RhApiClient.php` avec `getAbsences()` et `healthCheck()`
+  - [x] Implementation complete de `syncAbsences` dans `AbsenceMutator.php`
+  - [x] Detection des conflits avec saisies existantes
+  - [x] Creation automatique des notifications (import OK ou conflit)
+  - [x] Mise a jour du mock RH (matricules alignes, `duree_journaliere`, dates 2026)
+  - [x] Tests valides : 5 absences importees, 1 conflit detecte, idempotence OK
+
+#### Fichiers crees
+- `backend/app/Services/RhApiClient.php`
+- `backend/app/Exceptions/RhApiException.php`
+
+#### Fichiers modifies
+- `backend/config/services.php` (ajout config `rh_api`)
+- `backend/app/GraphQL/Mutations/AbsenceMutator.php` (implementation complete)
+- `docker/mock-rh/server.js` (matricules DEV001/DEV002/MOD001, duree_journaliere)
+
+#### Tests effectues
+```bash
+# Mock RH
+curl http://localhost:3001/api/absences?matricule=DEV001
+# → 2 absences retournees
+
+# syncAbsences via Tinker
+# → importes: 5, conflits: 1, erreurs: []
+
+# Idempotence (2e appel)
+# → importes: 0 (pas de doublons)
+```
+
+### 2026-01-30 - Phase 2 : Frontend (quasi-complete)
 
 #### Fait
 - [x] Interface de saisie hebdomadaire complete
@@ -212,37 +248,30 @@ curl -s -X POST http://localhost:8080/graphql \
 - [x] Policies d'autorisation
 - [x] Resolvers essentiels
 
-### Phase 2 - Test & Integration [COMPLETE]
+### Phase 2 - Fonctionnalites Core [COMPLETE]
 - [x] Docker operationnel
 - [x] API GraphQL testee
 - [x] Resolvers manquants
 - [x] Tests PHPUnit de base (23 tests, 74 assertions)
+- [x] Interface de saisie hebdomadaire complete
+- [x] CRUD Utilisateurs, Equipes, Projets, Activites
+- [ ] US-2.6 : Visibilite par utilisateur (backend non implemente)
 
-### Phase 3 - Frontend [EN COURS]
-- [x] Page de connexion
-- [x] Dashboard utilisateur
-- [x] Interface de saisie hebdomadaire
-  - [x] Grille 7 jours avec navigation semaine
-  - [x] Cellules editables avec validation
-  - [x] Totaux journaliers avec warnings
-  - [x] Selecteur projet/activite
-  - [x] Sauvegarde en lot
-  - [x] Vue mobile responsive
-  - [x] Blocage jours futurs
-- [x] Gestion des projets (admin)
-  - [x] CRUD projets
-  - [x] Configuration tri-state des activites
-  - [x] Toast d'annulation (>3 desactivations)
-- [x] Administration (admin)
-  - [x] CRUD Utilisateurs avec recherche/filtres
-  - [x] CRUD Equipes
-  - [x] Arborescence activites (creation, edition, reordonnancement)
-- [ ] Visibilite par utilisateur (backend non implemente)
+### Phase 3 - Integrations & Moderation [EN COURS]
+- [x] US-3.1 : Mock service RH (container Docker fonctionnel)
+- [x] US-3.2 : Import des absences
+  - [x] Client RhApiClient
+  - [x] Mutation syncAbsences
+  - [x] Detection conflits avec TimeEntry
+  - [x] Notifications automatiques
+- [ ] US-3.3 : Gestion des conflits absences (interface resolution)
+- [ ] US-3.4 : Droits moderateur
+- [ ] US-3.5 : Page de supervision
+- [ ] US-3.6 : Systeme de notifications (UI)
 
-### Phase 4 - Fonctionnalites avancees
-- [ ] Import des absences depuis API RH
-- [ ] Export CSV (job queue)
-- [ ] Notifications temps reel (optionnel)
+### Phase 4 - Reporting
+- [ ] US-4.1 : Dashboard statistiques
+- [ ] US-4.4 : Export CSV (job queue)
 - [ ] Tests Vitest
 
 ### Phase Bonus - Documentation et facilite d'installation
