@@ -4,15 +4,26 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Mutations;
 
+use App\Exceptions\RhApiException;
 use App\Models\Absence;
+use App\Models\Notification;
 use App\Models\TimeEntry;
 use App\Models\User;
+use App\Services\RhApiClient;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class AbsenceMutator
 {
+    protected RhApiClient $rhApiClient;
+
+    public function __construct(RhApiClient $rhApiClient)
+    {
+        $this->rhApiClient = $rhApiClient;
+    }
+
     /**
      * Synchroniser les absences depuis l'API RH externe.
      */
@@ -21,15 +32,234 @@ class AbsenceMutator
         $this->authorize('sync', Absence::class);
 
         $userId = $args['userId'] ?? null;
-        $dateDebut = Carbon::parse($args['dateDebut']);
-        $dateFin = Carbon::parse($args['dateFin']);
+        $dateDebut = Carbon::parse($args['dateDebut'])->format('Y-m-d');
+        $dateFin = Carbon::parse($args['dateFin'])->format('Y-m-d');
 
-        // TODO: Appeler l'API RH externe (mock en dev)
-        // Pour l'instant, retourner un resultat vide
+        $importes = 0;
+        $conflits = 0;
+        $erreurs = [];
+
+        // Determiner les utilisateurs a synchroniser
+        if ($userId) {
+            $utilisateurs = User::where('id', $userId)->whereNotNull('matricule')->get();
+        } else {
+            $utilisateurs = User::actif()->whereNotNull('matricule')->where('matricule', '!=', '')->get();
+        }
+
+        if ($utilisateurs->isEmpty()) {
+            return [
+                'importes' => 0,
+                'conflits' => 0,
+                'erreurs' => ['Aucun utilisateur avec matricule trouve'],
+            ];
+        }
+
+        // Verifier la disponibilite de l'API RH
+        if (! $this->rhApiClient->healthCheck()) {
+            return [
+                'importes' => 0,
+                'conflits' => 0,
+                'erreurs' => ["L'API RH est actuellement indisponible"],
+            ];
+        }
+
+        foreach ($utilisateurs as $utilisateur) {
+            try {
+                $resultat = $this->syncUtilisateur($utilisateur, $dateDebut, $dateFin);
+                $importes += $resultat['importes'];
+                $conflits += $resultat['conflits'];
+            } catch (RhApiException $e) {
+                $erreurs[] = "Erreur pour {$utilisateur->matricule} : {$e->getMessage()}";
+                Log::error('Erreur sync absence', [
+                    'utilisateur' => $utilisateur->id,
+                    'matricule' => $utilisateur->matricule,
+                    'erreur' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        Log::info('Sync absences terminee', [
+            'importes' => $importes,
+            'conflits' => $conflits,
+            'erreurs' => count($erreurs),
+        ]);
+
         return [
-            'importees' => 0,
-            'conflits' => [],
+            'importes' => $importes,
+            'conflits' => $conflits,
+            'erreurs' => $erreurs,
         ];
+    }
+
+    /**
+     * Synchroniser les absences d'un utilisateur specifique.
+     */
+    protected function syncUtilisateur(User $utilisateur, string $dateDebut, string $dateFin): array
+    {
+        $absencesRh = $this->rhApiClient->getAbsences(
+            $utilisateur->matricule,
+            $dateDebut,
+            $dateFin
+        );
+
+        $importes = 0;
+        $conflits = 0;
+
+        foreach ($absencesRh as $absenceRh) {
+            $resultat = $this->traiterAbsence($utilisateur, $absenceRh);
+            if ($resultat['importe']) {
+                $importes++;
+            }
+            if ($resultat['conflit']) {
+                $conflits++;
+            }
+        }
+
+        return [
+            'importes' => $importes,
+            'conflits' => $conflits,
+        ];
+    }
+
+    /**
+     * Traiter une absence provenant de l'API RH.
+     */
+    protected function traiterAbsence(User $utilisateur, array $absenceRh): array
+    {
+        $referenceExterne = (string) $absenceRh['id'];
+        $importe = false;
+        $conflit = false;
+
+        return DB::transaction(function () use ($utilisateur, $absenceRh, $referenceExterne, &$importe, &$conflit) {
+            // Verifier si l'absence existe deja
+            $absenceExistante = Absence::where('reference_externe', $referenceExterne)->first();
+
+            if ($absenceExistante) {
+                // Mise a jour du statut si necessaire
+                $this->mettreAJourStatut($absenceExistante, $absenceRh);
+
+                return ['importe' => false, 'conflit' => false];
+            }
+
+            // Creer la nouvelle absence
+            $absence = Absence::create([
+                'user_id' => $utilisateur->id,
+                'type' => $this->mapperType($absenceRh['type']),
+                'date_debut' => $absenceRh['date_debut'],
+                'date_fin' => $absenceRh['date_fin'],
+                'duree_journaliere' => $absenceRh['duree_journaliere'] ?? 1.0,
+                'statut' => $this->mapperStatut($absenceRh['statut']),
+                'reference_externe' => $referenceExterne,
+                'importe_le' => now(),
+            ]);
+
+            $importe = true;
+
+            // Detecter les conflits avec les saisies existantes
+            $saisiesEnConflit = $this->detecterConflits($utilisateur, $absence);
+
+            if ($saisiesEnConflit->isNotEmpty()) {
+                $conflit = true;
+                $this->creerNotificationConflit($utilisateur, $absence, $saisiesEnConflit);
+            } else {
+                $this->creerNotificationImport($utilisateur, $absence);
+            }
+
+            return ['importe' => $importe, 'conflit' => $conflit];
+        });
+    }
+
+    /**
+     * Mettre a jour le statut d'une absence existante.
+     */
+    protected function mettreAJourStatut(Absence $absence, array $absenceRh): void
+    {
+        $nouveauStatut = $this->mapperStatut($absenceRh['statut']);
+
+        if ($absence->statut !== $nouveauStatut) {
+            $absence->update([
+                'statut' => $nouveauStatut,
+                'importe_le' => now(),
+            ]);
+        }
+    }
+
+    /**
+     * Detecter les saisies en conflit avec une absence.
+     */
+    protected function detecterConflits(User $utilisateur, Absence $absence)
+    {
+        return TimeEntry::where('user_id', $utilisateur->id)
+            ->whereBetween('date', [$absence->date_debut, $absence->date_fin])
+            ->get();
+    }
+
+    /**
+     * Creer une notification de conflit.
+     */
+    protected function creerNotificationConflit(User $utilisateur, Absence $absence, $saisies): void
+    {
+        $nombreSaisies = $saisies->count();
+        $message = "L'absence {$absence->type_libelle} du {$absence->date_debut->format('d/m/Y')} "
+            ."au {$absence->date_fin->format('d/m/Y')} est en conflit avec "
+            ."{$nombreSaisies} saisie(s) existante(s).";
+
+        Notification::creer(
+            $utilisateur,
+            Notification::TYPE_CONFLIT_ABSENCE,
+            'Conflit absence/saisie detecte',
+            $message,
+            [
+                'absence_id' => $absence->id,
+                'saisie_ids' => $saisies->pluck('id')->toArray(),
+            ]
+        );
+    }
+
+    /**
+     * Creer une notification d'import reussi.
+     */
+    protected function creerNotificationImport(User $utilisateur, Absence $absence): void
+    {
+        $message = "Absence {$absence->type_libelle} importee "
+            ."du {$absence->date_debut->format('d/m/Y')} "
+            ."au {$absence->date_fin->format('d/m/Y')}.";
+
+        Notification::creer(
+            $utilisateur,
+            Notification::TYPE_ABSENCE_IMPORTEE,
+            'Absence importee du systeme RH',
+            $message,
+            [
+                'absence_id' => $absence->id,
+            ]
+        );
+    }
+
+    /**
+     * Mapper le type d'absence RH vers le type SAND.
+     */
+    protected function mapperType(string $typeRh): string
+    {
+        return match ($typeRh) {
+            'conges_payes', 'conges' => Absence::TYPE_CONGES_PAYES,
+            'rtt' => Absence::TYPE_RTT,
+            'maladie' => Absence::TYPE_MALADIE,
+            'formation' => Absence::TYPE_FORMATION,
+            default => Absence::TYPE_AUTRE,
+        };
+    }
+
+    /**
+     * Mapper le statut RH vers le statut SAND.
+     */
+    protected function mapperStatut(string $statutRh): string
+    {
+        return match ($statutRh) {
+            'valide', 'validee', 'approuve' => Absence::STATUT_VALIDE,
+            'annule', 'annulee', 'refuse' => Absence::STATUT_ANNULE,
+            default => Absence::STATUT_VALIDE,
+        };
     }
 
     /**
@@ -45,9 +275,8 @@ class AbsenceMutator
                 'date_debut' => $args['dateDebut'],
                 'date_fin' => $args['dateFin'],
                 'type' => $args['type'],
-                'etp_journalier' => $args['etpJournalier'] ?? 1.0,
-                'source' => 'manuel',
-                'est_valide' => true,
+                'duree_journaliere' => $args['dureeJournaliere'] ?? 1.0,
+                'statut' => Absence::STATUT_VALIDE,
             ]);
 
             return $absence;
@@ -68,7 +297,7 @@ class AbsenceMutator
         return DB::transaction(function () use ($action, $absenceId, $saisieId) {
             if ($action === 'garder_saisie') {
                 // Supprimer ou invalider l'absence
-                Absence::findOrFail($absenceId)->update(['est_valide' => false]);
+                Absence::findOrFail($absenceId)->update(['statut' => Absence::STATUT_ANNULE]);
             } elseif ($action === 'garder_absence' && $saisieId) {
                 // Supprimer la saisie
                 TimeEntry::findOrFail($saisieId)->delete();
@@ -84,7 +313,7 @@ class AbsenceMutator
     private function authorize(string $ability, $model): void
     {
         $user = Auth::user();
-        if (!$user || !$user->can($ability, $model)) {
+        if (! $user || ! $user->can($ability, $model)) {
             abort(403, 'Action non autorisee.');
         }
     }

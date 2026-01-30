@@ -32,10 +32,49 @@
 
 ---
 
+## BUG-003 : CRUD Activites - mutations GraphQL non fonctionnelles
+- **Page** : `/admin/activites` (ActivitesPage.tsx)
+- **Probleme** : Les mutations GraphQL pour la gestion des activites retournent des erreurs
+- **Details** :
+  - Creation : Internal server error (apres correction du format input)
+  - Modification : A tester
+  - Suppression : A tester
+  - Deplacement (monter/descendre) : A tester
+- **Cause probable** : Incoherence entre le schema GraphQL backend et les mutations frontend
+- **Fichiers concernes** :
+  - `frontend/src/graphql/operations/activities.ts`
+  - `backend/graphql/mutations/activity.graphql`
+  - `backend/app/GraphQL/Mutations/ActivityMutator.php`
+- **Action** : Debugger le backend (logs Laravel) pour identifier l'erreur exacte
+
+---
+
 ## A implementer (hors bugs)
+
+### Tests automatiques coherence front/back
+- **Objectif** : Detecter automatiquement les incoherences entre les mutations GraphQL frontend et le schema backend
+- **Idees** :
+  - Script de validation du schema GraphQL au build
+  - Tests d'integration qui appellent chaque mutation avec des donnees de test
+  - Utiliser `graphql-codegen` pour generer les types TypeScript depuis le schema backend
+- **Priorite** : Moyenne (qualite long terme)
 
 ### US-2.6 : Visibilite par utilisateur
 - **Statut** : Backend non implemente
 - **Table** : `activity_user_visibilities` existe
 - **Manque** : Resolvers GraphQL pour `setActivityVisibility`
 - **Frontend** : A creer une fois le backend pret
+
+### US-3.3 : Interface resolution conflits absences
+- **Statut** : Backend OK (resolveConflict dans AbsenceMutator), UI a creer
+- **Backend** : `AbsenceMutator::resolveConflict()` avec actions garder_saisie/garder_absence
+- **Notifications** : TYPE_CONFLIT_ABSENCE creees avec absence_id et saisie_ids
+- **Manque** : Interface frontend pour afficher et resoudre les conflits
+
+### US-3.6 : Systeme de notifications (UI)
+- **Statut** : Backend OK (model Notification, types definis), UI a creer
+- **Manque** :
+  - Icone cloche dans le header
+  - Badge compteur non lues
+  - Panneau lateral listant les notifications
+  - Marquage lu/non lu

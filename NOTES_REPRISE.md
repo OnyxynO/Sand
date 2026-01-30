@@ -42,24 +42,38 @@ cd frontend && npm run dev &
 **En attente :**
 - US-2.6 : Visibilite par utilisateur - necessite implementation backend
 
+### Phase 3 du backlog : en cours
+
+**Termine :**
+- US-3.1 : Mock service RH (container Docker `mock-rh` sur port 3001)
+- US-3.2 : Import des absences depuis l'API RH
+  - `RhApiClient.php` : client HTTP avec getAbsences() et healthCheck()
+  - `AbsenceMutator.php` : mutation syncAbsences complete
+  - Detection automatique des conflits avec saisies existantes
+  - Notifications creees (TYPE_ABSENCE_IMPORTEE ou TYPE_CONFLIT_ABSENCE)
+  - Teste et valide (5 imports, 1 conflit detecte, idempotence OK)
+
+**En attente :**
+- US-3.3 : Gestion des conflits absences (interface de resolution)
+- US-3.4 : Droits moderateur
+- US-3.5 : Page de supervision
+- US-3.6 : Systeme de notifications (UI cloche + panneau)
+
 ### Prochaines etapes possibles
 
-1. **Implementer US-2.6 backend** :
-   - Creer `SetActivityVisibilityMutator.php`
-   - Ajouter mutation dans `graphql/mutations/project.graphql`
-   - Puis creer l'UI frontend
+1. **Implementer US-3.3** : Interface de resolution des conflits
+   - Afficher les conflits dans les notifications
+   - Permettre de choisir "garder saisie" ou "garder absence"
 
-2. **Passer a la Phase 3** (Integrations & Moderation) :
-   - US-3.1 : Mock service RH
-   - US-3.2 : Import des absences
-   - US-3.3 : Gestion des conflits absences
-   - US-3.4 : Droits moderateur
-   - US-3.5 : Page de supervision
-   - US-3.6 : Systeme de notifications
+2. **Implementer US-3.6** : UI des notifications
+   - Icone cloche dans le header
+   - Badge compteur non lues
+   - Panneau lateral listant les notifications
 
 3. **Corriger les bugs** (voir TODO_BUGS.md) :
    - BUG-001 : Trim login
    - BUG-002 : Hot reload Vite
+   - BUG-003 : CRUD Activites - mutations GraphQL
 
 ---
 
@@ -79,7 +93,7 @@ frontend/src/
 │       └── ActivitesPage.tsx
 ├── components/
 │   ├── saisie/           # Composants grille saisie
-│   ├── admin/            # FormulaireUtilisateur
+│   ├── admin/            # FormulaireUtilisateur, NavAdmin
 │   └── ui/               # ToastAnnulation
 ├── graphql/operations/   # Queries et mutations
 ├── stores/               # Zustand (authStore, saisieStore)
@@ -91,8 +105,15 @@ frontend/src/
 ```
 backend/
 ├── app/GraphQL/          # Resolvers
+│   └── Mutations/
+│       └── AbsenceMutator.php  # syncAbsences, create, resolveConflict
+├── app/Services/
+│   └── RhApiClient.php         # Client API RH (getAbsences, healthCheck)
+├── app/Exceptions/
+│   └── RhApiException.php      # Exceptions API RH
 ├── graphql/              # Schema GraphQL (types/, inputs/, mutations/)
 ├── app/Models/           # Eloquent
+├── config/services.php   # Config API RH (rh_api.url, rh_api.key)
 └── database/migrations/  # Tables
 ```
 
