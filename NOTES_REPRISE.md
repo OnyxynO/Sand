@@ -70,10 +70,9 @@ cd frontend && npm run dev &
    - Badge compteur non lues
    - Panneau lateral listant les notifications
 
-3. **Corriger les bugs** (voir TODO_BUGS.md) :
-   - BUG-001 : Trim login
-   - BUG-002 : Hot reload Vite
-   - BUG-003 : CRUD Activites - mutations GraphQL
+3. **Corriger les bugs restants** (voir TODO_BUGS.md) :
+   - BUG-001 : Trim login (espaces non supprimes)
+   - BUG-002 : Hot reload Vite intermittent
 
 ---
 

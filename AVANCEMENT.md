@@ -7,9 +7,9 @@
 ## Prochaine session
 
 ### A faire en priorite
-1. **Corriger BUG-003** : mutations GraphQL activites (voir TODO_BUGS.md)
-2. **Implementer US-3.3** : gestion des conflits absences (interface de resolution)
-3. **Implementer US-3.6** : systeme de notifications (UI cloche + panneau)
+1. **Implementer US-3.3** : gestion des conflits absences (interface de resolution)
+2. **Implementer US-3.6** : systeme de notifications (UI cloche + panneau)
+3. **Bugs mineurs** : BUG-001 (trim login), BUG-002 (hot reload Vite)
 
 ### Commandes utiles
 ```bash
