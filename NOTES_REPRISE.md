@@ -1,5 +1,29 @@
 # Notes de reprise - Session suivante
 
+## Demarrage rapide apres redemarrage
+
+```bash
+# 1. Lancer Docker Desktop d'abord !
+
+# 2. Puis lancer l'environnement :
+cd "/Users/seb/Documents/Claude projet/Code/saelv1 vers sandv2"
+./start-dev.sh
+
+# Ou manuellement :
+docker-compose up -d db redis
+cd backend && php artisan serve --host=0.0.0.0 --port=8080 &
+cd frontend && npm run dev &
+```
+
+**URLs :**
+- Frontend : http://localhost:5173
+- Backend : http://localhost:8080
+- GraphiQL : http://localhost:8080/graphiql
+
+**Compte admin :** `admin@sand.local` / `password`
+
+---
+
 ## Etat actuel (2026-01-30)
 
 ### Phase 2 du backlog : quasi-complete
