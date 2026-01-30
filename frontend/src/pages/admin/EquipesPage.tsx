@@ -16,6 +16,7 @@ import {
   UPDATE_TEAM,
   DELETE_TEAM,
 } from '../../graphql/operations/teams';
+import NavAdmin from '../../components/admin/NavAdmin';
 
 interface Membre {
   id: string;
@@ -289,6 +290,8 @@ export default function EquipesPage() {
 
   return (
     <div className="space-y-4">
+      <NavAdmin />
+
       {/* En-tete */}
       <div className="flex items-center justify-between">
         <div>

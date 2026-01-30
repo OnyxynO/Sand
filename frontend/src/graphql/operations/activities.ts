@@ -80,22 +80,8 @@ export const ARBRE_ACTIVITES = gql`
 // Mutations
 export const CREATE_ACTIVITY = gql`
   ${ACTIVITY_FRAGMENT}
-  mutation CreateActivity(
-    $nom: String!
-    $code: String
-    $description: String
-    $parentId: ID
-    $ordre: Int
-    $estActif: Boolean
-  ) {
-    createActivity(
-      nom: $nom
-      code: $code
-      description: $description
-      parentId: $parentId
-      ordre: $ordre
-      estActif: $estActif
-    ) {
+  mutation CreateActivity($input: CreateActivityInput!) {
+    createActivity(input: $input) {
       ...ActivityFields
     }
   }
@@ -103,20 +89,8 @@ export const CREATE_ACTIVITY = gql`
 
 export const UPDATE_ACTIVITY = gql`
   ${ACTIVITY_FRAGMENT}
-  mutation UpdateActivity(
-    $id: ID!
-    $nom: String
-    $code: String
-    $description: String
-    $estActif: Boolean
-  ) {
-    updateActivity(
-      id: $id
-      nom: $nom
-      code: $code
-      description: $description
-      estActif: $estActif
-    ) {
+  mutation UpdateActivity($id: ID!, $input: UpdateActivityInput!) {
+    updateActivity(id: $id, input: $input) {
       ...ActivityFields
     }
   }

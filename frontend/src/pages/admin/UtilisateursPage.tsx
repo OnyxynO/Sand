@@ -11,6 +11,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { USERS_QUERY, TEAMS_QUERY, DELETE_USER } from '../../graphql/operations/users';
 import FormulaireUtilisateur from '../../components/admin/FormulaireUtilisateur';
+import NavAdmin from '../../components/admin/NavAdmin';
 import type { UserRole } from '../../types';
 
 interface Utilisateur {
@@ -113,6 +114,8 @@ export default function UtilisateursPage() {
 
   return (
     <div className="space-y-4">
+      <NavAdmin />
+
       {/* En-tete */}
       <div className="flex items-center justify-between">
         <div>
