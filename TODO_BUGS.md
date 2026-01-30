@@ -30,22 +30,10 @@
 - **Probleme** : Vite change parfois de port si 5173 est occupe
 - **Solution** : Ajouter 5174, 5175 dans `backend/config/cors.php` et `SANCTUM_STATEFUL_DOMAINS`
 
----
-
-## BUG-003 : CRUD Activites - mutations GraphQL non fonctionnelles
-- **Page** : `/admin/activites` (ActivitesPage.tsx)
-- **Probleme** : Les mutations GraphQL pour la gestion des activites retournent des erreurs
-- **Details** :
-  - Creation : Internal server error (apres correction du format input)
-  - Modification : A tester
-  - Suppression : A tester
-  - Deplacement (monter/descendre) : A tester
-- **Cause probable** : Incoherence entre le schema GraphQL backend et les mutations frontend
-- **Fichiers concernes** :
-  - `frontend/src/graphql/operations/activities.ts`
-  - `backend/graphql/mutations/activity.graphql`
-  - `backend/app/GraphQL/Mutations/ActivityMutator.php`
-- **Action** : Debugger le backend (logs Laravel) pour identifier l'erreur exacte
+### RESOLU : BUG-003 - CRUD Activites mutations GraphQL
+- **Probleme** : Incoherence entre mutations frontend et schema backend (input objects)
+- **Solution** : Aligner `CREATE_ACTIVITY` et `UPDATE_ACTIVITY` avec le format `input: CreateActivityInput!`
+- **Commit** : `1ebe2fd`
 
 ---
 
