@@ -78,7 +78,7 @@ function LigneActivite({
   return (
     <>
       <div
-        className={`flex items-center gap-2 py-2 px-3 hover:bg-gray-50 border-b ${
+        className={`group flex items-center gap-2 py-2 px-3 hover:bg-gray-50 border-b ${
           !activite.estActif ? 'opacity-50' : ''
         }`}
         style={{ paddingLeft: `${niveau * 24 + 12}px` }}
