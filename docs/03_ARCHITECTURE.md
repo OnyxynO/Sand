@@ -129,12 +129,13 @@ erDiagram
 
     ACTIVITY {
         uuid id PK
-        string name
+        string nom
         uuid parent_id FK
-        string path "materialized path"
-        int sort_order
-        boolean is_active
-        boolean is_system
+        ltree chemin "ltree PostgreSQL"
+        int ordre
+        boolean est_feuille
+        boolean est_actif
+        boolean est_systeme
         timestamp deleted_at
         timestamp created_at
         timestamp updated_at
@@ -423,5 +424,6 @@ flowchart LR
 
 ---
 
-*Document v1.0 - Janvier 2025*
+*Document v1.1 - Janvier 2026*
+*Mise à jour : type ltree pour l'arborescence des activités*
 *Diagrammes Mermaid - Rendu natif GitHub/GitLab/VS Code*

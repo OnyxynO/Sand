@@ -102,6 +102,36 @@ Ce document repertorie les problemes rencontres lors du developpement et leurs s
 
 ### Phase 3 - Interface de saisie
 
+### Phase 4 - Migration ltree et optimisations
+
+#### 17. Migration vers ltree PostgreSQL
+- **Objectif** : Optimiser les requêtes d'arborescence (descendants, ancêtres)
+- **Changements** :
+  - Extension ltree activée
+  - Colonne `chemin` convertie de VARCHAR à ltree
+  - Colonne `niveau` supprimée (calculée dynamiquement via `nlevel(chemin) - 1`)
+  - Index GiST créé pour les opérateurs ltree
+- **Fichiers modifiés** :
+  - `database/migrations/2026_01_31_100000_update_activities_to_ltree.php` (nouveau)
+  - `app/Models/Activity.php` (accesseur niveau, méthodes ltree)
+  - `app/GraphQL/Mutations/ActivityMutator.php` (optimisations)
+  - `database/seeders/ActivitySeeder.php`
+  - `database/factories/ActivityFactory.php`
+
+#### 18. Tests avec PostgreSQL au lieu de SQLite
+- **Problème** : ltree est une extension PostgreSQL, incompatible avec SQLite
+- **Solution** : Modifier `phpunit.xml` pour utiliser PostgreSQL avec base `sand_test`
+- **Fichiers modifiés** :
+  - `backend/phpunit.xml`
+  - `tests/Feature/AuthGraphQLTest.php` (retrait ID forcé)
+
+#### 19. Model events pour est_feuille
+- **Problème** : est_feuille non recalculé après suppression/restauration
+- **Solution** : Ajout de `booted()` avec événements `deleted` et `restored`
+- **Fichier** : `app/Models/Activity.php`
+
+---
+
 #### 13. Apollo Client 4.x - Imports des hooks React
 - **Probleme** : Erreur de compilation `Module '@apollo/client' has no exported member 'useQuery'`
 - **Cause** : Apollo Client 4.x a separe les hooks React dans un sous-module
@@ -231,3 +261,6 @@ docker-compose exec app php artisan migrate --seed
 | 2026-01-29 | 3 | Apollo Client 4.x useLazyQuery | Plus de onCompleted/onError |
 | 2026-01-29 | 3 | CORS port 5175 | Ajout ports alternatifs |
 | 2026-01-29 | 3 | Hot reload Vite | Non resolu (voir TODO_BUGS.md) |
+| 2026-01-31 | 4 | Migration ltree PostgreSQL | Extension ltree pour arborescence |
+| 2026-01-31 | 4 | Tests SQLite → PostgreSQL | phpunit.xml utilise PostgreSQL |
+| 2026-01-31 | 4 | Model events est_feuille | Recalcul automatique delete/restore |

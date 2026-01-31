@@ -104,7 +104,6 @@ class QueriesGraphQLTest extends TestCase
         // Activites racines
         Activity::factory()->count(2)->create([
             'parent_id' => null,
-            'niveau' => 0,
         ]);
 
         $response = $this->graphqlAsUser('

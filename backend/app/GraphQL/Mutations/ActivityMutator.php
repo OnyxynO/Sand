@@ -12,6 +12,7 @@ class ActivityMutator
 {
     /**
      * Creer une activite.
+     * Optimise : une seule INSERT (pas de double save).
      */
     public function create($root, array $args): Activity
     {
@@ -21,34 +22,34 @@ class ActivityMutator
             $parentId = $args['parentId'] ?? null;
             $parent = $parentId ? Activity::findOrFail($parentId) : null;
 
-            // Calculer le niveau et l'ordre
-            $niveau = $parent ? $parent->niveau + 1 : 0;
-            $ordre = (Activity::where('parent_id', $parentId)->max('ordre') ?? 0) + 1;
+            // Calculer l'ordre (dernier parmi les freres)
+            $ordre = Activity::where('parent_id', $parentId)->max('ordre');
+            $ordre = $ordre !== null ? $ordre + 1 : 0;
 
-            // Si on ajoute un enfant, le parent n'est plus une feuille
-            if ($parent && $parent->est_feuille) {
-                $parent->est_feuille = false;
-                $parent->save();
-            }
+            // Obtenir le prochain ID avant l'insertion
+            $nextId = DB::selectOne("SELECT nextval('activities_id_seq') AS id")->id;
 
-            // Creer l'activite avec chemin temporaire
-            $activity = new Activity([
+            // Calculer le chemin directement
+            $chemin = $parent ? "{$parent->chemin}.{$nextId}" : (string) $nextId;
+
+            // Creer l'activite en une seule requete
+            $activity = Activity::create([
+                'id' => $nextId,
                 'nom' => $args['nom'],
                 'code' => $args['code'] ?? null,
                 'description' => $args['description'] ?? null,
                 'parent_id' => $parentId,
-                'niveau' => $niveau,
+                'chemin' => $chemin,
                 'ordre' => $ordre,
-                'est_actif' => $args['estActif'] ?? true,
-                'est_feuille' => true, // Nouvelle activite = feuille par defaut
+                'est_feuille' => true,
                 'est_systeme' => false,
-                'chemin' => 'temp', // Placeholder temporaire
+                'est_actif' => $args['estActif'] ?? true,
             ]);
-            $activity->save();
 
-            // Mettre a jour le chemin avec l'ID reel
-            $activity->chemin = $parent ? "{$parent->chemin}.{$activity->id}" : (string)$activity->id;
-            $activity->save();
+            // Mettre a jour est_feuille du parent
+            if ($parent && $parent->est_feuille) {
+                $parent->update(['est_feuille' => false]);
+            }
 
             return $activity->fresh();
         });
@@ -78,6 +79,7 @@ class ActivityMutator
 
     /**
      * Supprimer une activite (soft delete).
+     * Note: est_feuille du parent est recalcule automatiquement via model event.
      */
     public function delete($root, array $args): bool
     {
@@ -105,6 +107,7 @@ class ActivityMutator
 
     /**
      * Deplacer une activite vers un autre parent.
+     * Optimise avec ltree : UPDATE batch pour les descendants.
      */
     public function move($root, array $args): Activity
     {
@@ -128,20 +131,48 @@ class ActivityMutator
             if ($newParentId !== $oldParentIdNorm) {
                 $newParent = $newParentId ? Activity::findOrFail($newParentId) : null;
 
-                // Verifier qu'on ne deplace pas vers un descendant
-                if ($newParent && str_starts_with($newParent->chemin, $activity->chemin . '.')) {
-                    abort(400, 'Impossible de deplacer une activite vers un de ses descendants.');
+                // Verifier qu'on ne deplace pas vers un descendant (operateur ltree)
+                if ($newParent) {
+                    $isDescendant = DB::selectOne(
+                        "SELECT ?::ltree <@ ?::ltree AS is_descendant",
+                        [$newParent->chemin, $activity->chemin]
+                    )->is_descendant;
+
+                    if ($isDescendant) {
+                        abort(400, 'Impossible de deplacer une activite vers un de ses descendants.');
+                    }
                 }
 
                 $oldPath = $activity->chemin;
-                $newNiveau = $newParent ? $newParent->niveau + 1 : 0;
+                $newPath = $newParent
+                    ? "{$newParent->chemin}.{$activity->id}"
+                    : (string) $activity->id;
 
+                // Mettre a jour les chemins des descendants en une seule requete (ltree batch)
+                DB::statement("
+                    UPDATE activities
+                    SET chemin = ?::ltree || subpath(chemin, nlevel(?::ltree))
+                    WHERE chemin <@ ?::ltree AND id != ?
+                ", [$newPath, $oldPath, $oldPath, $activity->id]);
+
+                // Mettre a jour l'activite
                 $activity->parent_id = $newParentId;
-                $activity->niveau = $newNiveau;
-                $activity->chemin = $newParent ? "{$newParent->chemin}.{$activity->id}" : (string)$activity->id;
+                $activity->chemin = $newPath;
 
-                // Mettre a jour les chemins des descendants
-                $this->updateDescendantPaths($activity, $oldPath);
+                // Gerer est_feuille de l'ancien parent
+                if ($oldParentId) {
+                    $nbEnfants = Activity::where('parent_id', $oldParentId)
+                        ->where('id', '!=', $activity->id)
+                        ->count();
+                    if ($nbEnfants === 0) {
+                        Activity::where('id', $oldParentId)->update(['est_feuille' => true]);
+                    }
+                }
+
+                // Gerer est_feuille du nouveau parent
+                if ($newParent && $newParent->est_feuille) {
+                    $newParent->update(['est_feuille' => false]);
+                }
             }
 
             // Reordonner : decaler les autres activites du meme parent
@@ -153,7 +184,7 @@ class ActivityMutator
                     ->where('ordre', '>=', $newOrdre)
                     ->where('ordre', '<', $currentOrdre)
                     ->increment('ordre');
-            } else if ($newOrdre > $currentOrdre) {
+            } elseif ($newOrdre > $currentOrdre) {
                 // Descendre : decaler vers le haut les activites entre currentOrdre et newOrdre
                 Activity::where('parent_id', $activity->parent_id)
                     ->where('id', '!=', $activity->id)
@@ -182,20 +213,6 @@ class ActivityMutator
             }
             return true;
         });
-    }
-
-    /**
-     * Mettre a jour les chemins des descendants apres un deplacement.
-     */
-    private function updateDescendantPaths(Activity $activity, string $oldPath): void
-    {
-        $descendants = Activity::where('chemin', 'like', $oldPath . '.%')->get();
-
-        foreach ($descendants as $descendant) {
-            $descendant->chemin = str_replace($oldPath, $activity->chemin, $descendant->chemin);
-            $descendant->niveau = substr_count($descendant->chemin, '.') + 1;
-            $descendant->save();
-        }
     }
 
     /**

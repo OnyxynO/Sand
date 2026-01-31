@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,13 +14,32 @@ class Activity extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected static function booted(): void
+    {
+        // Apres suppression (soft delete), recalculer est_feuille du parent
+        static::deleted(function (Activity $activity) {
+            if ($activity->parent_id) {
+                $nbEnfants = static::where('parent_id', $activity->parent_id)->count();
+                if ($nbEnfants === 0) {
+                    static::where('id', $activity->parent_id)->update(['est_feuille' => true]);
+                }
+            }
+        });
+
+        // Apres restauration, le parent n'est plus une feuille
+        static::restored(function (Activity $activity) {
+            if ($activity->parent_id) {
+                static::where('id', $activity->parent_id)->update(['est_feuille' => false]);
+            }
+        });
+    }
+
     protected $fillable = [
         'nom',
         'code',
         'description',
         'parent_id',
         'chemin',
-        'niveau',
         'ordre',
         'est_feuille',
         'est_systeme',
@@ -27,14 +47,31 @@ class Activity extends Model
     ];
 
     protected $casts = [
-        'niveau' => 'integer',
         'ordre' => 'integer',
         'est_feuille' => 'boolean',
         'est_systeme' => 'boolean',
         'est_actif' => 'boolean',
     ];
 
-    // Relations
+    // =========================================================================
+    // ACCESSEURS
+    // =========================================================================
+
+    /**
+     * Niveau calcule depuis le chemin (plus besoin de le stocker).
+     * Niveau 0 = racine, 1 = enfant direct, etc.
+     */
+    public function getNiveauAttribute(): int
+    {
+        if (empty($this->chemin)) {
+            return 0;
+        }
+        return substr_count($this->chemin, '.');
+    }
+
+    // =========================================================================
+    // RELATIONS
+    // =========================================================================
 
     public function parent(): BelongsTo
     {
@@ -57,18 +94,32 @@ class Activity extends Model
         return $this->hasMany(TimeEntry::class);
     }
 
-    // Methodes pour l'arborescence
+    // =========================================================================
+    // REQUETES LTREE
+    // =========================================================================
 
     /**
-     * Retourne tous les descendants (via le chemin materialise)
+     * Tous les descendants (enfants, petits-enfants, etc.) via operateur ltree.
      */
-    public function descendants()
+    public function descendants(): Builder
     {
-        return Activity::where('chemin', 'like', $this->chemin . '.%');
+        return static::whereRaw('chemin <@ ?::ltree', [$this->chemin])
+            ->where('id', '!=', $this->id)
+            ->orderBy('chemin');
     }
 
     /**
-     * Retourne tous les ancetres (via le chemin materialise)
+     * Tous les ancetres (parent, grand-parent, etc.) via operateur ltree.
+     */
+    public function ancestors(): Builder
+    {
+        return static::whereRaw('chemin @> ?::ltree', [$this->chemin])
+            ->where('id', '!=', $this->id)
+            ->orderBy('chemin');
+    }
+
+    /**
+     * Attribut ancetres pour compatibilite (retourne une collection).
      */
     public function getAncetresAttribute()
     {
@@ -76,18 +127,11 @@ class Activity extends Model
             return collect();
         }
 
-        $ids = explode('.', $this->chemin);
-        array_pop($ids); // Retirer l'ID actuel
-
-        if (empty($ids)) {
-            return collect();
-        }
-
-        return Activity::whereIn('id', $ids)->orderByRaw("POSITION(id::text IN ?)", [$this->chemin])->get();
+        return $this->ancestors()->get();
     }
 
     /**
-     * Genere le chemin complet (noms) pour affichage
+     * Genere le chemin complet (noms) pour affichage.
      */
     public function getCheminCompletAttribute(): string
     {
@@ -99,43 +143,43 @@ class Activity extends Model
     }
 
     /**
-     * Met a jour le chemin lors de la creation/modification
+     * Recalcule le chemin (utile apres modification de parent_id).
      */
     public function recalculerChemin(): void
     {
         if ($this->parent_id) {
             $parent = Activity::find($this->parent_id);
             $this->chemin = $parent->chemin . '.' . $this->id;
-            $this->niveau = $parent->niveau + 1;
         } else {
             $this->chemin = (string) $this->id;
-            $this->niveau = 0;
         }
     }
 
-    // Scopes
+    // =========================================================================
+    // SCOPES
+    // =========================================================================
 
-    public function scopeActif($query)
+    public function scopeActif(Builder $query): Builder
     {
         return $query->where('est_actif', true);
     }
 
-    public function scopeFeuille($query)
+    public function scopeFeuille(Builder $query): Builder
     {
         return $query->where('est_feuille', true);
     }
 
-    public function scopeRacine($query)
+    public function scopeRacine(Builder $query): Builder
     {
         return $query->whereNull('parent_id');
     }
 
-    public function scopeSysteme($query)
+    public function scopeSysteme(Builder $query): Builder
     {
         return $query->where('est_systeme', true);
     }
 
-    public function scopeOrdreHierarchique($query)
+    public function scopeOrdreHierarchique(Builder $query): Builder
     {
         return $query->orderBy('chemin');
     }

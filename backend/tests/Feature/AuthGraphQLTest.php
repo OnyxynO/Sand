@@ -19,8 +19,8 @@ class AuthGraphQLTest extends TestCase
     {
         parent::setUp();
 
-        // Creer une equipe pour les utilisateurs
-        Team::factory()->create(['id' => 1, 'nom' => 'Test', 'code' => 'TEST']);
+        // Creer une equipe pour les utilisateurs (sans forcer l'ID pour PostgreSQL)
+        Team::factory()->create(['nom' => 'Test', 'code' => 'TEST']);
     }
 
     public function test_login_avec_identifiants_valides(): void

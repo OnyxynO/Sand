@@ -78,7 +78,7 @@ sand/
 
 ## Concepts métier clés
 
-- **Activités** : Arborescence hiérarchique globale avec path matérialisé (`1.2.3`). Seules les feuilles sont saisissables. Activité "Absence" système (protégée, `is_system = true`).
+- **Activités** : Arborescence hiérarchique globale avec ltree PostgreSQL (`chemin` de type ltree). Seules les feuilles (`est_feuille = true`) sont saisissables. Activité "Absence" système (protégée, `est_systeme = true`).
 - **Projets** : Activent/désactivent des activités via système tri-state (vide → tout activé → vide).
 - **Saisies** : Par jour, en ETP (0.01 à 1.00, 2 décimales max), unicité `user + date + activité + projet`. Warning si total jour ≠ 1.0.
 - **Rôles** : Utilisateur (saisie perso), Modérateur (gestion équipe/projets assignés), Admin (configuration globale).
@@ -87,7 +87,9 @@ sand/
 ## Décisions techniques
 
 - **Auth** : Sanctum SPA avec cookies HttpOnly + CSRF (pas de JWT)
-- **Path matérialisé** : Champ `path` sur `activities` pour tri/requêtes descendants sans récursion
+- **Arborescence ltree** : Extension PostgreSQL native pour l'arborescence des activités. Opérateurs `<@` (descendants), `@>` (ancêtres), index GiST. Niveau calculé dynamiquement (`nlevel(chemin) - 1`), plus stocké en base.
 - **Soft delete** : Sur users, projects, activities, time_entries (préserve historique stats)
+- **Model events** : `est_feuille` recalculé automatiquement via événements `deleted`/`restored`
 - **Notifications** : Rafraîchissement au chargement de page (pas de WebSocket en v1)
 - **Export CSV** : Job queue Redis asynchrone, notification quand prêt, lien avec expiration
+- **Tests** : PostgreSQL obligatoire (ltree incompatible SQLite), base `sand_test`
