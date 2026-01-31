@@ -105,26 +105,50 @@ class ActivityMutator
         }
 
         return DB::transaction(function () use ($activity, $args) {
-            $newParentId = $args['nouveauParentId'] ?? null;
-            $newParent = $newParentId ? Activity::findOrFail($newParentId) : null;
+            $newParentId = $args['parentId'] ?? null;
+            $newOrdre = $args['ordre'];
+            $oldParentId = $activity->parent_id;
 
-            // Verifier qu'on ne deplace pas vers un descendant
-            if ($newParent && str_starts_with($newParent->chemin, $activity->chemin . '.')) {
-                abort(400, 'Impossible de deplacer une activite vers un de ses descendants.');
+            // Si on change de parent
+            if ($newParentId !== $oldParentId) {
+                $newParent = $newParentId ? Activity::findOrFail($newParentId) : null;
+
+                // Verifier qu'on ne deplace pas vers un descendant
+                if ($newParent && str_starts_with($newParent->chemin, $activity->chemin . '.')) {
+                    abort(400, 'Impossible de deplacer une activite vers un de ses descendants.');
+                }
+
+                $oldPath = $activity->chemin;
+                $newNiveau = $newParent ? $newParent->niveau + 1 : 0;
+
+                $activity->parent_id = $newParentId;
+                $activity->niveau = $newNiveau;
+                $activity->chemin = $newParent ? "{$newParent->chemin}.{$activity->id}" : (string)$activity->id;
+
+                // Mettre a jour les chemins des descendants
+                $this->updateDescendantPaths($activity, $oldPath);
             }
 
-            $oldPath = $activity->chemin;
-            $newNiveau = $newParent ? $newParent->niveau + 1 : 0;
-            $newOrdre = Activity::where('parent_id', $newParentId)->max('ordre') + 1;
+            // Reordonner : decaler les autres activites du meme parent
+            $currentOrdre = $activity->ordre;
+            if ($newOrdre < $currentOrdre) {
+                // Monter : decaler vers le bas les activites entre newOrdre et currentOrdre
+                Activity::where('parent_id', $activity->parent_id)
+                    ->where('id', '!=', $activity->id)
+                    ->where('ordre', '>=', $newOrdre)
+                    ->where('ordre', '<', $currentOrdre)
+                    ->increment('ordre');
+            } else if ($newOrdre > $currentOrdre) {
+                // Descendre : decaler vers le haut les activites entre currentOrdre et newOrdre
+                Activity::where('parent_id', $activity->parent_id)
+                    ->where('id', '!=', $activity->id)
+                    ->where('ordre', '>', $currentOrdre)
+                    ->where('ordre', '<=', $newOrdre)
+                    ->decrement('ordre');
+            }
 
-            $activity->parent_id = $newParentId;
-            $activity->niveau = $newNiveau;
             $activity->ordre = $newOrdre;
-            $activity->chemin = $newParent ? "{$newParent->chemin}.{$activity->id}" : (string)$activity->id;
             $activity->save();
-
-            // Mettre a jour les chemins des descendants
-            $this->updateDescendantPaths($activity, $oldPath);
 
             return $activity->fresh();
         });
