@@ -14,9 +14,13 @@ class AuthMutator
      */
     public function login($root, array $args): array
     {
-        $user = User::where('email', $args['email'])->first();
+        // Trim email et password pour eviter les erreurs de copier-coller
+        $email = trim($args['email']);
+        $password = trim($args['password']);
 
-        if (!$user || !Hash::check($args['password'], $user->password)) {
+        $user = User::where('email', $email)->first();
+
+        if (!$user || !Hash::check($password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Les identifiants fournis sont incorrects.'],
             ]);

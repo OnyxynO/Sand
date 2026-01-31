@@ -2,20 +2,20 @@
 
 ## Bugs actifs
 
-### BUG-002 : Hot reload Vite intermittent
-- **Contexte** : Le HMR de Vite affiche "update" dans la console mais le navigateur garde l'ancien code
-- **Impact** : Necessite parfois un refresh manuel ou restart du serveur
-- **Workaround** : Relancer `npm run dev` ou Ctrl+Shift+R si les changements ne s'appliquent pas
-- **Piste** : Peut etre lie a la config Docker ou au cache navigateur
-- **Priorite** : Basse (workaround disponible)
+Aucun bug actif connu.
 
 ---
 
 ## Problemes resolus
 
+### RESOLU : BUG-002 - Hot reload Vite intermittent
+- **Probleme** : Le HMR de Vite ne detectait pas les changements de fichiers dans Docker
+- **Cause** : Les volumes Docker ne propagent pas les evenements inotify
+- **Solution** : Ajouter `watch.usePolling: true` et config HMR dans vite.config.ts
+
 ### RESOLU : BUG-001 - Login espaces non trimmes
 - **Probleme** : Les espaces en fin d'email/mot de passe n'etaient pas supprimes
-- **Solution** : Ajout de `.trim()` dans `handleSubmit` (LoginPage.tsx lignes 35-36)
+- **Solution** : Ajout de `trim()` cote backend dans AuthMutator.php (plus fiable que frontend seul)
 - **Statut** : Corrige et verifie
 
 ### RESOLU : Apollo Client 4.x imports
