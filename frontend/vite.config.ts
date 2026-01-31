@@ -8,5 +8,15 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
+    // Configuration pour Docker - polling necessaire pour detecter les changements
+    watch: {
+      usePolling: true,
+      interval: 1000,
+    },
+    // HMR via WebSocket
+    hmr: {
+      host: 'localhost',
+      port: 5173,
+    },
   },
 })
