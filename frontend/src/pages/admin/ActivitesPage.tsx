@@ -487,6 +487,20 @@ export default function ActivitesPage() {
     }
   };
 
+  // Trouver le parent d'une activite (retourne null si racine)
+  const trouverParentId = (id: string, liste: Activite[] = activites): string | null => {
+    for (const a of liste) {
+      if (a.enfants?.some((e) => e.id === id)) {
+        return a.id; // Trouve ! Le parent est 'a'
+      }
+      if (a.enfants) {
+        const result = trouverParentId(id, a.enfants);
+        if (result !== null) return result;
+      }
+    }
+    return null; // C'est une racine
+  };
+
   // Trouver les freres d'une activite
   const trouverFreres = (id: string, liste: Activite[] = activites): Activite[] => {
     for (const a of liste) {
@@ -510,11 +524,13 @@ export default function ActivitesPage() {
     const index = freres.findIndex((f) => f.id === activite.id);
     if (index <= 0) return;
 
+    const parentId = trouverParentId(activite.id);
+
     try {
       await moveActivity({
         variables: {
           id: activite.id,
-          parentId: null, // garder le meme parent
+          parentId: parentId, // passer le vrai parent (null = racine)
           ordre: freres[index - 1].ordre,
         },
       });
@@ -529,11 +545,13 @@ export default function ActivitesPage() {
     const index = freres.findIndex((f) => f.id === activite.id);
     if (index >= freres.length - 1) return;
 
+    const parentId = trouverParentId(activite.id);
+
     try {
       await moveActivity({
         variables: {
           id: activite.id,
-          parentId: null,
+          parentId: parentId, // passer le vrai parent (null = racine)
           ordre: freres[index + 1].ordre,
         },
       });

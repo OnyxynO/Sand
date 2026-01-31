@@ -116,12 +116,16 @@ class ActivityMutator
         }
 
         return DB::transaction(function () use ($activity, $args) {
-            $newParentId = $args['parentId'] ?? null;
-            $newOrdre = $args['ordre'];
+            // Normaliser les IDs pour comparaison (string "2" vs int 2)
+            $newParentId = isset($args['parentId']) ? (int)$args['parentId'] : null;
             $oldParentId = $activity->parent_id;
+            $newOrdre = (int)$args['ordre'];
+
+            // Convertir pour comparaison coherente
+            $oldParentIdNorm = $oldParentId !== null ? (int)$oldParentId : null;
 
             // Si on change de parent
-            if ($newParentId !== $oldParentId) {
+            if ($newParentId !== $oldParentIdNorm) {
                 $newParent = $newParentId ? Activity::findOrFail($newParentId) : null;
 
                 // Verifier qu'on ne deplace pas vers un descendant
