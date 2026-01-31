@@ -11,6 +11,7 @@ import {
   Cog6ToothIcon,
   UserGroupIcon,
   CheckIcon,
+  EyeSlashIcon,
 } from '@heroicons/react/24/outline';
 import ToastAnnulation from '../components/ui/ToastAnnulation';
 import {
@@ -25,6 +26,11 @@ import {
 } from '../graphql/operations/projects';
 import { ARBRE_ACTIVITES } from '../graphql/operations/activities';
 import { USERS_QUERY } from '../graphql/operations/users';
+import {
+  RESTRICTIONS_VISIBILITE_QUERY,
+  HIDE_ACTIVITY_FOR_USER,
+  SHOW_ACTIVITY_FOR_USER,
+} from '../graphql/operations/visibility';
 import { useAuthStore } from '../stores/authStore';
 
 interface Utilisateur {
@@ -54,6 +60,21 @@ interface Activite {
   estFeuille: boolean;
   estActif: boolean;
   enfants?: Activite[];
+}
+
+interface RestrictionVisibilite {
+  id: string;
+  estVisible: boolean;
+  activite: {
+    id: string;
+    nom: string;
+    chemin: string;
+  };
+  utilisateur: {
+    id: string;
+    nomComplet: string;
+    email: string;
+  };
 }
 
 // Formulaire projet
@@ -674,6 +695,232 @@ function GestionModerateursModal({
   );
 }
 
+// Modal de gestion des restrictions de visibilite
+function GestionVisibilitesModal({
+  ouvert,
+  onFermer,
+  projet,
+  onSuccess,
+}: {
+  ouvert: boolean;
+  onFermer: () => void;
+  projet: Projet | null;
+  onSuccess: () => void;
+}) {
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
+  const [selectedActivityId, setSelectedActivityId] = useState<string>('');
+
+  interface RestrictionsData {
+    restrictionsVisibilite: RestrictionVisibilite[];
+  }
+
+  interface UsersData {
+    users: {
+      data: Utilisateur[];
+    };
+  }
+
+  const { data: dataRestrictions, loading: loadingRestrictions, refetch } = useQuery<RestrictionsData>(
+    RESTRICTIONS_VISIBILITE_QUERY,
+    {
+      variables: { projetId: projet?.id },
+      skip: !ouvert || !projet?.id,
+      fetchPolicy: 'network-only',
+    }
+  );
+
+  const { data: dataUsers } = useQuery<UsersData>(USERS_QUERY, {
+    variables: { actifSeulement: true },
+    skip: !ouvert,
+  });
+
+  const { data: dataActivites } = useQuery<{ arbreActivites: Activite[] }>(ARBRE_ACTIVITES, {
+    skip: !ouvert,
+  });
+
+  const [hideActivity, { loading: hidingActivity }] = useMutation(HIDE_ACTIVITY_FOR_USER);
+  const [showActivity, { loading: showingActivity }] = useMutation(SHOW_ACTIVITY_FOR_USER);
+
+  const restrictions = dataRestrictions?.restrictionsVisibilite || [];
+  const utilisateurs = dataUsers?.users?.data?.filter((u) => u.role !== 'ADMIN') || [];
+
+  // Aplatir l'arbre des activites pour les feuilles seulement
+  const collecterFeuilles = (activites: Activite[]): { id: string; nom: string; chemin: string }[] => {
+    return activites.flatMap((a) => {
+      if (a.estFeuille && a.estActif) {
+        return [{ id: a.id, nom: a.nom, chemin: a.chemin }];
+      }
+      if (a.enfants) {
+        return collecterFeuilles(a.enfants);
+      }
+      return [];
+    });
+  };
+
+  const activitesFeuilles = useMemo(
+    () => collecterFeuilles(dataActivites?.arbreActivites || []),
+    [dataActivites]
+  );
+
+  const handleAjouterRestriction = async () => {
+    if (!projet || !selectedUserId || !selectedActivityId) return;
+
+    try {
+      await hideActivity({
+        variables: {
+          projetId: projet.id,
+          activiteId: selectedActivityId,
+          userId: selectedUserId,
+        },
+      });
+      setSelectedUserId('');
+      setSelectedActivityId('');
+      refetch();
+      onSuccess();
+    } catch (err) {
+      console.error('Erreur ajout restriction:', err);
+    }
+  };
+
+  const handleSupprimerRestriction = async (restriction: RestrictionVisibilite) => {
+    if (!projet) return;
+
+    try {
+      await showActivity({
+        variables: {
+          projetId: projet.id,
+          activiteId: restriction.activite.id,
+          userId: restriction.utilisateur.id,
+        },
+      });
+      refetch();
+      onSuccess();
+    } catch (err) {
+      console.error('Erreur suppression restriction:', err);
+    }
+  };
+
+  const loading = hidingActivity || showingActivity;
+
+  return (
+    <Transition appear show={ouvert} as={Fragment}>
+      <Dialog as="div" className="relative z-50" onClose={onFermer}>
+        <Transition.Child as={Fragment} enter="ease-out duration-200" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-150" leaveFrom="opacity-100" leaveTo="opacity-0">
+          <div className="fixed inset-0 bg-black/30" />
+        </Transition.Child>
+        <div className="fixed inset-0 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <Transition.Child as={Fragment} enter="ease-out duration-200" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100" leave="ease-in duration-150" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95">
+              <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-xl bg-white shadow-xl">
+                <div className="flex items-center justify-between border-b px-4 py-3">
+                  <Dialog.Title className="text-lg font-semibold">
+                    Restrictions de visibilite - {projet?.nom}
+                  </Dialog.Title>
+                  <button onClick={onFermer} className="p-1 rounded hover:bg-gray-100">
+                    <XMarkIcon className="w-5 h-5 text-gray-500" />
+                  </button>
+                </div>
+
+                {/* Ajouter une restriction */}
+                <div className="px-4 py-3 border-b bg-gray-50">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">Masquer une activite</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Utilisateur</label>
+                      <select
+                        value={selectedUserId}
+                        onChange={(e) => setSelectedUserId(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-lg text-sm"
+                      >
+                        <option value="">Selectionner...</option>
+                        {utilisateurs.map((u) => (
+                          <option key={u.id} value={u.id}>
+                            {u.nomComplet}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Activite</label>
+                      <select
+                        value={selectedActivityId}
+                        onChange={(e) => setSelectedActivityId(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-lg text-sm"
+                      >
+                        <option value="">Selectionner...</option>
+                        {activitesFeuilles.map((a) => (
+                          <option key={a.id} value={a.id}>
+                            {a.nom}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleAjouterRestriction}
+                    disabled={!selectedUserId || !selectedActivityId || loading}
+                    className="mt-3 w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Masquer cette activite pour cet utilisateur
+                  </button>
+                </div>
+
+                {/* Liste des restrictions */}
+                <div className="px-4 py-3">
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">
+                    Restrictions actives ({restrictions.length})
+                  </h4>
+                  {loadingRestrictions ? (
+                    <p className="text-sm text-gray-500 py-4 text-center">Chargement...</p>
+                  ) : restrictions.length === 0 ? (
+                    <p className="text-sm text-gray-500 py-4 text-center">
+                      Aucune restriction. Toutes les activites sont visibles pour tous les utilisateurs.
+                    </p>
+                  ) : (
+                    <div className="max-h-64 overflow-y-auto space-y-2">
+                      {restrictions.map((restriction) => (
+                        <div
+                          key={restriction.id}
+                          className="flex items-center justify-between bg-orange-50 rounded-lg px-3 py-2"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <EyeSlashIcon className="w-4 h-4 text-orange-600 flex-shrink-0" />
+                              <span className="text-sm font-medium text-gray-900 truncate">
+                                {restriction.activite.nom}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-500 ml-6">
+                              Masquee pour {restriction.utilisateur.nomComplet}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => handleSupprimerRestriction(restriction)}
+                            disabled={loading}
+                            className="text-xs text-red-600 hover:text-red-800 font-medium disabled:opacity-50 ml-2"
+                          >
+                            Supprimer
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex justify-end px-4 py-3 border-t">
+                  <button onClick={onFermer} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-lg hover:bg-gray-50">
+                    Fermer
+                  </button>
+                </div>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </div>
+      </Dialog>
+    </Transition>
+  );
+}
+
 // Page principale
 export default function ProjetsPage() {
   const { utilisateur } = useAuthStore();
@@ -686,6 +933,8 @@ export default function ProjetsPage() {
   const [projetEdite, setProjetEdite] = useState<Projet | null>(null);
   const [projetPourActivites, setProjetPourActivites] = useState<Projet | null>(null);
   const [projetPourModerateurs, setProjetPourModerateurs] = useState<Projet | null>(null);
+  const [modaleVisibilitesOuverte, setModaleVisibilitesOuverte] = useState(false);
+  const [projetPourVisibilites, setProjetPourVisibilites] = useState<Projet | null>(null);
   const [confirmationSuppression, setConfirmationSuppression] = useState<Projet | null>(null);
 
   const { data, loading, refetch } = useQuery<{ projets: Projet[] }>(PROJETS_QUERY, {
@@ -705,6 +954,11 @@ export default function ProjetsPage() {
   const ouvrirModerateurs = (projet: Projet) => {
     setProjetPourModerateurs(projet);
     setModaleModerateursOuverte(true);
+  };
+
+  const ouvrirVisibilites = (projet: Projet) => {
+    setProjetPourVisibilites(projet);
+    setModaleVisibilitesOuverte(true);
   };
 
   const confirmerSuppression = async () => {
@@ -810,6 +1064,15 @@ export default function ProjetsPage() {
                         </button>
                       )}
                       {estAdmin && (
+                        <button
+                          onClick={() => ouvrirVisibilites(projet)}
+                          className="p-1.5 text-gray-400 hover:text-orange-600 rounded hover:bg-orange-50"
+                          title="Restrictions de visibilite"
+                        >
+                          <EyeSlashIcon className="w-4 h-4" />
+                        </button>
+                      )}
+                      {estAdmin && (
                         <>
                           <button
                             onClick={() => { setProjetEdite(projet); setModaleProjetOuverte(true); }}
@@ -854,6 +1117,13 @@ export default function ProjetsPage() {
         ouvert={modaleModerateursOuverte}
         onFermer={() => setModaleModerateursOuverte(false)}
         projet={projetPourModerateurs}
+        onSuccess={() => refetch()}
+      />
+
+      <GestionVisibilitesModal
+        ouvert={modaleVisibilitesOuverte}
+        onFermer={() => setModaleVisibilitesOuverte(false)}
+        projet={projetPourVisibilites}
         onSuccess={() => refetch()}
       />
 
