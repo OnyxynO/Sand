@@ -51,3 +51,9 @@ coverage/
 
 # Build
 build/
+
+# Archives et documentation de travail
+archive/
+
+# Lock files orphelins (racine)
+/package-lock.json
