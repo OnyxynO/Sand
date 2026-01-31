@@ -24,7 +24,6 @@ class ActivityFactory extends Factory
             'description' => fake()->optional()->sentence(),
             'parent_id' => null,
             'chemin' => (string) self::$ordre,
-            'niveau' => 0,
             'ordre' => self::$ordre,
             'est_feuille' => true,
             'est_systeme' => false,

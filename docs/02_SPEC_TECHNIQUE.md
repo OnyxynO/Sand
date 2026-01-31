@@ -56,16 +56,16 @@
 
 ### 2.2 Arborescence des activités
 
-**Choix : Path matérialisé en base**
+**Choix : Path matérialisé avec ltree PostgreSQL**
 
-Ajout d'un champ `path` dans la table `activities` pour faciliter :
-- Le tri hiérarchique
-- Les requêtes de descendants
-- L'affichage de l'arbre
+Utilisation de l'extension native `ltree` de PostgreSQL pour la gestion de l'arborescence des activités. Le champ `chemin` stocke le path matérialisé optimisé.
 
 ```sql
--- Exemple de path
-| id | name       | parent_id | path    |
+-- Activation de l'extension
+CREATE EXTENSION IF NOT EXISTS ltree;
+
+-- Exemple de chemin ltree
+| id | name       | parent_id | chemin  |
 |----|------------|-----------|---------|
 | 1  | Dev        | NULL      | 1       |
 | 2  | Backend    | 1         | 1.2     |
@@ -73,9 +73,17 @@ Ajout d'un champ `path` dans la table `activities` pour faciliter :
 | 4  | Frontend   | 1         | 1.4     |
 ```
 
+**Opérateurs ltree :**
+- `<@` : est descendant de (`chemin <@ '1.2'` → tous les descendants de 1.2)
+- `@>` : est ancêtre de (`chemin @> '1.2.3'` → tous les ancêtres de 1.2.3)
+- `nlevel()` : nombre de niveaux (`nlevel('1.2.3')` → 3)
+- `subpath()` : extraction de sous-chemin
+
 **Avantages :**
-- Tri simple : `ORDER BY path`
-- Descendants : `WHERE path LIKE '1.2.%'`
+- Tri simple : `ORDER BY chemin`
+- Descendants : `WHERE chemin <@ '1.2'::ltree` (index GiST, très performant)
+- Niveau calculé dynamiquement : `nlevel(chemin) - 1` (plus stocké en base)
+- Mise à jour batch des descendants lors d'un déplacement
 - Pas de récursion nécessaire côté GraphQL
 
 ### 2.3 Activité "Absence"
@@ -176,9 +184,9 @@ UNIQUE (user_id, date, activity_id, project_id, deleted_at)
 -- Recherche par période
 CREATE INDEX idx_time_entries_date ON time_entries(date);
 
--- Arborescence
-CREATE INDEX idx_activities_path ON activities(path);
-CREATE INDEX idx_activities_parent ON activities(parent_id);
+-- Arborescence (ltree avec index GiST)
+CREATE INDEX idx_activities_chemin_gist ON activities USING GIST (chemin);
+CREATE INDEX idx_activities_parent_ordre ON activities (parent_id, ordre);
 
 -- Notifications non lues
 CREATE INDEX idx_notifications_unread ON notifications(user_id, is_read) WHERE is_read = false;
@@ -191,7 +199,7 @@ CREATE INDEX idx_notifications_unread ON notifications(user_id, is_read) WHERE i
 | `duration` | `DECIMAL(3,2)` | Précision 2 décimales, max 9.99 |
 | `data` (notifications) | `JSONB` | Flexibilité, indexable |
 | `value` (settings) | `JSONB` | Valeurs complexes possibles |
-| `path` (activities) | `VARCHAR(255)` | Path matérialisé "1.2.3" |
+| `chemin` (activities) | `ltree` | Path matérialisé natif PostgreSQL, index GiST |
 
 ---
 
@@ -326,4 +334,5 @@ REDIS_HOST=redis
 
 ---
 
-*Document v1.0 - Janvier 2025*
+*Document v1.1 - Janvier 2026*
+*Mise à jour : migration vers ltree PostgreSQL pour l'arborescence*
