@@ -4,6 +4,8 @@ import { useMutation } from '@apollo/client/react';
 import { useAuthStore } from '../stores/authStore';
 import { LOGOUT_MUTATION } from '../graphql/operations/auth';
 import { apolloClient } from '../graphql/client';
+import NotificationBell from './notifications/NotificationBell';
+import NotificationPanel from './notifications/NotificationPanel';
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -69,6 +71,9 @@ export default function Layout() {
 
             {/* Menu utilisateur */}
             <div className="flex items-center space-x-4">
+              {/* Notifications */}
+              <NotificationBell />
+
               <div className="hidden sm:block text-right">
                 <p className="text-sm font-medium text-gray-900">
                   {utilisateur?.prenom} {utilisateur?.nom}
@@ -160,6 +165,9 @@ export default function Layout() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Outlet />
       </main>
+
+      {/* Panneau notifications (slide-over) */}
+      <NotificationPanel />
     </div>
   );
 }

@@ -281,7 +281,7 @@ Intégrer les absences et la modération.
 
 ---
 
-#### US-3.3 : Gestion des conflits absences (en cours)
+#### US-3.3 : Gestion des conflits absences ✅
 > **En tant qu'** utilisateur
 > **Je veux** être prévenu en cas de conflit absence/saisie
 > **Afin de** choisir comment le résoudre
@@ -290,8 +290,8 @@ Intégrer les absences et la modération.
 - [x] Détection conflit à l'import (fait dans US-3.2)
 - [x] Notification créée (TYPE_CONFLIT_ABSENCE avec absence_id et saisie_ids)
 - [x] Backend résolution (`resolveAbsenceConflict` mutation)
-- [ ] Interface de résolution (écraser/ignorer/ajuster)
-- [ ] Warning si total > 1.0
+- [x] Interface de résolution (modale écraser/ignorer)
+- [ ] Warning si total > 1.0 (hors scope v1, option AJUSTER masquée)
 
 ---
 
@@ -323,17 +323,17 @@ Intégrer les absences et la modération.
 
 ---
 
-#### US-3.6 : Système de notifications
+#### US-3.6 : Système de notifications ✅
 > **En tant qu'** utilisateur
 > **Je veux** recevoir des notifications
 > **Afin d'** être informé des anomalies
 
 **Critères d'acceptation :**
-- [ ] Icône cloche dans le header
-- [ ] Badge compteur (non lues)
-- [ ] Panneau latéral listant les notifications
-- [ ] Marquage lu/non lu
-- [ ] Chargement au refresh (pas temps réel)
+- [x] Icône cloche dans le header
+- [x] Badge compteur (non lues)
+- [x] Panneau latéral (slide-over) listant les notifications
+- [x] Marquage lu/non lu (clic ou "Tout marquer lu")
+- [x] Chargement au refresh + polling 60s (pas temps réel)
 
 ---
 

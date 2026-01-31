@@ -24,6 +24,12 @@ type Documents = {
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      user {\n        id\n        nom\n        prenom\n        email\n        role\n        equipe {\n          id\n          nom\n          code\n        }\n      }\n      token\n    }\n  }\n": typeof types.LoginDocument,
     "\n  mutation Logout {\n    logout\n  }\n": typeof types.LogoutDocument,
     "\n  query Me {\n    me {\n      id\n      nom\n      prenom\n      email\n      role\n      equipe {\n        id\n        nom\n        code\n      }\n    }\n  }\n": typeof types.MeDocument,
+    "\n  fragment NotificationFields on Notification {\n    id\n    type\n    titre\n    message\n    donnees\n    estLu\n    luLe\n    createdAt\n  }\n": typeof types.NotificationFieldsFragmentDoc,
+    "\n  \n  query MesNotifications($nonLuSeulement: Boolean, $limite: Int) {\n    mesNotifications(nonLuSeulement: $nonLuSeulement, limite: $limite) {\n      ...NotificationFields\n    }\n  }\n": typeof types.MesNotificationsDocument,
+    "\n  query NombreNotificationsNonLues {\n    nombreNotificationsNonLues\n  }\n": typeof types.NombreNotificationsNonLuesDocument,
+    "\n  \n  mutation MarkNotificationRead($id: ID!) {\n    markNotificationRead(id: $id) {\n      ...NotificationFields\n    }\n  }\n": typeof types.MarkNotificationReadDocument,
+    "\n  mutation MarkAllNotificationsRead {\n    markAllNotificationsRead\n  }\n": typeof types.MarkAllNotificationsReadDocument,
+    "\n  mutation ResolveAbsenceConflict($absenceId: ID!, $resolution: ConflictResolution!) {\n    resolveAbsenceConflict(absenceId: $absenceId, resolution: $resolution)\n  }\n": typeof types.ResolveAbsenceConflictDocument,
     "\n  fragment ProjectFields on Project {\n    id\n    nom\n    code\n    description\n    dateDebut\n    dateFin\n    estActif\n    createdAt\n  }\n": typeof types.ProjectFieldsFragmentDoc,
     "\n  fragment ProjectFullFields on Project {\n    id\n    nom\n    code\n    description\n    dateDebut\n    dateFin\n    estActif\n    createdAt\n    moderateurs {\n      id\n      nomComplet\n      email\n    }\n    utilisateurs {\n      id\n      nomComplet\n      email\n    }\n    activitesActives {\n      id\n      nom\n      chemin\n    }\n  }\n": typeof types.ProjectFullFieldsFragmentDoc,
     "\n  \n  query Projets($actif: Boolean, $moderateurId: ID) {\n    projets(actif: $actif, moderateurId: $moderateurId) {\n      ...ProjectFields\n      moderateurs {\n        id\n        nomComplet\n      }\n    }\n  }\n": typeof types.ProjetsDocument,
@@ -72,6 +78,12 @@ const documents: Documents = {
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      user {\n        id\n        nom\n        prenom\n        email\n        role\n        equipe {\n          id\n          nom\n          code\n        }\n      }\n      token\n    }\n  }\n": types.LoginDocument,
     "\n  mutation Logout {\n    logout\n  }\n": types.LogoutDocument,
     "\n  query Me {\n    me {\n      id\n      nom\n      prenom\n      email\n      role\n      equipe {\n        id\n        nom\n        code\n      }\n    }\n  }\n": types.MeDocument,
+    "\n  fragment NotificationFields on Notification {\n    id\n    type\n    titre\n    message\n    donnees\n    estLu\n    luLe\n    createdAt\n  }\n": types.NotificationFieldsFragmentDoc,
+    "\n  \n  query MesNotifications($nonLuSeulement: Boolean, $limite: Int) {\n    mesNotifications(nonLuSeulement: $nonLuSeulement, limite: $limite) {\n      ...NotificationFields\n    }\n  }\n": types.MesNotificationsDocument,
+    "\n  query NombreNotificationsNonLues {\n    nombreNotificationsNonLues\n  }\n": types.NombreNotificationsNonLuesDocument,
+    "\n  \n  mutation MarkNotificationRead($id: ID!) {\n    markNotificationRead(id: $id) {\n      ...NotificationFields\n    }\n  }\n": types.MarkNotificationReadDocument,
+    "\n  mutation MarkAllNotificationsRead {\n    markAllNotificationsRead\n  }\n": types.MarkAllNotificationsReadDocument,
+    "\n  mutation ResolveAbsenceConflict($absenceId: ID!, $resolution: ConflictResolution!) {\n    resolveAbsenceConflict(absenceId: $absenceId, resolution: $resolution)\n  }\n": types.ResolveAbsenceConflictDocument,
     "\n  fragment ProjectFields on Project {\n    id\n    nom\n    code\n    description\n    dateDebut\n    dateFin\n    estActif\n    createdAt\n  }\n": types.ProjectFieldsFragmentDoc,
     "\n  fragment ProjectFullFields on Project {\n    id\n    nom\n    code\n    description\n    dateDebut\n    dateFin\n    estActif\n    createdAt\n    moderateurs {\n      id\n      nomComplet\n      email\n    }\n    utilisateurs {\n      id\n      nomComplet\n      email\n    }\n    activitesActives {\n      id\n      nom\n      chemin\n    }\n  }\n": types.ProjectFullFieldsFragmentDoc,
     "\n  \n  query Projets($actif: Boolean, $moderateurId: ID) {\n    projets(actif: $actif, moderateurId: $moderateurId) {\n      ...ProjectFields\n      moderateurs {\n        id\n        nomComplet\n      }\n    }\n  }\n": types.ProjetsDocument,
@@ -164,6 +176,30 @@ export function graphql(source: "\n  mutation Logout {\n    logout\n  }\n"): (ty
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query Me {\n    me {\n      id\n      nom\n      prenom\n      email\n      role\n      equipe {\n        id\n        nom\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  query Me {\n    me {\n      id\n      nom\n      prenom\n      email\n      role\n      equipe {\n        id\n        nom\n        code\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment NotificationFields on Notification {\n    id\n    type\n    titre\n    message\n    donnees\n    estLu\n    luLe\n    createdAt\n  }\n"): (typeof documents)["\n  fragment NotificationFields on Notification {\n    id\n    type\n    titre\n    message\n    donnees\n    estLu\n    luLe\n    createdAt\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  \n  query MesNotifications($nonLuSeulement: Boolean, $limite: Int) {\n    mesNotifications(nonLuSeulement: $nonLuSeulement, limite: $limite) {\n      ...NotificationFields\n    }\n  }\n"): (typeof documents)["\n  \n  query MesNotifications($nonLuSeulement: Boolean, $limite: Int) {\n    mesNotifications(nonLuSeulement: $nonLuSeulement, limite: $limite) {\n      ...NotificationFields\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query NombreNotificationsNonLues {\n    nombreNotificationsNonLues\n  }\n"): (typeof documents)["\n  query NombreNotificationsNonLues {\n    nombreNotificationsNonLues\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  \n  mutation MarkNotificationRead($id: ID!) {\n    markNotificationRead(id: $id) {\n      ...NotificationFields\n    }\n  }\n"): (typeof documents)["\n  \n  mutation MarkNotificationRead($id: ID!) {\n    markNotificationRead(id: $id) {\n      ...NotificationFields\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation MarkAllNotificationsRead {\n    markAllNotificationsRead\n  }\n"): (typeof documents)["\n  mutation MarkAllNotificationsRead {\n    markAllNotificationsRead\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ResolveAbsenceConflict($absenceId: ID!, $resolution: ConflictResolution!) {\n    resolveAbsenceConflict(absenceId: $absenceId, resolution: $resolution)\n  }\n"): (typeof documents)["\n  mutation ResolveAbsenceConflict($absenceId: ID!, $resolution: ConflictResolution!) {\n    resolveAbsenceConflict(absenceId: $absenceId, resolution: $resolution)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
