@@ -21,11 +21,12 @@ class ActivityMutator
             $parentId = $args['parentId'] ?? null;
             $parent = $parentId ? Activity::findOrFail($parentId) : null;
 
-            // Calculer le niveau et le chemin
+            // Calculer le niveau et l'ordre
             $niveau = $parent ? $parent->niveau + 1 : 0;
-            $ordre = Activity::where('parent_id', $parentId)->max('ordre') + 1;
+            $ordre = (Activity::where('parent_id', $parentId)->max('ordre') ?? 0) + 1;
 
-            $activity = Activity::create([
+            // Creer l'activite avec chemin temporaire
+            $activity = new Activity([
                 'nom' => $args['nom'],
                 'code' => $args['code'] ?? null,
                 'description' => $args['description'] ?? null,
@@ -33,9 +34,11 @@ class ActivityMutator
                 'niveau' => $niveau,
                 'ordre' => $ordre,
                 'est_actif' => $args['estActif'] ?? true,
+                'chemin' => 'temp', // Placeholder temporaire
             ]);
+            $activity->save();
 
-            // Mettre a jour le chemin
+            // Mettre a jour le chemin avec l'ID reel
             $activity->chemin = $parent ? "{$parent->chemin}.{$activity->id}" : (string)$activity->id;
             $activity->save();
 
