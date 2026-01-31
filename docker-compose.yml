@@ -13,8 +13,10 @@ services:
     networks:
       - sand-network
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   # Serveur Web Nginx
   nginx:
@@ -32,6 +34,12 @@ services:
       - sand-network
     depends_on:
       - app
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
 
   # Base de données PostgreSQL
   db:
@@ -48,6 +56,12 @@ services:
       - sand-db-data:/var/lib/postgresql/data
     networks:
       - sand-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-sand} -d ${DB_DATABASE:-sand}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   # Cache Redis
   redis:
@@ -60,6 +74,12 @@ services:
       - sand-redis-data:/data
     networks:
       - sand-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
   # Frontend React (développement)
   frontend:
@@ -93,6 +113,12 @@ services:
     networks:
       - sand-network
     command: node server.js
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
 networks:
   sand-network:

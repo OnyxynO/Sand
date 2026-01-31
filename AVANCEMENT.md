@@ -63,6 +63,46 @@ curl -s -X POST http://localhost:8080/graphql \
 
 ## Historique
 
+### 2026-01-31 - Infrastructure de tests (Phase T0)
+
+#### Fait
+- [x] T0.1 : Setup graphql-codegen (validation schema front/back)
+  - [x] Installation @graphql-codegen/cli et presets
+  - [x] Configuration `frontend/codegen.ts`
+  - [x] Generation automatique des types dans `src/gql/`
+  - [x] Script `npm run codegen` ajoute au build
+  - [x] Correction des mutations frontend (55 erreurs detectees et corrigees)
+  - [x] Adaptation des appels de mutations dans les composants
+- [x] T0.2 : Healthchecks Docker
+  - [x] Healthcheck PostgreSQL (pg_isready)
+  - [x] Healthcheck Redis (ping)
+  - [x] Healthcheck nginx (api/health)
+  - [x] Healthcheck mock-rh (api/health)
+  - [x] Endpoint `/api/health` dans le backend (DB + Redis status)
+  - [x] Dependencies `condition: service_healthy` pour app
+- [x] T0.3 : Smoke tests demarrage
+  - [x] Script `tests/smoke-test.sh` cree
+  - [x] Verification des 6 services principaux
+  - [x] Mode `--ci` avec timeout plus long
+
+#### Fichiers crees
+- `frontend/codegen.ts`
+- `frontend/src/gql/` (generes)
+- `tests/smoke-test.sh`
+
+#### Fichiers modifies
+- `frontend/package.json` (scripts codegen)
+- `frontend/src/graphql/operations/projects.ts`
+- `frontend/src/graphql/operations/saisie.ts`
+- `frontend/src/graphql/operations/teams.ts`
+- `frontend/src/graphql/operations/users.ts`
+- `frontend/src/pages/admin/EquipesPage.tsx`
+- `frontend/src/pages/ProjetsPage.tsx`
+- `frontend/src/components/admin/FormulaireUtilisateur.tsx`
+- `backend/routes/web.php` (endpoint health)
+- `docker-compose.yml` (healthchecks)
+- `docs/PLAN_TESTS.md`
+
 ### 2026-01-30 - Phase 3 : Import absences (US-3.2)
 
 #### Fait

@@ -106,19 +106,23 @@ function FormulaireEquipe({
         await updateTeam({
           variables: {
             id: formData.id,
-            nom: formData.nom.trim(),
-            code: formData.code.trim().toUpperCase(),
-            description: formData.description.trim() || null,
-            estActif: formData.estActif,
+            input: {
+              nom: formData.nom.trim(),
+              code: formData.code.trim().toUpperCase(),
+              description: formData.description.trim() || null,
+              estActif: formData.estActif,
+            },
           },
         });
       } else {
         await createTeam({
           variables: {
-            nom: formData.nom.trim(),
-            code: formData.code.trim().toUpperCase(),
-            description: formData.description.trim() || null,
-            estActif: formData.estActif,
+            input: {
+              nom: formData.nom.trim(),
+              code: formData.code.trim().toUpperCase(),
+              description: formData.description.trim() || null,
+              estActif: formData.estActif,
+            },
           },
         });
       }
