@@ -1,22 +1,22 @@
 # Bugs et problemes a corriger
 
-## BUG-001 : Login - espaces non trimmes
-- **Fichier** : `frontend/src/pages/LoginPage.tsx`
-- **Probleme** : Les espaces en fin d'email/mot de passe ne sont pas supprimes avant envoi
-- **Impact** : Erreur de connexion si l'utilisateur copie-colle avec des espaces
-- **Correction tentee** : Ajout de `.trim()` dans `handleSubmit` mais le hot reload ne semble pas fonctionner
-- **Action** : Verifier que le code est bien applique apres rebuild complet
-- **Ref** : DIFFUSION_LOG.md
+## Bugs actifs
 
-## BUG-002 : Hot reload Vite intermittent
+### BUG-002 : Hot reload Vite intermittent
 - **Contexte** : Le HMR de Vite affiche "update" dans la console mais le navigateur garde l'ancien code
 - **Impact** : Necessite parfois un refresh manuel ou restart du serveur
-- **Workaround** : Relancer `npm run dev` si les changements ne s'appliquent pas
+- **Workaround** : Relancer `npm run dev` ou Ctrl+Shift+R si les changements ne s'appliquent pas
 - **Piste** : Peut etre lie a la config Docker ou au cache navigateur
+- **Priorite** : Basse (workaround disponible)
 
 ---
 
 ## Problemes resolus
+
+### RESOLU : BUG-001 - Login espaces non trimmes
+- **Probleme** : Les espaces en fin d'email/mot de passe n'etaient pas supprimes
+- **Solution** : Ajout de `.trim()` dans `handleSubmit` (LoginPage.tsx lignes 35-36)
+- **Statut** : Corrige et verifie
 
 ### RESOLU : Apollo Client 4.x imports
 - **Probleme** : `Module '@apollo/client' has no exported member 'useQuery'`
@@ -37,6 +37,25 @@
 
 ---
 
+## Fonctionnalites implementees (anciennement "A implementer")
+
+### US-2.6 : Visibilite par utilisateur ✅
+- **Commit** : `702387a`
+- **Backend** : Modele ActivityUserVisibility, mutations hideActivityForUser/showActivityForUser
+- **Frontend** : Modale GestionVisibilitesModal dans page Projets
+
+### US-3.3 : Interface resolution conflits absences ✅
+- **Commit** : `686c1e5`
+- **Backend** : resolveAbsenceConflict avec resolution ECRASER/IGNORER
+- **Frontend** : ConflitResolutionModal avec confirmation pour actions destructives
+
+### US-3.6 : Systeme de notifications (UI) ✅
+- **Commit** : `686c1e5`
+- **Frontend** : NotificationBell, NotificationPanel, NotificationItem
+- **Store** : notificationStore.ts avec Zustand
+
+---
+
 ## A implementer (hors bugs)
 
 ### Tests automatiques coherence front/back
@@ -47,22 +66,8 @@
   - Utiliser `graphql-codegen` pour generer les types TypeScript depuis le schema backend
 - **Priorite** : Moyenne (qualite long terme)
 
-### US-2.6 : Visibilite par utilisateur
-- **Statut** : Backend non implemente
-- **Table** : `activity_user_visibilities` existe
-- **Manque** : Resolvers GraphQL pour `setActivityVisibility`
-- **Frontend** : A creer une fois le backend pret
-
-### US-3.3 : Interface resolution conflits absences
-- **Statut** : Backend OK (resolveConflict dans AbsenceMutator), UI a creer
-- **Backend** : `AbsenceMutator::resolveConflict()` avec actions garder_saisie/garder_absence
-- **Notifications** : TYPE_CONFLIT_ABSENCE creees avec absence_id et saisie_ids
-- **Manque** : Interface frontend pour afficher et resoudre les conflits
-
-### US-3.6 : Systeme de notifications (UI)
-- **Statut** : Backend OK (model Notification, types definis), UI a creer
-- **Manque** :
-  - Icone cloche dans le header
-  - Badge compteur non lues
-  - Panneau lateral listant les notifications
-  - Marquage lu/non lu
+### RESOLU : Erreur codegen TypedDocumentNode
+- **Probleme** : `src/gql/gql.ts` et `src/gql/graphql.ts` avaient une erreur d'import TypedDocumentNode
+- **Message** : `'TypedDocumentNode' is a type and must be imported using a type-only import`
+- **Cause** : verbatimModuleSyntax dans tsconfig exige `import type`
+- **Solution** : Ajouter `useTypeImports: true` dans codegen.ts
