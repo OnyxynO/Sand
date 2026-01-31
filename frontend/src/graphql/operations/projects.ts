@@ -68,26 +68,8 @@ export const PROJET_QUERY = gql`
 // Mutations
 export const CREATE_PROJECT = gql`
   ${PROJECT_FULL_FRAGMENT}
-  mutation CreateProject(
-    $nom: String!
-    $code: String!
-    $description: String
-    $dateDebut: Date
-    $dateFin: Date
-    $estActif: Boolean
-    $moderateurIds: [ID!]
-    $activiteIds: [ID!]
-  ) {
-    createProject(
-      nom: $nom
-      code: $code
-      description: $description
-      dateDebut: $dateDebut
-      dateFin: $dateFin
-      estActif: $estActif
-      moderateurIds: $moderateurIds
-      activiteIds: $activiteIds
-    ) {
+  mutation CreateProject($input: CreateProjectInput!) {
+    createProject(input: $input) {
       ...ProjectFullFields
     }
   }
@@ -95,24 +77,8 @@ export const CREATE_PROJECT = gql`
 
 export const UPDATE_PROJECT = gql`
   ${PROJECT_FULL_FRAGMENT}
-  mutation UpdateProject(
-    $id: ID!
-    $nom: String
-    $code: String
-    $description: String
-    $dateDebut: Date
-    $dateFin: Date
-    $estActif: Boolean
-  ) {
-    updateProject(
-      id: $id
-      nom: $nom
-      code: $code
-      description: $description
-      dateDebut: $dateDebut
-      dateFin: $dateFin
-      estActif: $estActif
-    ) {
+  mutation UpdateProject($id: ID!, $input: UpdateProjectInput!) {
+    updateProject(id: $id, input: $input) {
       ...ProjectFullFields
     }
   }

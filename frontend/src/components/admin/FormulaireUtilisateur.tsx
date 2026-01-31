@@ -129,25 +129,29 @@ export default function FormulaireUtilisateur({
         await updateUser({
           variables: {
             id: formData.id,
-            nom: formData.nom.trim(),
-            prenom: formData.prenom.trim(),
-            email: formData.email.trim(),
-            password: formData.password || undefined,
-            role: formData.role,
-            matricule: formData.matricule?.trim() || undefined,
-            equipeId: formData.equipeId || undefined,
+            input: {
+              nom: formData.nom.trim(),
+              prenom: formData.prenom.trim(),
+              email: formData.email.trim(),
+              password: formData.password || undefined,
+              role: formData.role,
+              matricule: formData.matricule?.trim() || undefined,
+              equipeId: formData.equipeId || undefined,
+            },
           },
         });
       } else {
         await createUser({
           variables: {
-            nom: formData.nom.trim(),
-            prenom: formData.prenom.trim(),
-            email: formData.email.trim(),
-            password: formData.password,
-            role: formData.role,
-            matricule: formData.matricule?.trim() || undefined,
-            equipeId: formData.equipeId || undefined,
+            input: {
+              nom: formData.nom.trim(),
+              prenom: formData.prenom.trim(),
+              email: formData.email.trim(),
+              password: formData.password,
+              role: formData.role,
+              matricule: formData.matricule?.trim() || undefined,
+              equipeId: formData.equipeId || undefined,
+            },
           },
         });
       }

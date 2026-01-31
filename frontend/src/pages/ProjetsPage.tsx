@@ -103,23 +103,27 @@ function FormulaireProjet({
         await updateProject({
           variables: {
             id: projet!.id,
-            nom: formData.nom.trim(),
-            code: formData.code.trim().toUpperCase(),
-            description: formData.description.trim() || null,
-            dateDebut: formData.dateDebut || null,
-            dateFin: formData.dateFin || null,
-            estActif: formData.estActif,
+            input: {
+              nom: formData.nom.trim(),
+              code: formData.code.trim().toUpperCase(),
+              description: formData.description.trim() || null,
+              dateDebut: formData.dateDebut || null,
+              dateFin: formData.dateFin || null,
+              estActif: formData.estActif,
+            },
           },
         });
       } else {
         await createProject({
           variables: {
-            nom: formData.nom.trim(),
-            code: formData.code.trim().toUpperCase(),
-            description: formData.description.trim() || null,
-            dateDebut: formData.dateDebut || null,
-            dateFin: formData.dateFin || null,
-            estActif: formData.estActif,
+            input: {
+              nom: formData.nom.trim(),
+              code: formData.code.trim().toUpperCase(),
+              description: formData.description.trim() || null,
+              dateDebut: formData.dateDebut || null,
+              dateFin: formData.dateFin || null,
+              estActif: formData.estActif,
+            },
           },
         });
       }

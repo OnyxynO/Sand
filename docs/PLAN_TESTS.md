@@ -44,132 +44,85 @@ Vitest non configure. Aucun test.
 
 ## Plan d'implementation
 
-### Phase T0 : Tests d'infrastructure (priorite critique)
+### Phase T0 : Tests d'infrastructure (priorite critique) - COMPLETE
 
-#### T0.1 : Validation schema GraphQL front/back
+#### T0.1 : Validation schema GraphQL front/back - FAIT
 **Probleme** : Le BUG-003 etait cause par une incoherence entre les mutations frontend et le schema backend. Sans validation automatique, ce probleme peut se reproduire.
 
-**Solution** : Utiliser `graphql-codegen` pour :
+**Solution implementee** : `graphql-codegen` configure pour :
 1. Generer les types TypeScript depuis le schema backend
 2. Valider les operations frontend contre le schema
 3. Echouer le build si incoherence
 
-**Fichiers a creer :**
-```
-frontend/codegen.ts           # Config graphql-codegen
-frontend/src/gql/             # Types generes
-```
+**Fichiers crees :**
+- `frontend/codegen.ts` - Config graphql-codegen
+- `frontend/src/gql/` - Types generes automatiquement
 
-**Dependances :**
-```bash
-npm install -D @graphql-codegen/cli @graphql-codegen/typescript \
-  @graphql-codegen/typescript-operations @graphql-codegen/typed-document-node
-```
-
-**Script package.json :**
+**Scripts ajoutes a package.json :**
 ```json
-"codegen": "graphql-codegen",
-"codegen:watch": "graphql-codegen --watch",
-"prebuild": "npm run codegen"  // Valide avant chaque build
+"codegen": "graphql-codegen --config codegen.ts",
+"codegen:watch": "graphql-codegen --config codegen.ts --watch",
+"build": "npm run codegen && tsc -b && vite build"
 ```
+
+**Mutations frontend corrigees pour correspondre au schema :**
+- `projects.ts` - CREATE_PROJECT, UPDATE_PROJECT
+- `saisie.ts` - CREATE_TIME_ENTRY, UPDATE_TIME_ENTRY
+- `teams.ts` - CREATE_TEAM, UPDATE_TEAM
+- `users.ts` - CREATE_USER, UPDATE_USER
+
+**Appels de mutations corriges dans les composants :**
+- `EquipesPage.tsx`
+- `FormulaireUtilisateur.tsx`
+- `ProjetsPage.tsx`
 
 **Tests automatiques :**
-- [ ] CI echoue si schema backend change sans mise a jour frontend
-- [ ] Types TypeScript generes automatiquement
-- [ ] Erreur de compilation si mutation mal formee
+- [x] Types TypeScript generes automatiquement
+- [x] Erreur de compilation si mutation mal formee
+- [ ] CI echoue si schema backend change sans mise a jour frontend (a configurer)
 
-#### T0.2 : Healthchecks Docker
+#### T0.2 : Healthchecks Docker - FAIT
 **Probleme** : Les services peuvent echouer sans que docker-compose le detecte.
 
-**Modifications docker-compose.yml :**
-```yaml
-services:
-  db:
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sand"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+**Modifications apportees :**
 
-  redis:
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+1. **docker-compose.yml** - Healthchecks ajoutes pour :
+   - `db` : pg_isready avec depends_on healthy
+   - `redis` : redis-cli ping avec depends_on healthy
+   - `nginx` : wget vers /api/health
+   - `mock-rh` : wget vers /api/health
 
-  app:
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+2. **backend/routes/web.php** - Endpoint `/api/health` cree :
+   - Verifie connexion PostgreSQL
+   - Verifie connexion Redis
+   - Retourne status `ok` ou `degraded`
 
-  mock-rh:
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-```
+3. **Dependencies sante** :
+   - `app` attend que `db` et `redis` soient healthy avant de demarrer
 
-**Endpoint sante backend :**
-```php
-// routes/api.php
-Route::get('/health', function () {
-    return response()->json([
-        'status' => 'ok',
-        'db' => DB::connection()->getPdo() ? 'ok' : 'error',
-        'redis' => Redis::ping() ? 'ok' : 'error',
-    ]);
-});
-```
-
-#### T0.3 : Smoke tests demarrage
+#### T0.3 : Smoke tests demarrage - FAIT
 **Objectif** : Verifier que tous les services demarrent et communiquent.
 
-**Script tests/smoke-test.sh :**
+**Script cree : `tests/smoke-test.sh`**
+
+Verifie en 6 etapes :
+1. Tous les conteneurs Docker sont running
+2. PostgreSQL repond (pg_isready)
+3. Redis repond (PONG)
+4. Backend /api/health retourne ok (avec details DB/Redis)
+5. Mock RH /api/health retourne ok
+6. GraphQL repond a une query introspection
+
+**Usage :**
 ```bash
-#!/bin/bash
-set -e
+# Execution locale
+./tests/smoke-test.sh
 
-echo "=== Smoke Tests SAND ==="
-
-# 1. Verifier que les conteneurs sont up
-echo "[1/5] Verification conteneurs..."
-docker-compose ps | grep -q "Up" || exit 1
-
-# 2. Verifier PostgreSQL
-echo "[2/5] Verification PostgreSQL..."
-docker-compose exec -T db pg_isready -U sand || exit 1
-
-# 3. Verifier Redis
-echo "[3/5] Verification Redis..."
-docker-compose exec -T redis redis-cli ping | grep -q "PONG" || exit 1
-
-# 4. Verifier API Backend
-echo "[4/5] Verification API Backend..."
-curl -sf http://localhost:8080/api/health | grep -q "ok" || exit 1
-
-# 5. Verifier Mock RH
-echo "[5/5] Verification Mock RH..."
-curl -sf http://localhost:3001/api/health | grep -q "ok" || exit 1
-
-# 6. Verifier GraphQL
-echo "[6/6] Verification GraphQL..."
-curl -sf -X POST http://localhost:8080/graphql \
-  -H "Content-Type: application/json" \
-  -d '{"query":"{ __typename }"}' | grep -q "Query" || exit 1
-
-echo "=== Tous les smoke tests OK ==="
+# Mode CI (timeout plus long)
+./tests/smoke-test.sh --ci
 ```
 
-**Integration CI (GitHub Actions) :**
+**Integration CI (a configurer) :**
 ```yaml
 # .github/workflows/smoke-tests.yml
 name: Smoke Tests
@@ -184,7 +137,7 @@ jobs:
       - name: Wait for services
         run: sleep 30
       - name: Run smoke tests
-        run: ./tests/smoke-test.sh
+        run: ./tests/smoke-test.sh --ci
 ```
 
 ---

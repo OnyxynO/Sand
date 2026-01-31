@@ -38,8 +38,8 @@ export const TEAM_QUERY = gql`
 // Mutations
 export const CREATE_TEAM = gql`
   ${TEAM_FULL_FRAGMENT}
-  mutation CreateTeam($nom: String!, $code: String!, $description: String, $estActif: Boolean) {
-    createTeam(nom: $nom, code: $code, description: $description, estActif: $estActif) {
+  mutation CreateTeam($input: TeamInput!) {
+    createTeam(input: $input) {
       ...TeamFullFields
     }
   }
@@ -47,8 +47,8 @@ export const CREATE_TEAM = gql`
 
 export const UPDATE_TEAM = gql`
   ${TEAM_FULL_FRAGMENT}
-  mutation UpdateTeam($id: ID!, $nom: String!, $code: String!, $description: String, $estActif: Boolean) {
-    updateTeam(id: $id, nom: $nom, code: $code, description: $description, estActif: $estActif) {
+  mutation UpdateTeam($id: ID!, $input: TeamInput!) {
+    updateTeam(id: $id, input: $input) {
       ...TeamFullFields
     }
   }

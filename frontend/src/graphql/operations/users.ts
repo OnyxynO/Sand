@@ -67,24 +67,8 @@ export const TEAMS_QUERY = gql`
 // Mutations
 export const CREATE_USER = gql`
   ${USER_FRAGMENT}
-  mutation CreateUser(
-    $nom: String!
-    $prenom: String!
-    $email: String!
-    $password: String!
-    $role: UserRole!
-    $matricule: String
-    $equipeId: ID
-  ) {
-    createUser(
-      nom: $nom
-      prenom: $prenom
-      email: $email
-      password: $password
-      role: $role
-      matricule: $matricule
-      equipeId: $equipeId
-    ) {
+  mutation CreateUser($input: CreateUserInput!) {
+    createUser(input: $input) {
       ...UserFields
     }
   }
@@ -92,28 +76,8 @@ export const CREATE_USER = gql`
 
 export const UPDATE_USER = gql`
   ${USER_FRAGMENT}
-  mutation UpdateUser(
-    $id: ID!
-    $nom: String
-    $prenom: String
-    $email: String
-    $password: String
-    $role: UserRole
-    $matricule: String
-    $equipeId: ID
-    $estActif: Boolean
-  ) {
-    updateUser(
-      id: $id
-      nom: $nom
-      prenom: $prenom
-      email: $email
-      password: $password
-      role: $role
-      matricule: $matricule
-      equipeId: $equipeId
-      estActif: $estActif
-    ) {
+  mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {
+    updateUser(id: $id, input: $input) {
       ...UserFields
     }
   }

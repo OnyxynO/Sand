@@ -74,20 +74,8 @@ export const ACTIVITES_DISPONIBLES = gql`
 
 export const CREATE_TIME_ENTRY = gql`
   ${SAISIE_FRAGMENT}
-  mutation CreateTimeEntry(
-    $projetId: ID!
-    $activiteId: ID!
-    $date: Date!
-    $duree: Float!
-    $commentaire: String
-  ) {
-    createTimeEntry(
-      projetId: $projetId
-      activiteId: $activiteId
-      date: $date
-      duree: $duree
-      commentaire: $commentaire
-    ) {
+  mutation CreateTimeEntry($input: TimeEntryInput!) {
+    createTimeEntry(input: $input) {
       ...SaisieFields
     }
   }
@@ -95,22 +83,8 @@ export const CREATE_TIME_ENTRY = gql`
 
 export const UPDATE_TIME_ENTRY = gql`
   ${SAISIE_FRAGMENT}
-  mutation UpdateTimeEntry(
-    $id: ID!
-    $projetId: ID!
-    $activiteId: ID!
-    $date: Date!
-    $duree: Float!
-    $commentaire: String
-  ) {
-    updateTimeEntry(
-      id: $id
-      projetId: $projetId
-      activiteId: $activiteId
-      date: $date
-      duree: $duree
-      commentaire: $commentaire
-    ) {
+  mutation UpdateTimeEntry($id: ID!, $input: TimeEntryInput!) {
+    updateTimeEntry(id: $id, input: $input) {
       ...SaisieFields
     }
   }
