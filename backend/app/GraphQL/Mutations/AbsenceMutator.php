@@ -284,24 +284,36 @@ class AbsenceMutator
     }
 
     /**
-     * Resoudre un conflit entre absence et saisie existante.
+     * Resoudre un conflit entre absence et saisies existantes.
+     *
+     * @param  array  $args  Contient absenceId et resolution (ECRASER|IGNORER)
      */
     public function resolveConflict($root, array $args): bool
     {
         $this->authorize('resolveConflict', Absence::class);
 
-        $action = $args['action']; // 'garder_saisie' ou 'garder_absence'
         $absenceId = $args['absenceId'];
-        $saisieId = $args['saisieId'] ?? null;
+        $resolution = $args['resolution']; // 'ECRASER' ou 'IGNORER'
 
-        return DB::transaction(function () use ($action, $absenceId, $saisieId) {
-            if ($action === 'garder_saisie') {
-                // Supprimer ou invalider l'absence
-                Absence::findOrFail($absenceId)->update(['statut' => Absence::STATUT_ANNULE]);
-            } elseif ($action === 'garder_absence' && $saisieId) {
-                // Supprimer la saisie
-                TimeEntry::findOrFail($saisieId)->delete();
+        return DB::transaction(function () use ($absenceId, $resolution) {
+            $absence = Absence::findOrFail($absenceId);
+
+            if ($resolution === 'IGNORER') {
+                // Ignorer l'absence = l'annuler, garder les saisies
+                $absence->update(['statut' => Absence::STATUT_ANNULE]);
+            } elseif ($resolution === 'ECRASER') {
+                // Ecraser = supprimer TOUTES les saisies en conflit avec cette absence
+                TimeEntry::where('user_id', $absence->user_id)
+                    ->whereBetween('date', [$absence->date_debut, $absence->date_fin])
+                    ->delete();
             }
+
+            // Marquer les notifications de conflit associees comme lues
+            Notification::where('user_id', $absence->user_id)
+                ->where('type', Notification::TYPE_CONFLIT_ABSENCE)
+                ->where('est_lu', false)
+                ->whereJsonContains('donnees->absence_id', $absence->id)
+                ->update(['est_lu' => true, 'lu_le' => now()]);
 
             return true;
         });

@@ -133,3 +133,38 @@ export interface ActiviteDisponible {
   estFeuille: boolean;
   estActif: boolean;
 }
+
+// Types pour les notifications
+
+export type NotificationType =
+  | 'saisie_incomplete'
+  | 'absence_importee'
+  | 'conflit_absence'
+  | 'export_pret'
+  | 'systeme';
+
+export type ConflictResolution = 'ECRASER' | 'IGNORER';
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  titre: string;
+  message: string;
+  donnees?: ConflitAbsenceDonnees | Record<string, unknown>;
+  estLu: boolean;
+  luLe?: string;
+  createdAt: string;
+}
+
+export interface ConflitAbsenceDonnees {
+  absence_id: number;
+  saisie_ids: number[];
+}
+
+export interface AbsenceDetails {
+  id: string;
+  type: string;
+  dateDebut: string;
+  dateFin: string;
+  dureeJournaliere: number;
+}
