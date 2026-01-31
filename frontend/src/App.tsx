@@ -6,6 +6,7 @@ import { useAuthStore } from './stores/authStore';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import SaisiePage from './pages/SaisiePage';
+import SupervisionPage from './pages/SupervisionPage';
 import UtilisateursPage from './pages/admin/UtilisateursPage';
 import EquipesPage from './pages/admin/EquipesPage';
 import ActivitesPage from './pages/admin/ActivitesPage';
@@ -62,21 +63,14 @@ function AppContent() {
 
         {/* Projets */}
         <Route path="/projets" element={<ProjetsPage />} />
+
+        {/* Supervision (moderateurs/admin) */}
+        <Route path="/supervision" element={<SupervisionPage />} />
       </Route>
 
       {/* Redirection par defaut */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
-  );
-}
-
-// Page placeholder pour les routes non implementees
-function PlaceholderPage({ titre }: { titre: string }) {
-  return (
-    <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">{titre}</h1>
-      <p className="text-gray-600">Cette page sera implementee prochainement.</p>
-    </div>
   );
 }
 

@@ -160,7 +160,7 @@ Implémenter la saisie des temps et l'administration.
 - [x] Arbre des activités avec checkboxes tri-state
 - [x] Cycle : vide → tout → vide
 - [x] État indéterminé calculé automatiquement
-- [ ] Attribution des modérateurs
+- [x] Attribution des modérateurs (modale avec recherche)
 
 ---
 
@@ -309,17 +309,19 @@ Intégrer les absences et la modération.
 
 ---
 
-#### US-3.5 : Page de supervision
+#### US-3.5 : Page de supervision ✅
 > **En tant que** modérateur/admin
 > **Je veux** voir les anomalies de saisie
 > **Afin de** les traiter
 
 **Critères d'acceptation :**
-- [ ] Liste des anomalies (incomplet, dépassement, vide)
-- [ ] Filtres (projet, équipe, période)
-- [ ] Clic → accès à la saisie de l'utilisateur
-- [ ] Modérateur : ses projets uniquement
-- [ ] Admin : tous les projets
+- [x] Liste des anomalies (incomplet, dépassement, vide, conflit absence)
+- [x] Filtres (projet, équipe, période, type)
+- [x] Navigation par semaine
+- [x] Groupement par utilisateur
+- [ ] Clic → accès à la saisie de l'utilisateur (lien direct non implémenté)
+- [x] Modérateur : ses projets uniquement (via backend policy)
+- [x] Admin : tous les projets
 
 ---
 
