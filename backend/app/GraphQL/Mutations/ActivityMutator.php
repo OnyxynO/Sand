@@ -25,6 +25,12 @@ class ActivityMutator
             $niveau = $parent ? $parent->niveau + 1 : 0;
             $ordre = (Activity::where('parent_id', $parentId)->max('ordre') ?? 0) + 1;
 
+            // Si on ajoute un enfant, le parent n'est plus une feuille
+            if ($parent && $parent->est_feuille) {
+                $parent->est_feuille = false;
+                $parent->save();
+            }
+
             // Creer l'activite avec chemin temporaire
             $activity = new Activity([
                 'nom' => $args['nom'],
@@ -34,6 +40,8 @@ class ActivityMutator
                 'niveau' => $niveau,
                 'ordre' => $ordre,
                 'est_actif' => $args['estActif'] ?? true,
+                'est_feuille' => true, // Nouvelle activite = feuille par defaut
+                'est_systeme' => false,
                 'chemin' => 'temp', // Placeholder temporaire
             ]);
             $activity->save();
@@ -42,7 +50,7 @@ class ActivityMutator
             $activity->chemin = $parent ? "{$parent->chemin}.{$activity->id}" : (string)$activity->id;
             $activity->save();
 
-            return $activity;
+            return $activity->fresh();
         });
     }
 
