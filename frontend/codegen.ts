@@ -21,6 +21,8 @@ const config: CodegenConfig = {
         namingConvention: 'keep',
         // Ajouter __typename pour le cache Apollo
         addTypename: true,
+        // Utiliser import type pour compatibilite verbatimModuleSyntax
+        useTypeImports: true,
       },
       presetConfig: {
         // Fragment masking pour meilleure isolation
