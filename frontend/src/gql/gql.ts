@@ -67,6 +67,9 @@ type Documents = {
     "\n  \n  mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {\n    updateUser(id: $id, input: $input) {\n      ...UserFields\n    }\n  }\n": typeof types.UpdateUserDocument,
     "\n  mutation DeleteUser($id: ID!) {\n    deleteUser(id: $id)\n  }\n": typeof types.DeleteUserDocument,
     "\n  \n  mutation RestoreUser($id: ID!) {\n    restoreUser(id: $id) {\n      ...UserFields\n    }\n  }\n": typeof types.RestoreUserDocument,
+    "\n  query RestrictionsVisibilite($projetId: ID!) {\n    restrictionsVisibilite(projetId: $projetId) {\n      id\n      estVisible\n      activite {\n        id\n        nom\n        chemin\n      }\n      utilisateur {\n        id\n        nomComplet\n        email\n      }\n    }\n  }\n": typeof types.RestrictionsVisibiliteDocument,
+    "\n  mutation HideActivityForUser($projetId: ID!, $activiteId: ID!, $userId: ID!) {\n    hideActivityForUser(projetId: $projetId, activiteId: $activiteId, userId: $userId)\n  }\n": typeof types.HideActivityForUserDocument,
+    "\n  mutation ShowActivityForUser($projetId: ID!, $activiteId: ID!, $userId: ID!) {\n    showActivityForUser(projetId: $projetId, activiteId: $activiteId, userId: $userId)\n  }\n": typeof types.ShowActivityForUserDocument,
 };
 const documents: Documents = {
     "\n  fragment ActivityFields on Activity {\n    id\n    nom\n    code\n    description\n    chemin\n    cheminComplet\n    niveau\n    ordre\n    estFeuille\n    estSysteme\n    estActif\n  }\n": types.ActivityFieldsFragmentDoc,
@@ -122,6 +125,9 @@ const documents: Documents = {
     "\n  \n  mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {\n    updateUser(id: $id, input: $input) {\n      ...UserFields\n    }\n  }\n": types.UpdateUserDocument,
     "\n  mutation DeleteUser($id: ID!) {\n    deleteUser(id: $id)\n  }\n": types.DeleteUserDocument,
     "\n  \n  mutation RestoreUser($id: ID!) {\n    restoreUser(id: $id) {\n      ...UserFields\n    }\n  }\n": types.RestoreUserDocument,
+    "\n  query RestrictionsVisibilite($projetId: ID!) {\n    restrictionsVisibilite(projetId: $projetId) {\n      id\n      estVisible\n      activite {\n        id\n        nom\n        chemin\n      }\n      utilisateur {\n        id\n        nomComplet\n        email\n      }\n    }\n  }\n": types.RestrictionsVisibiliteDocument,
+    "\n  mutation HideActivityForUser($projetId: ID!, $activiteId: ID!, $userId: ID!) {\n    hideActivityForUser(projetId: $projetId, activiteId: $activiteId, userId: $userId)\n  }\n": types.HideActivityForUserDocument,
+    "\n  mutation ShowActivityForUser($projetId: ID!, $activiteId: ID!, $userId: ID!) {\n    showActivityForUser(projetId: $projetId, activiteId: $activiteId, userId: $userId)\n  }\n": types.ShowActivityForUserDocument,
 };
 
 /**
@@ -350,6 +356,18 @@ export function graphql(source: "\n  mutation DeleteUser($id: ID!) {\n    delete
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  \n  mutation RestoreUser($id: ID!) {\n    restoreUser(id: $id) {\n      ...UserFields\n    }\n  }\n"): (typeof documents)["\n  \n  mutation RestoreUser($id: ID!) {\n    restoreUser(id: $id) {\n      ...UserFields\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query RestrictionsVisibilite($projetId: ID!) {\n    restrictionsVisibilite(projetId: $projetId) {\n      id\n      estVisible\n      activite {\n        id\n        nom\n        chemin\n      }\n      utilisateur {\n        id\n        nomComplet\n        email\n      }\n    }\n  }\n"): (typeof documents)["\n  query RestrictionsVisibilite($projetId: ID!) {\n    restrictionsVisibilite(projetId: $projetId) {\n      id\n      estVisible\n      activite {\n        id\n        nom\n        chemin\n      }\n      utilisateur {\n        id\n        nomComplet\n        email\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation HideActivityForUser($projetId: ID!, $activiteId: ID!, $userId: ID!) {\n    hideActivityForUser(projetId: $projetId, activiteId: $activiteId, userId: $userId)\n  }\n"): (typeof documents)["\n  mutation HideActivityForUser($projetId: ID!, $activiteId: ID!, $userId: ID!) {\n    hideActivityForUser(projetId: $projetId, activiteId: $activiteId, userId: $userId)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ShowActivityForUser($projetId: ID!, $activiteId: ID!, $userId: ID!) {\n    showActivityForUser(projetId: $projetId, activiteId: $activiteId, userId: $userId)\n  }\n"): (typeof documents)["\n  mutation ShowActivityForUser($projetId: ID!, $activiteId: ID!, $userId: ID!) {\n    showActivityForUser(projetId: $projetId, activiteId: $activiteId, userId: $userId)\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

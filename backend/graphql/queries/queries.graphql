@@ -116,4 +116,10 @@ extend type Query {
 
     "Un parametre par cle"
     parametre(cle: String! @eq): Setting @find(model: "App\\Models\\Setting") @guard
+
+    # ─── Visibilite ─────────────────────────────────
+    "Restrictions de visibilite d'un projet"
+    restrictionsVisibilite(projetId: ID!): [ActivityVisibility!]!
+        @field(resolver: "App\\GraphQL\\Queries\\RestrictionsVisibiliteQuery")
+        @guard
 }

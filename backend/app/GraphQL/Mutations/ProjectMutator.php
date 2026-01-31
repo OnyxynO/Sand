@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\GraphQL\Mutations;
 
+use App\Models\ActivityUserVisibility;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -136,6 +137,40 @@ class ProjectMutator
         $project->moderateurs()->detach($args['userId']);
 
         return $project->fresh();
+    }
+
+    /**
+     * Masquer une activite pour un utilisateur sur un projet.
+     */
+    public function hideActivityForUser($root, array $args): bool
+    {
+        $project = Project::findOrFail($args['projetId']);
+        $this->authorize('update', $project);
+
+        ActivityUserVisibility::masquer(
+            (int) $args['activiteId'],
+            (int) $args['userId'],
+            (int) $args['projetId']
+        );
+
+        return true;
+    }
+
+    /**
+     * Rendre visible une activite pour un utilisateur sur un projet.
+     */
+    public function showActivityForUser($root, array $args): bool
+    {
+        $project = Project::findOrFail($args['projetId']);
+        $this->authorize('update', $project);
+
+        ActivityUserVisibility::rendre_visible(
+            (int) $args['activiteId'],
+            (int) $args['userId'],
+            (int) $args['projetId']
+        );
+
+        return true;
     }
 
     /**

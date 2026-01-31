@@ -178,16 +178,17 @@ Implémenter la saisie des temps et l'administration.
 
 ---
 
-#### US-2.6 : Visibilité par utilisateur
+#### US-2.6 : Visibilité par utilisateur ✅
 > **En tant qu'** admin
 > **Je veux** masquer certaines activités pour certains utilisateurs
 > **Afin de** restreindre l'accès
 
 **Critères d'acceptation :**
-- [ ] Section "Visibilité" dans config projet
-- [ ] Ajout de restriction (activité + utilisateurs)
-- [ ] Suppression de restriction
-- [ ] Scope par projet (pas global)
+- [x] Modale "Restrictions de visibilité" dans page projets
+- [x] Ajout de restriction (activité + utilisateur)
+- [x] Suppression de restriction
+- [x] Scope par projet (pas global)
+- [x] Activités système (Absence) toujours visibles
 
 ---
 

@@ -52,4 +52,16 @@ extend type Mutation {
         @field(resolver: "App\\GraphQL\\Mutations\\ProjectMutator@setActivities")
         @guard
         @can(ability: "manageActivities", find: "projetId", model: "App\\Models\\Project")
+
+    "Masquer une activite pour un utilisateur sur un projet"
+    hideActivityForUser(projetId: ID!, activiteId: ID!, userId: ID!): Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\ProjectMutator@hideActivityForUser")
+        @guard
+        @can(ability: "manageVisibility", find: "projetId", model: "App\\Models\\Project")
+
+    "Rendre visible une activite pour un utilisateur sur un projet"
+    showActivityForUser(projetId: ID!, activiteId: ID!, userId: ID!): Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\ProjectMutator@showActivityForUser")
+        @guard
+        @can(ability: "manageVisibility", find: "projetId", model: "App\\Models\\Project")
 }

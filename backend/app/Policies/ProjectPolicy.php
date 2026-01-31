@@ -62,4 +62,12 @@ class ProjectPolicy
     {
         return $user->peutModererProjet($project);
     }
+
+    /**
+     * Gestion des restrictions de visibilite (admins uniquement)
+     */
+    public function manageVisibility(User $user, Project $project): bool
+    {
+        return $user->estAdmin();
+    }
 }

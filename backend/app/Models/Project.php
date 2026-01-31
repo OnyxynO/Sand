@@ -52,6 +52,11 @@ class Project extends Model
         return $this->hasMany(TimeEntry::class);
     }
 
+    public function restrictionsVisibilite(): HasMany
+    {
+        return $this->hasMany(ActivityUserVisibility::class);
+    }
+
     // Methodes metier
 
     /**
@@ -76,6 +81,31 @@ class Project extends Model
                     ->orWhere('est_systeme', true);
             })
             ->get();
+    }
+
+    /**
+     * Retourne les activites disponibles pour un utilisateur sur ce projet.
+     * Filtre les activites masquees par les restrictions de visibilite.
+     */
+    public function getActivitesDisponiblesPour(User $user)
+    {
+        $activites = $this->getActivitesDisponibles();
+
+        // Recuperer les activites masquees pour cet utilisateur
+        $activitesMasquees = ActivityUserVisibility::activitesMasquees($user->id, $this->id);
+
+        if (empty($activitesMasquees)) {
+            return $activites;
+        }
+
+        // Filtrer les activites masquees (sauf les systeme qui restent toujours visibles)
+        return $activites->filter(function ($activite) use ($activitesMasquees) {
+            if ($activite->est_systeme) {
+                return true;
+            }
+
+            return ! in_array($activite->id, $activitesMasquees);
+        })->values();
     }
 
     // Scopes
