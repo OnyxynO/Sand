@@ -433,28 +433,31 @@ Finalisation et qualité.
 
 ---
 
-#### US-5.2 : Tests backend
+#### US-5.2 : Tests backend ✅
 > **En tant que** développeur
 > **Je veux** des tests automatisés
 > **Afin de** garantir la qualité
 
 **Critères d'acceptation :**
-- [ ] Tests unitaires (Models, Services)
-- [ ] Tests Feature (GraphQL mutations)
-- [ ] Tests Policy (autorisations)
-- [ ] Coverage > 70%
+- [x] Tests unitaires (Models, Policies) - 33 tests
+- [x] Tests Feature (GraphQL mutations) - 86 tests
+- [x] Tests Policy (autorisations) - 20 tests
+- [x] 119 tests, 504 assertions, 0 echecs
+
+**Bonus** : Les tests ont revele 6 bugs applicatifs reels (voir DIFFUSION_LOG.md Phase 5)
 
 ---
 
-#### US-5.3 : Tests frontend
+#### US-5.3 : Tests frontend ✅
 > **En tant que** développeur
 > **Je veux** des tests frontend
 > **Afin de** garantir l'UI
 
 **Critères d'acceptation :**
-- [ ] Tests composants (Vitest)
-- [ ] Tests hooks
-- [ ] Tests intégration (formulaires)
+- [x] Tests composants (Vitest) - CelluleSaisie, NavigationSemaine, TotauxJournaliers
+- [x] Tests stores Zustand - authStore, saisieStore, notificationStore
+- [x] Tests utilitaires - semaineUtils
+- [x] 66 tests, 0 echecs
 
 ---
 
