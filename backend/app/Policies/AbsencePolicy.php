@@ -30,4 +30,12 @@ class AbsencePolicy
     {
         return $user->estModerateur();
     }
+
+    /**
+     * Resoudre un conflit absence/saisie (admins et moderateurs)
+     */
+    public function resolveConflict(User $user): bool
+    {
+        return $user->estModerateur();
+    }
 }

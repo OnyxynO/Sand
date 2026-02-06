@@ -23,9 +23,9 @@ class UserMutator
             'email' => $args['email'],
             'password' => Hash::make($args['password'] ?? 'password'),
             'matricule' => $args['matricule'] ?? null,
-            'equipe_id' => $args['equipeId'] ?? null,
+            'equipe_id' => $args['equipe_id'] ?? null,
             'role' => $args['role'] ?? 'utilisateur',
-            'est_actif' => $args['estActif'] ?? true,
+            'est_actif' => $args['est_actif'] ?? true,
         ]);
     }
 
@@ -42,9 +42,9 @@ class UserMutator
             'prenom' => $args['prenom'] ?? null,
             'email' => $args['email'] ?? null,
             'matricule' => $args['matricule'] ?? null,
-            'equipe_id' => $args['equipeId'] ?? null,
+            'equipe_id' => $args['equipe_id'] ?? null,
             'role' => $args['role'] ?? null,
-            'est_actif' => $args['estActif'] ?? null,
+            'est_actif' => $args['est_actif'] ?? null,
         ], fn($v) => $v !== null);
 
         if (isset($args['password']) && $args['password']) {

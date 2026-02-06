@@ -20,7 +20,7 @@ class TeamPolicy
         return $user->estAdmin();
     }
 
-    public function delete(User $user, Team $team): bool
+    public function delete(User $user): bool
     {
         return $user->estAdmin();
     }

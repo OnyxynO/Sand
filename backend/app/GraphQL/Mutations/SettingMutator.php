@@ -22,7 +22,7 @@ class SettingMutator
         $setting->save();
 
         // Vider le cache
-        Setting::clearCache();
+        Setting::invaliderToutLeCache();
 
         return $setting;
     }
@@ -47,7 +47,7 @@ class SettingMutator
             }
 
             // Vider le cache
-            Setting::clearCache();
+            Setting::invaliderToutLeCache();
 
             return $updated;
         });

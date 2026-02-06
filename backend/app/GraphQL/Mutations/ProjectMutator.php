@@ -23,9 +23,9 @@ class ProjectMutator
             'nom' => $args['nom'],
             'code' => $args['code'],
             'description' => $args['description'] ?? null,
-            'date_debut' => $args['dateDebut'] ?? null,
-            'date_fin' => $args['dateFin'] ?? null,
-            'est_actif' => $args['estActif'] ?? true,
+            'date_debut' => $args['date_debut'] ?? null,
+            'date_fin' => $args['date_fin'] ?? null,
+            'est_actif' => $args['est_actif'] ?? true,
         ]);
     }
 
@@ -41,9 +41,9 @@ class ProjectMutator
             'nom' => $args['nom'] ?? null,
             'code' => $args['code'] ?? null,
             'description' => $args['description'] ?? null,
-            'date_debut' => $args['dateDebut'] ?? null,
-            'date_fin' => $args['dateFin'] ?? null,
-            'est_actif' => $args['estActif'] ?? null,
+            'date_debut' => $args['date_debut'] ?? null,
+            'date_fin' => $args['date_fin'] ?? null,
+            'est_actif' => $args['est_actif'] ?? null,
         ], fn($v) => $v !== null));
 
         return $project->fresh();
@@ -77,12 +77,12 @@ class ProjectMutator
      */
     public function setActivities($root, array $args): Project
     {
-        $project = Project::findOrFail($args['id']);
+        $project = Project::findOrFail($args['projetId']);
         $this->authorize('update', $project);
 
         // Sync les activites selectionnees
         $activityIds = $args['activiteIds'] ?? [];
-        $project->activites()->sync($activityIds);
+        $project->activitesActives()->sync($activityIds);
 
         return $project->fresh();
     }
