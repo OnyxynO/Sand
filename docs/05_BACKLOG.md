@@ -296,17 +296,17 @@ Intégrer les absences et la modération.
 
 ---
 
-#### US-3.4 : Droits modérateur
+#### US-3.4 : Droits modérateur ✅
 > **En tant que** modérateur
 > **Je veux** voir et modifier les saisies de mon équipe
 > **Afin de** corriger les erreurs
 
 **Critères d'acceptation :**
-- [ ] Accès aux saisies des users de ses projets
-- [ ] Création de saisie pour un autre user
-- [ ] Modification de saisie
-- [ ] Suppression de saisie
-- [ ] Log de qui a modifié
+- [x] Accès aux saisies des users de ses projets
+- [x] Création de saisie pour un autre user
+- [x] Modification de saisie
+- [x] Suppression de saisie
+- [x] Log de qui a modifié
 
 ---
 

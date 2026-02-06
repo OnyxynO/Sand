@@ -288,8 +288,11 @@ type Query {
     endDate: Date!
   ): [TimeEntry!]!
 
-  # Saisies de la semaine pour l'utilisateur courant
-  myWeekEntries(week: String!): [TimeEntry!]!
+  # Saisies de la semaine (pour soi-meme ou un utilisateur modere)
+  myWeekEntries(week: String!, userId: ID): [TimeEntry!]!
+
+  # Utilisateurs dont le moderateur peut gerer les saisies
+  moderatableUsers: [User!]!
 
   # ─── Absences ───────────────────────────────────
   absences(
@@ -489,6 +492,7 @@ input TimeEntryInput {
   date: Date!
   duration: Float!    # Validation: 0.01 ≤ x ≤ 1.00, max 2 décimales
   comment: String
+  userId: ID          # Optionnel : utilisateur cible (moderateurs/admins uniquement)
 }
 
 input BulkUpdateEntry {
