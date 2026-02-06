@@ -271,11 +271,11 @@ class AbsenceMutator
 
         return DB::transaction(function () use ($args) {
             $absence = Absence::create([
-                'user_id' => $args['userId'],
-                'date_debut' => $args['dateDebut'],
-                'date_fin' => $args['dateFin'],
+                'user_id' => $args['user_id'],
+                'date_debut' => $args['date_debut'],
+                'date_fin' => $args['date_fin'],
                 'type' => $args['type'],
-                'duree_journaliere' => $args['dureeJournaliere'] ?? 1.0,
+                'duree_journaliere' => $args['duree_journaliere'] ?? 1.0,
                 'statut' => Absence::STATUT_VALIDE,
             ]);
 

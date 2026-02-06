@@ -19,7 +19,7 @@ class ActivityMutator
         $this->authorize('create', Activity::class);
 
         return DB::transaction(function () use ($args) {
-            $parentId = $args['parentId'] ?? null;
+            $parentId = $args['parent_id'] ?? null;
             $parent = $parentId ? Activity::findOrFail($parentId) : null;
 
             // Calculer l'ordre (dernier parmi les freres)
@@ -32,8 +32,8 @@ class ActivityMutator
             // Calculer le chemin directement
             $chemin = $parent ? "{$parent->chemin}.{$nextId}" : (string) $nextId;
 
-            // Creer l'activite en une seule requete
-            $activity = Activity::create([
+            // Creer l'activite en une seule requete (forceCreate pour inclure l'id explicite)
+            $activity = Activity::forceCreate([
                 'id' => $nextId,
                 'nom' => $args['nom'],
                 'code' => $args['code'] ?? null,
@@ -43,7 +43,7 @@ class ActivityMutator
                 'ordre' => $ordre,
                 'est_feuille' => true,
                 'est_systeme' => false,
-                'est_actif' => $args['estActif'] ?? true,
+                'est_actif' => $args['est_actif'] ?? true,
             ]);
 
             // Mettre a jour est_feuille du parent
@@ -71,7 +71,7 @@ class ActivityMutator
             'nom' => $args['nom'] ?? null,
             'code' => $args['code'] ?? null,
             'description' => $args['description'] ?? null,
-            'est_actif' => $args['estActif'] ?? null,
+            'est_actif' => $args['est_actif'] ?? null,
         ], fn($v) => $v !== null));
 
         return $activity->fresh();
