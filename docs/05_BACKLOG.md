@@ -347,69 +347,69 @@ Statistiques et exports.
 
 ### User Stories
 
-#### US-4.1 : Dashboard statistiques
+#### US-4.1 : Dashboard statistiques ✅
 > **En tant qu'** utilisateur
 > **Je veux** voir mes statistiques
 > **Afin de** suivre mon activité
 
 **Critères d'acceptation :**
-- [ ] Total temps par période
-- [ ] Répartition par projet (graphique)
-- [ ] Taux de complétion (jours complets)
+- [x] Total temps par période
+- [x] Répartition par projet (graphique camembert)
+- [x] Taux de complétion (jours complets)
 
 ---
 
-#### US-4.2 : Stats projet (modérateur)
+#### US-4.2 : Stats projet (modérateur) ✅
 > **En tant que** modérateur
 > **Je veux** voir les stats de mes projets
 > **Afin de** piloter l'activité
 
 **Critères d'acceptation :**
-- [ ] Temps total par projet
-- [ ] Répartition par activité
-- [ ] Répartition par utilisateur
-- [ ] Évolution mensuelle (courbe)
+- [x] Temps total par projet
+- [x] Répartition par activité (camembert)
+- [x] Répartition par utilisateur (barres horizontales)
+- [x] Évolution mensuelle (courbe)
 
 ---
 
-#### US-4.3 : Stats globales (admin)
+#### US-4.3 : Stats globales (admin) ✅
 > **En tant qu'** admin
 > **Je veux** voir les stats globales
 > **Afin de** piloter l'organisation
 
 **Critères d'acceptation :**
-- [ ] Vue tous projets
-- [ ] Vue par équipe
-- [ ] Filtres période
-- [ ] Comparatif entre périodes
+- [x] Vue tous projets (répartition camembert)
+- [x] Vue par équipe (filtre select)
+- [x] Filtres période (navigation mois)
+- [x] Comparatif entre périodes (deltas M vs M-1 sur KPI)
 
 ---
 
-#### US-4.4 : Export CSV asynchrone
+#### US-4.4 : Export CSV asynchrone ✅
 > **En tant qu'** admin
 > **Je veux** exporter les données en CSV
 > **Afin de** faire des analyses externes
 
 **Critères d'acceptation :**
-- [ ] Bouton "Exporter"
-- [ ] Sélection filtres (période, projet, équipe)
-- [ ] Job asynchrone lancé
-- [ ] Notification quand prêt
-- [ ] Lien de téléchargement (expire après 24h)
+- [x] Bouton "Exporter"
+- [x] Sélection filtres (période, projet, équipe)
+- [x] Job asynchrone lancé (ExportTimeEntriesJob)
+- [x] Notification quand prêt (TYPE_EXPORT_PRET)
+- [x] Lien de téléchargement (expire après 24h)
 
 ---
 
-#### US-4.5 : Configuration système
+#### US-4.5 : Configuration système ✅
 > **En tant qu'** admin
 > **Je veux** configurer les paramètres système
 > **Afin de** personnaliser l'application
 
 **Critères d'acceptation :**
-- [ ] Page Config. Système
-- [ ] Délai d'annulation (undo)
-- [ ] Affichage weekends
-- [ ] Premier jour de semaine
-- [ ] Sauvegarde en base (settings)
+- [x] Page Config. Système (/admin/configuration)
+- [x] Délai d'annulation (undo)
+- [x] Affichage weekends
+- [x] Premier jour de semaine
+- [x] Sauvegarde en base (settings)
 
 ---
 
