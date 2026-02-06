@@ -69,12 +69,26 @@ Les diagrammes dans `03_ARCHITECTURE.md` sont au format **Mermaid** :
 
 ## 📝 Changelog
 
+### v1.2 - Fevrier 2026
+- **119 tests backend** (PHPUnit) - 504 assertions, 0 echecs
+- **66 tests frontend** (Vitest) - 0 echecs
+- Correction de 6 bugs applicatifs decouverts par les tests
+- Migration arborescence activites vers ltree PostgreSQL
+- Documentation problemes Lighthouse (@rename, @delete, cache schema)
+
+### v1.1 - Janvier 2026
+- Phases 1 a 4 implementees
+- Infrastructure Docker + healthchecks + smoke tests
+- graphql-codegen pour validation schema front/back
+- Import absences depuis API RH (mock)
+- Systeme de notifications et resolution conflits
+
 ### v1.0 - Janvier 2025
-- Documentation initiale complète
+- Documentation initiale complete
 - Specs fonctionnelles et techniques
-- Schéma GraphQL
+- Schema GraphQL
 - Backlog avec user stories
 
 ---
 
-*Projet SAND - Successeur de SAEL (Saisie d'Activité En Ligne)*
+*Projet SAND - Successeur de SAEL (Saisie d'Activite En Ligne)*

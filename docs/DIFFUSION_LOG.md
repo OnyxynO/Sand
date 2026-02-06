@@ -102,6 +102,8 @@ Ce document repertorie les problemes rencontres lors du developpement et leurs s
 
 ### Phase 3 - Interface de saisie
 
+(Pas de problemes specifiques documentes)
+
 ### Phase 4 - Migration ltree et optimisations
 
 #### 17. Migration vers ltree PostgreSQL
@@ -169,6 +171,59 @@ Ce document repertorie les problemes rencontres lors du developpement et leurs s
 - **Statut** : Non resolu
 - **Workaround** : Hard refresh (Ctrl+Shift+R) ou relancer le serveur
 - **Ref** : `TODO_BUGS.md#BUG-001`
+
+---
+
+### Phase 5 - Tests et qualite
+
+#### 20. Directive @rename transforme les cles de $args
+- **Probleme** : Toutes les mutations custom echouaient (5 mutators)
+- **Symptome** : `Undefined array key "userId"`, valeurs ignorees (`estActif` toujours true)
+- **Cause** : `@rename(attribute: "snake_case")` sur les champs input avec `@spread` transforme les cles en snake_case dans `$args`. Les mutators utilisaient des cles camelCase.
+- **Impact** : Bug critique en production (createAbsence, updateUser, createProject, etc.)
+- **Solution** : Utiliser les cles snake_case dans tous les mutators
+- **Fichiers corriges** :
+  - `app/GraphQL/Mutations/ActivityMutator.php`
+  - `app/GraphQL/Mutations/UserMutator.php`
+  - `app/GraphQL/Mutations/AbsenceMutator.php`
+  - `app/GraphQL/Mutations/ProjectMutator.php`
+
+#### 21. Activity::create() ignore l'id explicite
+- **Probleme** : L'id calcule n'etait pas utilise, chemin incoherent
+- **Cause** : `id` n'est pas dans `$fillable` du model Activity
+- **Solution** : Remplacer `Activity::create()` par `Activity::forceCreate()`
+- **Fichier** : `app/GraphQL/Mutations/ActivityMutator.php`
+
+#### 22. Directive @delete + @can = "Would modify all models"
+- **Probleme** : Suppression d'equipe echouait systematiquement
+- **Symptome** : `Would modify all models, use an argument to filter.`
+- **Cause** : Conflit entre `@delete` et `@can` dans Lighthouse (v6.64.2)
+- **Solution** : Remplacer `@delete` par `@field(resolver: "TeamMutator@delete")` avec un mutator custom
+- **Fichiers** :
+  - `graphql/mutations/team.graphql` (modifie)
+  - `app/GraphQL/Mutations/TeamMutator.php` (nouveau)
+  - `app/Policies/TeamPolicy.php` (signature delete modifiee)
+
+#### 23. Cache schema Lighthouse
+- **Probleme** : Modifications du schema .graphql non prises en compte dans les tests
+- **Cause** : Lighthouse met en cache l'AST du schema GraphQL
+- **Solution** : `php artisan lighthouse:clear-cache` apres toute modification de fichiers .graphql
+- **Important** : A executer dans Docker (`docker-compose exec app ...`)
+
+#### 24. JSON scalar rejette les entiers bruts
+- **Probleme** : Mutation updateSetting echouait avec une valeur entiere
+- **Symptome** : `Variable "$valeur" got invalid value 60; Expected type "JSON"`
+- **Solution** : Passer les valeurs en string (`'60'` au lieu de `60`)
+
+#### 25. AbsencePolicy::resolveConflict manquant
+- **Probleme** : Resolution de conflit absence/saisie echouait
+- **Cause** : La methode `resolveConflict` n'existait pas dans AbsencePolicy
+- **Solution** : Ajout de la methode dans `app/Policies/AbsencePolicy.php`
+
+#### 26. Setting::clearCache() inexistant
+- **Probleme** : Mutations de settings echouaient
+- **Cause** : SettingMutator appelait `Setting::clearCache()` mais la methode s'appelle `invaliderToutLeCache()`
+- **Solution** : Corriger les 2 appels dans `app/GraphQL/Mutations/SettingMutator.php`
 
 ---
 
@@ -264,3 +319,9 @@ docker-compose exec app php artisan migrate --seed
 | 2026-01-31 | 4 | Migration ltree PostgreSQL | Extension ltree pour arborescence |
 | 2026-01-31 | 4 | Tests SQLite → PostgreSQL | phpunit.xml utilise PostgreSQL |
 | 2026-01-31 | 4 | Model events est_feuille | Recalcul automatique delete/restore |
+| 2026-02-06 | 5 | @rename transforme cles $args | Utiliser snake_case dans mutators |
+| 2026-02-06 | 5 | Activity::create ignore id | Utiliser forceCreate() |
+| 2026-02-06 | 5 | Cache schema Lighthouse | lighthouse:clear-cache apres modif .graphql |
+| 2026-02-06 | 5 | @delete + @can conflit | Remplacer par @field(resolver) custom |
+| 2026-02-06 | 5 | JSON scalar rejette int | Passer les valeurs en string |
+| 2026-02-06 | 5 | AbsencePolicy resolveConflict | Methode manquante dans policy |
