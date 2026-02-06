@@ -2,7 +2,7 @@
 
 ## Etat actuel (mis a jour 2026-02-06)
 
-### Backend (PHPUnit) - 119 tests, 504 assertions ✅
+### Backend (PHPUnit) - 170 tests, 670 assertions ✅
 | Fichier | Tests | Couverture |
 |---------|-------|------------|
 | AuthGraphQLTest | 6 | Login, logout, me |
@@ -16,9 +16,14 @@
 | TeamMutatorGraphQLTest | 5 | CRUD, autorisations |
 | SettingMutatorGraphQLTest | 4 | Modifier, autorisations |
 | AbsenceMutatorGraphQLTest | 7 | CRUD, conflits (ecraser/ignorer), autorisations |
+| ExportModelTest | 12 | Model Export, attributs, scopes, telechargement, expiration |
+| ExportMutatorGraphQLTest | 6 | Demander export, telecharger, autorisations |
+| ExportJobTest | 7 | Generation CSV, filtres, notification |
+| StatistiquesQueryTest | 8 | Stats globales, par projet, par equipe, par utilisateur |
+| SettingUpdateMultipleTest | 4 | Mise a jour multiple, autorisations |
 | ExampleTest | 2 | Smoke tests |
 
-### Frontend (Vitest) - 66 tests ✅
+### Frontend (Vitest) - 101 tests (16 fichiers) ✅
 | Fichier | Tests | Couverture |
 |---------|-------|------------|
 | semaineUtils.test.ts | ~10 | Calculs dates, navigation semaines |
@@ -28,6 +33,16 @@
 | CelluleSaisie.test.tsx | ~10 | Edition, validation, readonly |
 | NavigationSemaine.test.tsx | ~8 | Navigation, affichage dates |
 | TotauxJournaliers.test.tsx | ~10 | Calculs, warnings |
+| CarteResume.test.tsx | 3 | Carte KPI, icone, variation |
+| SelecteurPeriode.test.tsx | 4 | Navigation mois, affichage periode |
+| GraphiqueActivites.test.tsx | 3 | Camembert repartition activites |
+| GraphiqueUtilisateurs.test.tsx | 4 | Barres horizontales utilisateurs |
+| GraphiqueEvolution.test.tsx | 3 | Courbe evolution journaliere |
+| DashboardPage.test.tsx | 4 | Page dashboard utilisateur |
+| ExportPage.test.tsx | 6 | Page export CSV, filtres |
+| StatsProjetPage.test.tsx | 3 | Page stats projet, selecteur |
+| StatsGlobalesPage.test.tsx | 3 | Page stats globales, filtre equipe |
+| ConfigurationPage.test.tsx | 2 | Page configuration admin |
 
 ---
 
@@ -238,7 +253,51 @@ src/components/saisie/TotauxJournaliers.test.tsx (~10 tests)
 - [x] Navigation semaines, affichage dates
 - [x] Calcul totaux, warnings
 
+#### T3.3 : Tests composants dashboard - FAIT ✅
+```
+src/components/dashboard/CarteResume.test.tsx (3 tests)
+src/components/dashboard/SelecteurPeriode.test.tsx (4 tests)
+src/components/dashboard/GraphiqueActivites.test.tsx (3 tests)
+src/components/dashboard/GraphiqueUtilisateurs.test.tsx (4 tests)
+src/components/dashboard/GraphiqueEvolution.test.tsx (3 tests)
+```
+- [x] Carte KPI avec icone et variation
+- [x] Selecteur de periode (navigation mois)
+- [x] Camembert repartition activites
+- [x] Barres horizontales utilisateurs
+- [x] Courbe evolution journaliere
+
+#### T3.4 : Tests pages completes - FAIT ✅
+```
+src/pages/DashboardPage.test.tsx (4 tests)
+src/pages/ExportPage.test.tsx (6 tests)
+src/pages/StatsProjetPage.test.tsx (3 tests)
+src/pages/StatsGlobalesPage.test.tsx (3 tests)
+src/pages/admin/ConfigurationPage.test.tsx (2 tests)
+```
+- [x] Dashboard utilisateur (cartes, graphiques)
+- [x] Export CSV (formulaire, filtres, projets, equipes)
+- [x] Stats projet (selecteur projet, graphiques)
+- [x] Stats globales (filtre equipe, graphiques)
+- [x] Configuration admin (formulaire parametres)
+
+**Note technique** : Les tests de pages utilisent `renderAvecApollo` (utilitaire custom) car `MockedProvider` a ete supprime en Apollo Client 4. Voir `DIFFUSION_LOG.md` entrees 27-31 pour le detail des problemes rencontres.
+
 ### Phase T4 : Tests backend complementaires - COMPLETE ✅
+
+#### T4.0 : Tests Export et Statistiques - FAIT ✅
+```
+tests/Unit/ExportModelTest.php (12 tests)
+tests/Feature/ExportMutatorGraphQLTest.php (6 tests)
+tests/Feature/ExportJobTest.php (7 tests)
+tests/Feature/StatistiquesQueryTest.php (8 tests)
+tests/Feature/SettingUpdateMultipleTest.php (4 tests)
+```
+- [x] Model Export : attributs, scopes, telechargement, expiration
+- [x] Mutations export : demander, telecharger, autorisations
+- [x] Job export CSV : generation, filtres, notification
+- [x] Statistiques : globales, par projet, par equipe, par utilisateur
+- [x] Settings : mise a jour multiple, autorisations
 
 #### T4.1 : Tests CRUD Activites - FAIT ✅
 ```
@@ -279,9 +338,9 @@ tests/Unit/UserModelTest.php (13 tests)
 | **T0 (Infrastructure)** | 3 composants | **FAIT** ✅ | **Critique** |
 | **T1 (Backend critique)** | ~27 realises | **FAIT** ✅ (sauf RhApiClient) | Haute |
 | **T2 (Setup Vitest + utils)** | ~38 realises | **FAIT** ✅ | Haute |
-| **T3 (Integration frontend)** | ~28 realises | **FAIT** ✅ (sauf useSaisieHebdo) | Moyenne |
-| **T4 (Backend complement)** | ~69 realises | **FAIT** ✅ | Moyenne |
-| **Total** | **185 tests** | **Quasi complet** | |
+| **T3 (Integration frontend)** | ~63 realises | **FAIT** ✅ (sauf useSaisieHebdo) | Moyenne |
+| **T4 (Backend complement)** | ~106 realises | **FAIT** ✅ | Moyenne |
+| **Total** | **271 tests (170 back + 101 front)** | **Quasi complet** | |
 
 ---
 
@@ -302,7 +361,10 @@ tests/Unit/UserModelTest.php (13 tests)
 
 ### Frontend
 - Tester comportement, pas implementation
-- Mock API avec MSW ou MockedProvider
+- Mock API avec `renderAvecApollo` (utilitaire custom, `MockedProvider` supprime en Apollo 4)
+- `__typename` obligatoire dans toutes les donnees mock (normalisation InMemoryCache)
+- Toutes les queries d'un composant doivent etre mockees (variables exactes, pas de wildcard)
+- Mocks globaux heroicons et recharts dans `setup.ts` (SVG incompatible happy-dom)
 - Eviter tests de snapshot (fragiles)
 - Tester accessibilite (a11y)
 
@@ -312,11 +374,11 @@ tests/Unit/UserModelTest.php (13 tests)
 
 | Metrique | Debut | Actuel (2026-02-06) | Cible v1 | Statut |
 |----------|-------|---------------------|----------|--------|
-| Tests backend | 23 | **119** | 60 | ✅ Depasse |
-| Tests frontend | 0 | **66** | 40 | ✅ Depasse |
-| Assertions backend | 74 | **504** | - | ✅ |
-| Couverture backend | ? | ~80% mutations | 50% | ✅ Depasse |
-| Couverture frontend | 0% | ~40% composants | 30% | ✅ Depasse |
+| Tests backend | 23 | **170** | 60 | ✅ Depasse x2.8 |
+| Tests frontend | 0 | **101** | 40 | ✅ Depasse x2.5 |
+| Assertions backend | 74 | **670** | - | ✅ |
+| Couverture backend | ? | ~90% mutations | 50% | ✅ Depasse |
+| Couverture frontend | 0% | ~60% composants | 30% | ✅ Depasse |
 
 ---
 

@@ -40,7 +40,7 @@ class StatistiquesQuery
         }
 
         if (isset($args['equipeId'])) {
-            $query->whereHas('user', function ($q) use ($args) {
+            $query->whereHas('utilisateur', function ($q) use ($args) {
                 $q->where('equipe_id', $args['equipeId']);
             });
         }

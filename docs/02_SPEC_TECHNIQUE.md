@@ -20,7 +20,7 @@
 |-----------|-------------|---------------|
 | Framework | React | 18+ | Composants réutilisables, écosystème |
 | State | Zustand | Léger, simple, performant |
-| GraphQL Client | Apollo Client | Cache intelligent, hooks React |
+| GraphQL Client | Apollo Client 4 | Cache intelligent, hooks React (imports depuis `@apollo/client/react`) |
 | UI | Tailwind CSS + Headless UI | Flexibilité, responsive, accessibilité |
 | Formulaires | React Hook Form | Performance, validation intégrée |
 | Graphiques | Recharts | Composants React natifs |

@@ -225,6 +225,48 @@ Ce document repertorie les problemes rencontres lors du developpement et leurs s
 - **Cause** : SettingMutator appelait `Setting::clearCache()` mais la methode s'appelle `invaliderToutLeCache()`
 - **Solution** : Corriger les 2 appels dans `app/GraphQL/Mutations/SettingMutator.php`
 
+#### 27. Apollo Client 4 - MockedProvider supprime
+- **Probleme** : Tous les tests de pages frontend echouaient avec `Element type is invalid: expected a string... but got: undefined`
+- **Cause** : `MockedProvider` a ete retire de `@apollo/client/testing` en Apollo Client 4.x. Seuls `MockLink`, `MockSubscriptionLink` et `realisticDelay` sont exportes.
+- **Solution** : Creer un utilitaire `renderAvecApollo.tsx` qui construit manuellement `MockLink` + `ApolloClient` + `ApolloProvider`
+- **Fichier cree** : `frontend/src/test/renderAvecApollo.tsx`
+- **Impact** : Tous les tests de composants utilisant des queries GraphQL
+
+#### 28. Apollo Client 4 - Hooks dans @apollo/client/react
+- **Probleme** : `useQuery`, `useMutation` sont `undefined` quand importes depuis `@apollo/client` en mode test (Vitest SSR/CJS)
+- **Cause** : Apollo Client 4.x a deplace les hooks React dans `@apollo/client/react`. En mode dev (Vite ESM), les re-exports fonctionnent grace a l'optimizer. En mode test, non.
+- **Symptome** : Fonctionne en dev, echoue dans les tests. `skipLibCheck: true` dans tsconfig masquait l'erreur a la compilation.
+- **Solution** : Importer les hooks depuis `@apollo/client/react` dans les fichiers source (pas seulement les tests)
+- **Fichiers corriges** :
+  - `frontend/src/pages/DashboardPage.tsx`
+  - `frontend/src/pages/ExportPage.tsx`
+  - `frontend/src/pages/StatsProjetPage.tsx`
+  - `frontend/src/pages/StatsGlobalesPage.tsx`
+  - `frontend/src/pages/admin/ConfigurationPage.tsx`
+
+#### 29. Apollo Client 4 - __typename obligatoire dans les mocks
+- **Probleme** : Les donnees mockees retournaient des proprietes `undefined` (ex: `<option> - </option>` au lieu de `<option>DEV - Equipe Dev</option>`)
+- **Cause** : `InMemoryCache` normalise par `__typename:id`. Sans `__typename` dans les mocks, les objets normalises perdent leurs proprietes.
+- **Solution** : Ajouter `__typename` a toutes les donnees mock. Le typename doit correspondre au type du schema GraphQL (`'Team'`, pas `'Equipe'`).
+- **Piege** : `addTypename: false` sur MockLink empeche l'ajout aux requetes sortantes mais n'aide pas pour le cache
+
+#### 30. Apollo Client 4 - Toutes les queries doivent etre mockees
+- **Probleme** : Erreur `No more mocked responses for the query` sur certaines queries
+- **Cause** : Un composant executant 3 queries necessite 3 mocks. Les queries non mockees bloquent le rendu.
+- **Solution** : Mocker TOUTES les queries d'un composant, avec des variables exactes (pas de wildcard)
+- **Piege** : Les dates dynamiques calculees par le composant doivent etre recalculees identiquement dans les mocks
+
+#### 31. Heroicons et Recharts - SVG incompatible avec happy-dom
+- **Probleme** : Erreurs de rendu SVG dans les tests Vitest avec happy-dom
+- **Cause** : `@heroicons/react` et `recharts` generent du SVG que happy-dom ne gere pas
+- **Solution** : Mocks globaux dans `frontend/src/test/setup.ts` avec `vi.mock()`
+- **Detail** : Chaque icone mockee comme `React.createElement('span', ...)`, chaque composant recharts comme un `<div>`
+
+#### 32. StatistiquesQuery - Mauvaise relation Eloquent
+- **Probleme** : Stats par utilisateur retournaient une erreur
+- **Cause** : `whereHas('user')` au lieu de `whereHas('utilisateur')` (noms de relations en francais)
+- **Solution** : Corriger dans `app/GraphQL/Queries/StatistiquesQuery.php`
+
 ---
 
 ## Phase Bonus - Documentation et facilite d'installation
@@ -325,3 +367,9 @@ docker-compose exec app php artisan migrate --seed
 | 2026-02-06 | 5 | @delete + @can conflit | Remplacer par @field(resolver) custom |
 | 2026-02-06 | 5 | JSON scalar rejette int | Passer les valeurs en string |
 | 2026-02-06 | 5 | AbsencePolicy resolveConflict | Methode manquante dans policy |
+| 2026-02-06 | 5 | Apollo 4 MockedProvider supprime | renderAvecApollo avec MockLink |
+| 2026-02-06 | 5 | Apollo 4 hooks dans /react | Importer depuis @apollo/client/react |
+| 2026-02-06 | 5 | Apollo 4 __typename obligatoire | Ajouter __typename dans les mocks |
+| 2026-02-06 | 5 | Apollo 4 toutes queries mockees | Mocker toutes les queries du composant |
+| 2026-02-06 | 5 | Heroicons/Recharts SVG happy-dom | Mocks globaux dans setup.ts |
+| 2026-02-06 | 5 | StatistiquesQuery mauvaise relation | whereHas('utilisateur') pas 'user' |
