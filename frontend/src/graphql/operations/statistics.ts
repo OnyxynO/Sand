@@ -29,3 +29,32 @@ export const MES_STATISTIQUES = gql`
     }
   }
 `;
+
+export const STATS_PROJET = gql`
+  query StatsProjet($dateDebut: Date!, $dateFin: Date!, $projetId: ID!) {
+    statistiques(dateDebut: $dateDebut, dateFin: $dateFin, projetId: $projetId) {
+      tempsTotal
+      parActivite {
+        activite {
+          id
+          nom
+        }
+        tempsTotal
+        pourcentage
+      }
+      parUtilisateur {
+        utilisateur {
+          id
+          nomComplet
+        }
+        tempsTotal
+        tauxCompletion
+      }
+      parJour {
+        date
+        tempsTotal
+        estComplet
+      }
+    }
+  }
+`;

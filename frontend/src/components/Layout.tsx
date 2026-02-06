@@ -33,6 +33,7 @@ export default function Layout() {
   if (utilisateur?.role === 'MODERATEUR' || utilisateur?.role === 'ADMIN') {
     navigation.push({ nom: 'Projets', href: '/projets' });
     navigation.push({ nom: 'Supervision', href: '/supervision' });
+    navigation.push({ nom: 'Stats projet', href: '/stats-projet' });
   }
 
   // Navigation admin
