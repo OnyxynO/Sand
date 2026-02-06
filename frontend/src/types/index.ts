@@ -109,6 +109,15 @@ export interface TimeEntryInput {
   date: string;
   duree: number;
   commentaire?: string;
+  userId?: string;
+}
+
+// Utilisateur moderable (retourne par utilisateursModerables)
+export interface UtilisateurModerable {
+  id: string;
+  nom: string;
+  prenom: string;
+  nomComplet: string;
 }
 
 export interface BulkUpdateEntry {

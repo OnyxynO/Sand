@@ -23,7 +23,11 @@ interface UseSaisieHebdoResult {
   sauvegarder: () => Promise<void>;
 }
 
-export function useSaisieHebdo(): UseSaisieHebdoResult {
+/**
+ * Hook de saisie hebdomadaire.
+ * @param userId - ID utilisateur cible (moderation). Null = soi-meme.
+ */
+export function useSaisieHebdo(userId?: string | null): UseSaisieHebdoResult {
   const {
     semaineISO,
     lignes,
@@ -71,15 +75,25 @@ export function useSaisieHebdo(): UseSaisieHebdoResult {
     }
   }, [queryError, setErreur]);
 
-  // Charger les saisies quand la semaine change
+  // Charger les saisies quand la semaine ou l'utilisateur cible change
   useEffect(() => {
-    fetchSaisies({ variables: { semaine: semaineISO } });
-  }, [semaineISO, fetchSaisies]);
+    fetchSaisies({
+      variables: {
+        semaine: semaineISO,
+        ...(userId ? { userId } : {}),
+      },
+    });
+  }, [semaineISO, userId, fetchSaisies]);
 
   // Fonction de chargement manuel
   const charger = useCallback(() => {
-    fetchSaisies({ variables: { semaine: semaineISO } });
-  }, [fetchSaisies, semaineISO]);
+    fetchSaisies({
+      variables: {
+        semaine: semaineISO,
+        ...(userId ? { userId } : {}),
+      },
+    });
+  }, [fetchSaisies, semaineISO, userId]);
 
   // Fonction de sauvegarde
   const sauvegarder = useCallback(async () => {
@@ -105,6 +119,7 @@ export function useSaisieHebdo(): UseSaisieHebdoResult {
           date: dateStr,
           duree: celluleData.duree!,
           commentaire: celluleData.commentaire,
+          ...(userId ? { userId } : {}),
         };
       });
 
@@ -142,7 +157,12 @@ export function useSaisieHebdo(): UseSaisieHebdoResult {
       await Promise.all(operations);
 
       // Recharger les donnees apres sauvegarde
-      await fetchSaisies({ variables: { semaine: semaineISO } });
+      await fetchSaisies({
+        variables: {
+          semaine: semaineISO,
+          ...(userId ? { userId } : {}),
+        },
+      });
       reinitialiserModifications();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erreur inconnue';
@@ -154,6 +174,7 @@ export function useSaisieHebdo(): UseSaisieHebdoResult {
   }, [
     getModifications,
     lignes,
+    userId,
     bulkCreate,
     bulkUpdate,
     deleteEntry,

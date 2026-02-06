@@ -6,6 +6,7 @@ use App\Models\TimeEntry;
 use App\Models\TimeEntryLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
 class TimeEntryMutator
@@ -16,14 +17,18 @@ class TimeEntryMutator
     public function create($root, array $args): TimeEntry
     {
         $user = Auth::user();
+        $targetUserId = isset($args['user_id']) ? (int) $args['user_id'] : $user->id;
+
+        // Verifier les droits de creation
+        Gate::forUser($user)->authorize('create', [TimeEntry::class, $targetUserId, (int) $args['project_id']]);
 
         // Validation metier
         $this->validateDuree($args['duree']);
-        $this->validateUnique($user->id, $args['date'], $args['activity_id'], $args['project_id']);
+        $this->validateUnique($targetUserId, $args['date'], $args['activity_id'], $args['project_id']);
 
-        return DB::transaction(function () use ($user, $args) {
+        return DB::transaction(function () use ($user, $targetUserId, $args) {
             $saisie = TimeEntry::create([
-                'user_id' => $user->id,
+                'user_id' => $targetUserId,
                 'project_id' => $args['project_id'],
                 'activity_id' => $args['activity_id'],
                 'date' => $args['date'],
@@ -31,7 +36,7 @@ class TimeEntryMutator
                 'commentaire' => $args['commentaire'] ?? null,
             ]);
 
-            // Log de creation
+            // Log de creation (performed_by = utilisateur connecte)
             TimeEntryLog::logCreation($saisie, $user);
 
             return $saisie;
@@ -105,11 +110,16 @@ class TimeEntryMutator
 
         DB::transaction(function () use ($user, $args, &$saisies) {
             foreach ($args['inputs'] as $input) {
+                $targetUserId = isset($input['user_id']) ? (int) $input['user_id'] : $user->id;
+
+                // Verifier les droits de creation
+                Gate::forUser($user)->authorize('create', [TimeEntry::class, $targetUserId, (int) $input['project_id']]);
+
                 $this->validateDuree($input['duree']);
-                $this->validateUnique($user->id, $input['date'], $input['activity_id'], $input['project_id']);
+                $this->validateUnique($targetUserId, $input['date'], $input['activity_id'], $input['project_id']);
 
                 $saisie = TimeEntry::create([
-                    'user_id' => $user->id,
+                    'user_id' => $targetUserId,
                     'project_id' => $input['project_id'],
                     'activity_id' => $input['activity_id'],
                     'date' => $input['date'],

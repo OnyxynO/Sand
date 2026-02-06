@@ -45,9 +45,20 @@ export const ACTIVITE_FRAGMENT = gql`
 
 export const MES_SAISIES_SEMAINE = gql`
   ${SAISIE_FRAGMENT}
-  query MesSaisiesSemaine($semaine: String!) {
-    mesSaisiesSemaine(semaine: $semaine) {
+  query MesSaisiesSemaine($semaine: String!, $userId: ID) {
+    mesSaisiesSemaine(semaine: $semaine, userId: $userId) {
       ...SaisieFields
+    }
+  }
+`;
+
+export const UTILISATEURS_MODERABLES = gql`
+  query UtilisateursModerables {
+    utilisateursModerables {
+      id
+      nom
+      prenom
+      nomComplet
     }
   }
 `;

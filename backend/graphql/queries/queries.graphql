@@ -37,7 +37,7 @@ extend type Query {
     # ─── Activities ─────────────────────────────────
     "Arborescence complete des activites"
     arbreActivites: [Activity!]!
-        @all(model: "App\\Models\\Activity", scopes: ["racine", "ordreHierarchique"])
+        @all(model: "App\\Models\\Activity", scopes: ["racine", "trierParOrdre"])
         @guard
 
     "Activites disponibles pour un projet"
@@ -49,18 +49,25 @@ extend type Query {
     activite(id: ID! @eq): Activity @find(model: "App\\Models\\Activity") @guard
 
     # ─── Time Entries ───────────────────────────────
-    "Saisies de temps"
+    "Saisies de temps (filtrees par droits d'acces)"
     saisies(
         userId: ID @where(key: "user_id")
         projetId: ID @where(key: "project_id")
         activiteId: ID @where(key: "activity_id")
         dateDebut: Date! @where(key: "date", operator: ">=")
         dateFin: Date! @where(key: "date", operator: "<=")
-    ): [TimeEntry!]! @all(model: "App\\Models\\TimeEntry") @guard
+    ): [TimeEntry!]!
+        @field(resolver: "App\\GraphQL\\Queries\\SaisiesQuery")
+        @guard
 
-    "Mes saisies de la semaine"
-    mesSaisiesSemaine(semaine: String!): [TimeEntry!]!
+    "Saisies de la semaine (pour soi-meme ou un utilisateur modere)"
+    mesSaisiesSemaine(semaine: String!, userId: ID): [TimeEntry!]!
         @field(resolver: "App\\GraphQL\\Queries\\MesSaisiesSemaineQuery")
+        @guard
+
+    "Utilisateurs dont le moderateur peut gerer les saisies"
+    utilisateursModerables: [User!]!
+        @field(resolver: "App\\GraphQL\\Queries\\UtilisateursModerables")
         @guard
 
     # ─── Absences ───────────────────────────────────
