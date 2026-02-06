@@ -13,6 +13,7 @@ import ExportPage from './pages/ExportPage';
 import UtilisateursPage from './pages/admin/UtilisateursPage';
 import EquipesPage from './pages/admin/EquipesPage';
 import ActivitesPage from './pages/admin/ActivitesPage';
+import ConfigurationPage from './pages/admin/ConfigurationPage';
 import ProjetsPage from './pages/ProjetsPage';
 
 // Composants
@@ -63,6 +64,7 @@ function AppContent() {
         <Route path="/admin/utilisateurs" element={<UtilisateursPage />} />
         <Route path="/admin/equipes" element={<EquipesPage />} />
         <Route path="/admin/activites" element={<ActivitesPage />} />
+        <Route path="/admin/configuration" element={<ConfigurationPage />} />
 
         {/* Projets */}
         <Route path="/projets" element={<ProjetsPage />} />

@@ -26,5 +26,23 @@ class SettingSeeder extends Seeder
             true,
             'Activer les rappels de saisie incomplete'
         );
+
+        Setting::set(
+            Setting::CLE_DELAI_ANNULATION,
+            5,
+            'Delai d\'annulation en secondes (toast undo)'
+        );
+
+        Setting::set(
+            Setting::CLE_AFFICHER_WEEKENDS,
+            false,
+            'Afficher les weekends dans la grille de saisie'
+        );
+
+        Setting::set(
+            Setting::CLE_PREMIER_JOUR_SEMAINE,
+            1,
+            'Premier jour de la semaine (1=lundi, 0=dimanche)'
+        );
     }
 }

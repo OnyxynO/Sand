@@ -24,6 +24,9 @@ class Setting extends Model
     public const CLE_JOURS_RETRO = 'jours_retroactifs';
     public const CLE_PERIODE_SAISIE = 'periode_saisie_defaut';
     public const CLE_RAPPEL_SAISIE = 'rappel_saisie_actif';
+    public const CLE_DELAI_ANNULATION = 'delai_annulation';
+    public const CLE_AFFICHER_WEEKENDS = 'afficher_weekends';
+    public const CLE_PREMIER_JOUR_SEMAINE = 'premier_jour_semaine';
 
     /**
      * Recupere une valeur de configuration (avec cache)
