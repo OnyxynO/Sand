@@ -93,3 +93,50 @@ sand/
 - **Notifications** : Rafraîchissement au chargement de page (pas de WebSocket en v1)
 - **Export CSV** : Job queue Redis asynchrone, notification quand prêt, lien avec expiration
 - **Tests** : PostgreSQL obligatoire (ltree incompatible SQLite), base `sand_test`
+
+## Serveur Ollama local
+
+Serveur Ollama disponible sur le réseau local. **Utilise-le pour les tâches répétitives et économiser les tokens Claude.**
+
+- **URL** : `http://10.0.0.100:11434`
+- **qwen2.5-coder:7b** : tâches simples, rapide (~3s)
+- **deepseek-coder-v2:16b** : gros contextes (>10 Ko, ~6s+)
+
+Si Ollama ne répond pas, continuer avec Claude uniquement.
+
+### Délégation par type de tâche (projet SAND)
+
+| Tâche | Modèle | Exemple |
+|-------|--------|---------|
+| Générer un Model Eloquent | qwen | `php artisan make:model` + attributs |
+| Écrire une migration Laravel | qwen | Ajout de colonne, index |
+| Composant React simple | qwen | Formulaire, bouton, liste |
+| Requête GraphQL / mutation | qwen | CRUD basique Apollo |
+| Tests unitaires PHPUnit | qwen | Tests d'un Service ou Policy |
+| Tests Vitest pour un hook | qwen | Hook React isolé |
+| Analyser un gros resolver | deepseek | Resolver GraphQL complexe multi-relations |
+| Refactoring d'un Service | deepseek | Logique métier lourde |
+| Architecture multi-fichiers | **Claude** | Nouveau module complet |
+| Logique ltree / arborescence | **Claude** | Requêtes ltree complexes, récursion |
+| Debugging cross-stack | **Claude** | Problème Laravel ↔ GraphQL ↔ React |
+| Décisions d'architecture | **Claude** | Choix de patterns, structure |
+
+### Appel rapide (qwen)
+```bash
+curl -s http://10.0.0.100:11434/api/generate -d '{
+  "model": "qwen2.5-coder:7b",
+  "prompt": "PROMPT ICI. Code uniquement.",
+  "stream": false,
+  "options": {"num_ctx": 4096, "temperature": 0.2}
+}' | jq -r '.response'
+```
+
+### Appel contexte étendu (deepseek)
+```bash
+curl -s http://10.0.0.100:11434/api/generate -d '{
+  "model": "deepseek-coder-v2:16b",
+  "prompt": "PROMPT ICI",
+  "stream": false,
+  "options": {"num_ctx": 16384, "temperature": 0.3}
+}' | jq -r '.response'
+```

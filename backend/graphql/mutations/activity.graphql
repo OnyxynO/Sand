@@ -23,15 +23,15 @@ extend type Mutation {
         @guard
         @can(ability: "restore", model: "App\\Models\\Activity")
 
-    "Deplacer une activite dans l'arborescence"
+    "Deplacer/reordonner une activite dans l'arborescence"
     moveActivity(id: ID!, parentId: ID, ordre: Int!): Activity!
         @field(resolver: "App\\GraphQL\\Mutations\\ActivityMutator@move")
         @guard
-        @can(ability: "update", find: "id", model: "App\\Models\\Activity")
+        @can(ability: "reorder", model: "App\\Models\\Activity")
 
     "Reordonner des activites"
     reorderActivities(ids: [ID!]!): [Activity!]!
         @field(resolver: "App\\GraphQL\\Mutations\\ActivityMutator@reorder")
         @guard
-        @can(ability: "update", model: "App\\Models\\Activity")
+        @can(ability: "reorder", model: "App\\Models\\Activity")
 }

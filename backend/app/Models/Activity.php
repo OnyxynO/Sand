@@ -183,4 +183,9 @@ class Activity extends Model
     {
         return $query->orderBy('chemin');
     }
+
+    public function scopeTrierParOrdre(Builder $query): Builder
+    {
+        return $query->orderBy('ordre');
+    }
 }

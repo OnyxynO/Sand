@@ -112,11 +112,7 @@ class ActivityMutator
     public function move($root, array $args): Activity
     {
         $activity = Activity::findOrFail($args['id']);
-        $this->authorize('update', $activity);
-
-        if ($activity->est_systeme) {
-            abort(403, 'Les activites systeme ne peuvent pas etre deplacees.');
-        }
+        $this->authorize('reorder', Activity::class);
 
         return DB::transaction(function () use ($activity, $args) {
             // Normaliser les IDs pour comparaison (string "2" vs int 2)
@@ -126,6 +122,11 @@ class ActivityMutator
 
             // Convertir pour comparaison coherente
             $oldParentIdNorm = $oldParentId !== null ? (int)$oldParentId : null;
+
+            // Activite systeme : reordonnement autorise, changement de parent interdit
+            if ($activity->est_systeme && $newParentId !== $oldParentIdNorm) {
+                abort(403, 'Les activites systeme ne peuvent pas etre deplacees vers un autre parent.');
+            }
 
             // Si on change de parent
             if ($newParentId !== $oldParentIdNorm) {
@@ -176,18 +177,21 @@ class ActivityMutator
             }
 
             // Reordonner : decaler les autres activites du meme parent
+            // Note : whereNull necessaire car WHERE parent_id = NULL ne matche rien en SQL
             $currentOrdre = $activity->ordre;
+            $freresQuery = fn() => Activity::when(
+                $activity->parent_id !== null,
+                fn($q) => $q->where('parent_id', $activity->parent_id),
+                fn($q) => $q->whereNull('parent_id'),
+            )->where('id', '!=', $activity->id);
+
             if ($newOrdre < $currentOrdre) {
-                // Monter : decaler vers le bas les activites entre newOrdre et currentOrdre
-                Activity::where('parent_id', $activity->parent_id)
-                    ->where('id', '!=', $activity->id)
+                $freresQuery()
                     ->where('ordre', '>=', $newOrdre)
                     ->where('ordre', '<', $currentOrdre)
                     ->increment('ordre');
             } elseif ($newOrdre > $currentOrdre) {
-                // Descendre : decaler vers le haut les activites entre currentOrdre et newOrdre
-                Activity::where('parent_id', $activity->parent_id)
-                    ->where('id', '!=', $activity->id)
+                $freresQuery()
                     ->where('ordre', '>', $currentOrdre)
                     ->where('ordre', '<=', $newOrdre)
                     ->decrement('ordre');
