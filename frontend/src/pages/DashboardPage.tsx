@@ -1,7 +1,50 @@
+import { useState, useMemo } from 'react';
+import { useQuery } from '@apollo/client';
+import {
+  ClockIcon,
+  CheckCircleIcon,
+  FolderIcon,
+} from '@heroicons/react/24/outline';
 import { useAuthStore } from '../stores/authStore';
+import { MES_STATISTIQUES } from '../graphql/operations/statistics';
+import SelecteurPeriode from '../components/dashboard/SelecteurPeriode';
+import CarteResume from '../components/dashboard/CarteResume';
+import GraphiqueRepartitionProjets from '../components/dashboard/GraphiqueRepartitionProjets';
+import GraphiqueJournalier from '../components/dashboard/GraphiqueJournalier';
+
+function dernierJourDuMois(annee: number, mois: number): number {
+  return new Date(annee, mois + 1, 0).getDate();
+}
+
+function periodeInitiale() {
+  const maintenant = new Date();
+  const a = maintenant.getFullYear();
+  const m = maintenant.getMonth();
+  const debut = `${a}-${String(m + 1).padStart(2, '0')}-01`;
+  const fin = `${a}-${String(m + 1).padStart(2, '0')}-${dernierJourDuMois(a, m)}`;
+  return { debut, fin };
+}
 
 export default function DashboardPage() {
   const utilisateur = useAuthStore((state) => state.utilisateur);
+  const initial = useMemo(() => periodeInitiale(), []);
+  const [dateDebut, setDateDebut] = useState(initial.debut);
+  const [dateFin, setDateFin] = useState(initial.fin);
+
+  const { data, loading, error } = useQuery(MES_STATISTIQUES, {
+    variables: { dateDebut, dateFin },
+    fetchPolicy: 'cache-and-network',
+  });
+
+  const stats = data?.statistiques;
+
+  const tauxCompletion = useMemo(() => {
+    if (!stats?.parJour || stats.parJour.length === 0) return 0;
+    const joursComplets = stats.parJour.filter((j: { estComplet: boolean }) => j.estComplet).length;
+    return Math.round((joursComplets / stats.parJour.length) * 100);
+  }, [stats]);
+
+  const nbProjets = stats?.parProjet?.length ?? 0;
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
@@ -23,6 +66,11 @@ export default function DashboardPage() {
       default:
         return 'Utilisateur';
     }
+  };
+
+  const handleChangePeriode = (debut: string, fin: string) => {
+    setDateDebut(debut);
+    setDateFin(fin);
   };
 
   return (
@@ -70,21 +118,57 @@ export default function DashboardPage() {
         </dl>
       </div>
 
-      {/* Placeholder pour les prochaines fonctionnalites */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl shadow-sm p-6 border-2 border-dashed border-gray-200">
-          <h3 className="font-medium text-gray-400">Saisie hebdomadaire</h3>
-          <p className="text-sm text-gray-400 mt-1">A venir...</p>
+      {/* Selecteur de periode */}
+      <SelecteurPeriode
+        dateDebut={dateDebut}
+        dateFin={dateFin}
+        onChangePeriode={handleChangePeriode}
+      />
+
+      {/* Contenu statistiques */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700">
+          Erreur lors du chargement des statistiques : {error.message}
         </div>
-        <div className="bg-white rounded-xl shadow-sm p-6 border-2 border-dashed border-gray-200">
-          <h3 className="font-medium text-gray-400">Mes statistiques</h3>
-          <p className="text-sm text-gray-400 mt-1">A venir...</p>
+      )}
+
+      {loading && !stats && (
+        <div className="flex justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
         </div>
-        <div className="bg-white rounded-xl shadow-sm p-6 border-2 border-dashed border-gray-200">
-          <h3 className="font-medium text-gray-400">Notifications</h3>
-          <p className="text-sm text-gray-400 mt-1">A venir...</p>
-        </div>
-      </div>
+      )}
+
+      {stats && (
+        <>
+          {/* Cartes resume */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <CarteResume
+              icone={<ClockIcon className="w-6 h-6" />}
+              valeur={`${stats.tempsTotal.toFixed(1)} j`}
+              label="Temps total (ETP)"
+              couleurIcone="text-blue-600 bg-blue-100"
+            />
+            <CarteResume
+              icone={<CheckCircleIcon className="w-6 h-6" />}
+              valeur={`${tauxCompletion}%`}
+              label="Jours complets"
+              couleurIcone="text-green-600 bg-green-100"
+            />
+            <CarteResume
+              icone={<FolderIcon className="w-6 h-6" />}
+              valeur={String(nbProjets)}
+              label="Projets actifs"
+              couleurIcone="text-purple-600 bg-purple-100"
+            />
+          </div>
+
+          {/* Graphiques */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <GraphiqueRepartitionProjets donnees={stats.parProjet} />
+            <GraphiqueJournalier donnees={stats.parJour} />
+          </div>
+        </>
+      )}
     </div>
   );
 }
