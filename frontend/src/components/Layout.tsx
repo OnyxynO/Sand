@@ -38,6 +38,7 @@ export default function Layout() {
 
   // Navigation admin
   if (utilisateur?.role === 'ADMIN') {
+    navigation.push({ nom: 'Stats globales', href: '/stats-globales' });
     navigation.push({ nom: 'Administration', href: '/admin' });
   }
 
