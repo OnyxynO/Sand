@@ -118,27 +118,23 @@ function LigneActivite({
 
         {/* Actions */}
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 hover:opacity-100">
-          {/* Monter/Descendre */}
-          {!activite.estSysteme && (
-            <>
-              <button
-                onClick={() => onMonter(activite)}
-                disabled={estPremier}
-                className="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-100 disabled:opacity-30"
-                title="Monter"
-              >
-                <ArrowUpIcon className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => onDescendre(activite)}
-                disabled={estDernier}
-                className="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-100 disabled:opacity-30"
-                title="Descendre"
-              >
-                <ArrowDownIcon className="w-4 h-4" />
-              </button>
-            </>
-          )}
+          {/* Monter/Descendre (toutes les activites, y compris systeme) */}
+          <button
+            onClick={() => onMonter(activite)}
+            disabled={estPremier}
+            className="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-100 disabled:opacity-30"
+            title="Monter"
+          >
+            <ArrowUpIcon className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => onDescendre(activite)}
+            disabled={estDernier}
+            className="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-100 disabled:opacity-30"
+            title="Descendre"
+          >
+            <ArrowDownIcon className="w-4 h-4" />
+          </button>
 
           {/* Ajouter enfant */}
           <button

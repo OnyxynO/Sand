@@ -35,6 +35,14 @@ class ActivityPolicy
         return $user->estAdmin();
     }
 
+    /**
+     * Reordonner une activite (y compris systeme)
+     */
+    public function reorder(User $user): bool
+    {
+        return $user->estAdmin();
+    }
+
     public function restore(User $user): bool
     {
         return $user->estAdmin();

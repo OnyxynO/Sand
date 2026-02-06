@@ -448,14 +448,35 @@ class ActivityMutatorGraphQLTest extends TestCase
         $this->assertGraphQLError($response);
     }
 
-    public function test_deplacer_activite_systeme_echoue(): void
+    public function test_deplacer_activite_systeme_vers_autre_parent_echoue(): void
+    {
+        $activite = $this->creerActiviteViaGraphQL('Systeme');
+        Activity::where('id', $activite->id)->update(['est_systeme' => true]);
+        $autreParent = $this->creerActiviteViaGraphQL('Autre');
+
+        // Changer de parent : interdit pour activite systeme
+        $response = $this->graphqlAsUser('
+            mutation MoveActivity($id: ID!, $parentId: ID, $ordre: Int!) {
+                moveActivity(id: $id, parentId: $parentId, ordre: $ordre) { id }
+            }
+        ', [
+            'id' => $activite->id,
+            'parentId' => (string) $autreParent->id,
+            'ordre' => 0,
+        ], $this->admin);
+
+        $this->assertGraphQLError($response);
+    }
+
+    public function test_reordonner_activite_systeme_fonctionne(): void
     {
         $activite = $this->creerActiviteViaGraphQL('Systeme');
         Activity::where('id', $activite->id)->update(['est_systeme' => true]);
 
+        // Simple reordonnement (meme parent) : autorise
         $response = $this->graphqlAsUser('
             mutation MoveActivity($id: ID!, $parentId: ID, $ordre: Int!) {
-                moveActivity(id: $id, parentId: $parentId, ordre: $ordre) { id }
+                moveActivity(id: $id, parentId: $parentId, ordre: $ordre) { id ordre }
             }
         ', [
             'id' => $activite->id,
@@ -463,7 +484,7 @@ class ActivityMutatorGraphQLTest extends TestCase
             'ordre' => 0,
         ], $this->admin);
 
-        $this->assertGraphQLError($response);
+        $this->assertGraphQLSuccess($response);
     }
 
     // =========================================================================
