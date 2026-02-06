@@ -9,6 +9,7 @@ import SaisiePage from './pages/SaisiePage';
 import SupervisionPage from './pages/SupervisionPage';
 import StatsProjetPage from './pages/StatsProjetPage';
 import StatsGlobalesPage from './pages/StatsGlobalesPage';
+import ExportPage from './pages/ExportPage';
 import UtilisateursPage from './pages/admin/UtilisateursPage';
 import EquipesPage from './pages/admin/EquipesPage';
 import ActivitesPage from './pages/admin/ActivitesPage';
@@ -74,6 +75,9 @@ function AppContent() {
 
         {/* Stats globales (admin) */}
         <Route path="/stats-globales" element={<StatsGlobalesPage />} />
+
+        {/* Export CSV (admin) */}
+        <Route path="/export" element={<ExportPage />} />
       </Route>
 
       {/* Redirection par defaut */}
