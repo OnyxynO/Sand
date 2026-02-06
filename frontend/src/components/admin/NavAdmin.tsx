@@ -6,6 +6,7 @@ const liens = [
   { nom: 'Utilisateurs', href: '/admin/utilisateurs' },
   { nom: 'Equipes', href: '/admin/equipes' },
   { nom: 'Activites', href: '/admin/activites' },
+  { nom: 'Configuration', href: '/admin/configuration' },
 ];
 
 export default function NavAdmin() {

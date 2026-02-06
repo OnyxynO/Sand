@@ -37,7 +37,7 @@ class SettingMutator
         return DB::transaction(function () use ($args) {
             $updated = [];
 
-            foreach ($args['parametres'] as $param) {
+            foreach ($args['settings'] as $param) {
                 $setting = Setting::where('cle', $param['cle'])->first();
                 if ($setting) {
                     $setting->valeur = $param['valeur'];
