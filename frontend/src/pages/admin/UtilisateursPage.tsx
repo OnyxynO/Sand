@@ -1,6 +1,6 @@
 // Page de gestion des utilisateurs (Admin)
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import {
   MagnifyingGlassIcon,
@@ -8,6 +8,8 @@ import {
   PencilSquareIcon,
   TrashIcon,
   FunnelIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
 } from '@heroicons/react/24/outline';
 import { USERS_QUERY, TEAMS_QUERY, DELETE_USER } from '../../graphql/operations/users';
 import FormulaireUtilisateur from '../../components/admin/FormulaireUtilisateur';
@@ -61,18 +63,43 @@ export default function UtilisateursPage() {
   const [modaleOuverte, setModaleOuverte] = useState(false);
   const [utilisateurEdite, setUtilisateurEdite] = useState<Utilisateur | null>(null);
 
+  // Pagination
+  const [page, setPage] = useState(1);
+
   // Confirmation suppression
   const [confirmationSuppression, setConfirmationSuppression] = useState<Utilisateur | null>(null);
 
+  // Reset page sur changement de filtre
+  const changerRecherche = useCallback((valeur: string) => {
+    setRecherche(valeur);
+    setPage(1);
+  }, []);
+
+  const changerFiltreEquipe = useCallback((valeur: string) => {
+    setFiltreEquipe(valeur);
+    setPage(1);
+  }, []);
+
+  const changerFiltreRole = useCallback((valeur: UserRole | '') => {
+    setFiltreRole(valeur);
+    setPage(1);
+  }, []);
+
+  const changerFiltreActif = useCallback((valeur: boolean) => {
+    setFiltreActif(valeur);
+    setPage(1);
+  }, []);
+
   // Queries
   const { data, loading, refetch } = useQuery<{
-    users: { data: Utilisateur[]; paginatorInfo: { total: number } };
+    users: { data: Utilisateur[]; paginatorInfo: { total: number; currentPage: number; lastPage: number; hasMorePages: boolean } };
   }>(USERS_QUERY, {
     variables: {
       search: recherche || undefined,
       equipeId: filtreEquipe || undefined,
       role: filtreRole || undefined,
       actifSeulement: filtreActif || undefined,
+      page,
     },
     fetchPolicy: 'cache-and-network',
   });
@@ -86,6 +113,9 @@ export default function UtilisateursPage() {
 
   const utilisateurs = data?.users?.data || [];
   const total = data?.users?.paginatorInfo?.total || 0;
+  const pageActuelle = data?.users?.paginatorInfo?.currentPage || 1;
+  const dernierePage = data?.users?.paginatorInfo?.lastPage || 1;
+  const aPageSuivante = data?.users?.paginatorInfo?.hasMorePages || false;
 
   // Ouvrir le formulaire pour creation
   const ouvrirCreation = () => {
@@ -117,7 +147,7 @@ export default function UtilisateursPage() {
       <NavAdmin />
 
       {/* En-tete */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap gap-2 items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Utilisateurs</h1>
           <p className="text-sm text-gray-500">{total} utilisateur{total > 1 ? 's' : ''}</p>
@@ -140,7 +170,7 @@ export default function UtilisateursPage() {
             <input
               type="text"
               value={recherche}
-              onChange={(e) => setRecherche(e.target.value)}
+              onChange={(e) => changerRecherche(e.target.value)}
               placeholder="Rechercher par nom..."
               className="w-full pl-9 pr-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -166,7 +196,7 @@ export default function UtilisateursPage() {
               <label className="block text-xs font-medium text-gray-500 mb-1">Equipe</label>
               <select
                 value={filtreEquipe}
-                onChange={(e) => setFiltreEquipe(e.target.value)}
+                onChange={(e) => changerFiltreEquipe(e.target.value)}
                 className="w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Toutes les equipes</option>
@@ -183,7 +213,7 @@ export default function UtilisateursPage() {
               <label className="block text-xs font-medium text-gray-500 mb-1">Role</label>
               <select
                 value={filtreRole}
-                onChange={(e) => setFiltreRole(e.target.value as UserRole | '')}
+                onChange={(e) => changerFiltreRole(e.target.value as UserRole | '')}
                 className="w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Tous les roles</option>
@@ -200,7 +230,7 @@ export default function UtilisateursPage() {
                 <input
                   type="checkbox"
                   checked={filtreActif}
-                  onChange={(e) => setFiltreActif(e.target.checked)}
+                  onChange={(e) => changerFiltreActif(e.target.checked)}
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 Actifs uniquement
@@ -211,7 +241,7 @@ export default function UtilisateursPage() {
       </div>
 
       {/* Liste des utilisateurs */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
         {loading && utilisateurs.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
             <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
@@ -226,10 +256,10 @@ export default function UtilisateursPage() {
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
                   Utilisateur
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
+                <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
                   Email
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
+                <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
                   Equipe
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
@@ -251,8 +281,8 @@ export default function UtilisateursPage() {
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{user.email}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
+                  <td className="hidden sm:table-cell px-4 py-3 text-sm text-gray-600">{user.email}</td>
+                  <td className="hidden sm:table-cell px-4 py-3 text-sm text-gray-600">
                     {user.equipe ? (
                       <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded bg-gray-100">
                         {user.equipe.code}
@@ -294,6 +324,33 @@ export default function UtilisateursPage() {
           </table>
         )}
       </div>
+
+      {/* Pagination */}
+      {dernierePage > 1 && (
+        <div className="flex items-center justify-between bg-white rounded-lg shadow-sm px-4 py-3">
+          <p className="text-sm text-gray-600">
+            Page {pageActuelle} sur {dernierePage}
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage(page - 1)}
+              disabled={pageActuelle <= 1}
+              className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            >
+              <ChevronLeftIcon className="w-4 h-4" />
+              Precedent
+            </button>
+            <button
+              onClick={() => setPage(page + 1)}
+              disabled={!aPageSuivante}
+              className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            >
+              Suivant
+              <ChevronRightIcon className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Modal formulaire */}
       <FormulaireUtilisateur

@@ -32,8 +32,8 @@ export const TEAM_FRAGMENT = gql`
 // Queries
 export const USERS_QUERY = gql`
   ${USER_FRAGMENT}
-  query Users($equipeId: ID, $role: UserRole, $search: String, $actifSeulement: Boolean) {
-    users(equipeId: $equipeId, role: $role, search: $search, actifSeulement: $actifSeulement) {
+  query Users($equipeId: ID, $role: UserRole, $search: String, $actifSeulement: Boolean, $page: Int) {
+    users(equipeId: $equipeId, role: $role, search: $search, actifSeulement: $actifSeulement, page: $page) {
       data {
         ...UserFields
       }
@@ -41,6 +41,7 @@ export const USERS_QUERY = gql`
         currentPage
         lastPage
         total
+        hasMorePages
       }
     }
   }
