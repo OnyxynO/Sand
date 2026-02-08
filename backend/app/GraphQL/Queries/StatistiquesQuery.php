@@ -55,17 +55,21 @@ class StatistiquesQuery
         $tempsTotal = (float) $query->sum('duree');
 
         // Stats par projet
-        $parProjet = TimeEntry::query()
+        $resultatsProjet = TimeEntry::query()
             ->select('project_id', DB::raw('SUM(duree) as temps_total'))
             ->whereBetween('date', [$dateDebut, $dateFin])
             ->when(!$user->estAdmin() && !$user->estModerateur(), function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             })
             ->groupBy('project_id')
-            ->get()
-            ->map(function ($item) use ($tempsTotal) {
+            ->get();
+
+        $projets = Project::whereIn('id', $resultatsProjet->pluck('project_id'))->get()->keyBy('id');
+
+        $parProjet = $resultatsProjet
+            ->map(function ($item) use ($tempsTotal, $projets) {
                 return [
-                    'projet' => Project::find($item->project_id),
+                    'projet' => $projets->get($item->project_id),
                     'tempsTotal' => (float) $item->temps_total,
                     'pourcentage' => $tempsTotal > 0 ? round(($item->temps_total / $tempsTotal) * 100, 2) : 0,
                 ];
@@ -75,17 +79,21 @@ class StatistiquesQuery
             ->toArray();
 
         // Stats par activite
-        $parActivite = TimeEntry::query()
+        $resultatsActivite = TimeEntry::query()
             ->select('activity_id', DB::raw('SUM(duree) as temps_total'))
             ->whereBetween('date', [$dateDebut, $dateFin])
             ->when(!$user->estAdmin() && !$user->estModerateur(), function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             })
             ->groupBy('activity_id')
-            ->get()
-            ->map(function ($item) use ($tempsTotal) {
+            ->get();
+
+        $activites = Activity::whereIn('id', $resultatsActivite->pluck('activity_id'))->get()->keyBy('id');
+
+        $parActivite = $resultatsActivite
+            ->map(function ($item) use ($tempsTotal, $activites) {
                 return [
-                    'activite' => Activity::find($item->activity_id),
+                    'activite' => $activites->get($item->activity_id),
                     'tempsTotal' => (float) $item->temps_total,
                     'pourcentage' => $tempsTotal > 0 ? round(($item->temps_total / $tempsTotal) * 100, 2) : 0,
                 ];
@@ -99,15 +107,19 @@ class StatistiquesQuery
         if ($user->estAdmin() || $user->estModerateur()) {
             $joursOuvres = $this->compterJoursOuvres($dateDebut, $dateFin);
 
-            $parUtilisateur = TimeEntry::query()
+            $resultatsUtilisateur = TimeEntry::query()
                 ->select('user_id', DB::raw('SUM(duree) as temps_total'))
                 ->whereBetween('date', [$dateDebut, $dateFin])
                 ->groupBy('user_id')
-                ->get()
-                ->map(function ($item) use ($joursOuvres) {
+                ->get();
+
+            $utilisateurs = User::whereIn('id', $resultatsUtilisateur->pluck('user_id'))->get()->keyBy('id');
+
+            $parUtilisateur = $resultatsUtilisateur
+                ->map(function ($item) use ($joursOuvres, $utilisateurs) {
                     $attendu = $joursOuvres; // 1 ETP par jour
                     return [
-                        'utilisateur' => User::find($item->user_id),
+                        'utilisateur' => $utilisateurs->get($item->user_id),
                         'tempsTotal' => (float) $item->temps_total,
                         'tauxCompletion' => $attendu > 0 ? round(($item->temps_total / $attendu) * 100, 2) : 0,
                     ];
