@@ -327,6 +327,16 @@ Ce document repertorie les problemes rencontres lors du developpement et leurs s
   - `frontend/src/components/notifications/NotificationItem.tsx` (bouton supprimer)
   - `frontend/src/components/notifications/NotificationPanel.tsx` (handler)
 
+#### 41. Saisie moderation - Sauvegarde pour le mauvais utilisateur
+- **Probleme** : Quand un moderateur saisit du temps pour un autre utilisateur, la sauvegarde enregistre pour le moderateur lui-meme (l'utilisateur connecte) au lieu de l'utilisateur cible
+- **Symptome** : Erreur "Une saisie existe deja pour cette combinaison date/activite/projet" si le moderateur a deja une saisie pour cette date/activite/projet. Sinon, la saisie est creee pour le mauvais utilisateur sans erreur visible.
+- **Cause** : `BoutonSauvegarde.tsx` appelait `useSaisieHebdo()` SANS `userId`, creant une instance separee du hook avec `userId = undefined`. La fonction `sauvegarder` de cette instance n'incluait jamais `userId` dans les variables GraphQL. Pendant ce temps, `SaisiePage.tsx` appelait `useSaisieHebdo(userIdModeration)` avec le bon `userId`, mais son `sauvegarder` n'etait pas utilise.
+- **Solution** : Refactoriser `BoutonSauvegarde` pour recevoir `sauvegarder`, `aDesModifications`, `sauvegarde` et `erreur` en props depuis `SaisiePage`, au lieu de creer sa propre instance du hook.
+- **Lecon** : Un hook React custom cree une instance separee par appel. Meme si l'etat Zustand est partage (singleton), les closures (`useCallback`) capturent les parametres locaux de chaque instance. Deux appels a `useSaisieHebdo()` avec des parametres differents = deux fonctions `sauvegarder` differentes.
+- **Fichiers** :
+  - `frontend/src/components/saisie/BoutonSauvegarde.tsx` (props au lieu de hook)
+  - `frontend/src/pages/SaisiePage.tsx` (passe les props)
+
 ---
 
 ## Phase Bonus - Documentation et facilite d'installation
@@ -437,8 +447,9 @@ docker-compose exec app php artisan migrate --seed
 | 2026-02-08 | 5 | @cache necessite cache driver | Redis configure dans Laravel |
 | 2026-02-08 | 5 | GraphiQL config a publier | vendor:publish --tag=graphiql-config |
 | 2026-02-08 | 5 | React.lazy necessite export default | Toutes les pages ont deja export default |
-| 2026-02-08 | 6 | Login espace visible dans email | Ajout onBlur trim |
+| 2026-02-08 | 6 | Login espace visible dans email | type="text" + inputMode="email" + regex replace |
 | 2026-02-08 | 6 | Supervision enum manquantes | Ajout JOUR_MANQUANT, SAISIE_SUR_ABSENCE |
 | 2026-02-08 | 6 | Config NavAdmin manquant | Ajout NavAdmin dans ConfigurationPage |
 | 2026-02-08 | 6 | Export notification non cliquable | Bouton Telecharger dans notification |
 | 2026-02-08 | 6 | Notifications pas de suppression | Branchement mutation deleteNotification |
+| 2026-02-08 | 6 | Saisie moderation sauvegarde pour soi | BoutonSauvegarde recoit props au lieu de creer son propre hook |

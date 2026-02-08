@@ -1,10 +1,20 @@
 // Barre de sauvegarde fixe en bas de page
 
 import { CheckIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
-import { useSaisieHebdo } from '../../hooks/useSaisieHebdo';
 
-export default function BoutonSauvegarde() {
-  const { aDesModifications, sauvegarde, erreur, sauvegarder } = useSaisieHebdo();
+interface BoutonSauvegardeProps {
+  aDesModifications: boolean;
+  sauvegarde: boolean;
+  erreur: string | null;
+  sauvegarder: () => Promise<void>;
+}
+
+export default function BoutonSauvegarde({
+  aDesModifications,
+  sauvegarde,
+  erreur,
+  sauvegarder,
+}: BoutonSauvegardeProps) {
 
   // Ne pas afficher si pas de modifications
   if (!aDesModifications && !erreur) {

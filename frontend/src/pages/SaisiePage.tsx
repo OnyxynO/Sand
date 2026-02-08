@@ -30,7 +30,7 @@ function useIsMobile(breakpoint = 768) {
 export default function SaisiePage() {
   const isMobile = useIsMobile();
   const [userIdModeration, setUserIdModeration] = useState<string | null>(null);
-  const { erreur, aDesModifications } = useSaisieHebdo(userIdModeration);
+  const { erreur, aDesModifications, sauvegarde, sauvegarder } = useSaisieHebdo(userIdModeration);
   const utilisateur = useAuthStore((state) => state.utilisateur);
 
   // Afficher le selecteur si moderateur ou admin
@@ -58,7 +58,12 @@ export default function SaisiePage() {
       {isMobile ? <GrilleSemaineMobile /> : <GrilleSemaine />}
 
       {/* Barre de sauvegarde */}
-      <BoutonSauvegarde />
+      <BoutonSauvegarde
+        aDesModifications={aDesModifications}
+        sauvegarde={sauvegarde}
+        erreur={erreur}
+        sauvegarder={sauvegarder}
+      />
     </div>
   );
 }

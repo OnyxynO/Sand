@@ -144,6 +144,29 @@ Absence (systeme)
 
 ---
 
+## EV-07 : Affichage des absences dans la grille de saisie
+
+**En tant qu'** utilisateur
+**Je veux** voir mes absences (conges, RTT, maladie, formation) dans la grille de saisie hebdomadaire
+**Afin de** savoir quels jours sont deja couverts et eviter de saisir sur un jour d'absence
+
+**Etat actuel** :
+- Backend : query `absences` et mutation `syncAbsences` existent et fonctionnent
+- Mock RH : donnees d'absences presentes pour DEV001, DEV002, MOD001
+- Frontend : aucun code n'appelle ces endpoints, aucune absences affichee dans la grille
+
+**Implementation envisagee** :
+- Ajouter une operation GraphQL frontend pour `syncAbsences` + `absences`
+- Appeler `syncAbsences` au chargement de la page de saisie (ou sur action utilisateur)
+- Afficher les absences dans la grille : ligne speciale "Absence" ou indicateur visuel sur les jours concernes
+- Cellules en lecture seule (pas de saisie d'absence manuelle depuis la grille)
+- Prise en compte des demi-journees (0.5 ETP)
+- Affichage du type d'absence (conges, RTT, maladie, formation) via tooltip ou badge
+
+**Complexite** : Moyenne
+
+---
+
 ## Resume et priorisation proposee
 
 | ID | Evolution | Complexite | Prerequis |
@@ -155,6 +178,7 @@ Absence (systeme)
 | EV-05 | Reset parametres par defaut | Faible | - |
 | EV-06a | Suppression donnees RGPD | Moyenne | - |
 | EV-06b | Purge totale | Moyenne | - |
+| EV-07 | Absences dans grille de saisie | Moyenne | - |
 
 ---
 
