@@ -1,8 +1,13 @@
 import { screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { renderAvecApollo } from '../../test/renderAvecApollo';
 import ConfigurationPage from './ConfigurationPage';
 import { PARAMETRES_QUERY } from '../../graphql/operations/settings';
+
+// Mock NavAdmin pour eviter le besoin de Router context
+vi.mock('../../components/admin/NavAdmin', () => ({
+  default: () => <nav data-testid="nav-admin">NavAdmin</nav>,
+}));
 
 const parametresMock = {
   request: {

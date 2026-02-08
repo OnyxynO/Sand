@@ -5,6 +5,7 @@ import {
   CheckIcon,
 } from '@heroicons/react/24/outline';
 import { PARAMETRES_QUERY, UPDATE_SETTINGS } from '../../graphql/operations/settings';
+import NavAdmin from '../../components/admin/NavAdmin';
 
 interface Parametre {
   id: string;
@@ -111,6 +112,8 @@ export default function ConfigurationPage() {
 
   return (
     <div className="space-y-6">
+      <NavAdmin />
+
       {/* Titre */}
       <div className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-3">
         <Cog6ToothIcon className="w-7 h-7 text-gray-700" />

@@ -12,8 +12,10 @@ const http = require('http');
 
 const PORT = 3001;
 
-// Donnees fictives d'absences - dates en fevrier 2026 pour les tests
+// Donnees fictives d'absences - dates en fevrier/mars 2026 pour les tests
 const absences = [
+  // --- Jean Martin (DEV001) ---
+  // Semaine complete de conges (lun-ven)
   {
     id: 1,
     matricule: 'DEV001',
@@ -23,15 +25,7 @@ const absences = [
     duree_journaliere: 1.0,
     statut: 'valide'
   },
-  {
-    id: 2,
-    matricule: 'DEV002',
-    type: 'maladie',
-    date_debut: '2026-02-16',
-    date_fin: '2026-02-16',
-    duree_journaliere: 1.0,
-    statut: 'valide'
-  },
+  // RTT un vendredi
   {
     id: 3,
     matricule: 'DEV001',
@@ -41,6 +35,116 @@ const absences = [
     duree_journaliere: 1.0,
     statut: 'valide'
   },
+  // Demi-journee maladie (matin)
+  {
+    id: 6,
+    matricule: 'DEV001',
+    type: 'maladie',
+    date_debut: '2026-02-25',
+    date_fin: '2026-02-25',
+    duree_journaliere: 0.5,
+    statut: 'valide'
+  },
+  // Mercredis recurrents - RTT tous les mercredis de mars
+  {
+    id: 7,
+    matricule: 'DEV001',
+    type: 'rtt',
+    date_debut: '2026-03-04',
+    date_fin: '2026-03-04',
+    duree_journaliere: 1.0,
+    statut: 'valide'
+  },
+  {
+    id: 8,
+    matricule: 'DEV001',
+    type: 'rtt',
+    date_debut: '2026-03-11',
+    date_fin: '2026-03-11',
+    duree_journaliere: 1.0,
+    statut: 'valide'
+  },
+  {
+    id: 9,
+    matricule: 'DEV001',
+    type: 'rtt',
+    date_debut: '2026-03-18',
+    date_fin: '2026-03-18',
+    duree_journaliere: 1.0,
+    statut: 'valide'
+  },
+  {
+    id: 10,
+    matricule: 'DEV001',
+    type: 'rtt',
+    date_debut: '2026-03-25',
+    date_fin: '2026-03-25',
+    duree_journaliere: 1.0,
+    statut: 'valide'
+  },
+
+  // --- Pierre Bernard (DEV002) ---
+  // Maladie 1 jour
+  {
+    id: 2,
+    matricule: 'DEV002',
+    type: 'maladie',
+    date_debut: '2026-02-16',
+    date_fin: '2026-02-16',
+    duree_journaliere: 1.0,
+    statut: 'valide'
+  },
+  // Demi-journees de conges (jeu + ven apres-midi)
+  {
+    id: 5,
+    matricule: 'DEV002',
+    type: 'conges_payes',
+    date_debut: '2026-02-26',
+    date_fin: '2026-02-27',
+    duree_journaliere: 0.5,
+    statut: 'valide'
+  },
+  // Semaine complete conges mars
+  {
+    id: 11,
+    matricule: 'DEV002',
+    type: 'conges_payes',
+    date_debut: '2026-03-09',
+    date_fin: '2026-03-13',
+    duree_journaliere: 1.0,
+    statut: 'valide'
+  },
+  // Mercredis recurrents - absence partielle (demi-journee) tous les mercredis de mars
+  {
+    id: 12,
+    matricule: 'DEV002',
+    type: 'rtt',
+    date_debut: '2026-03-04',
+    date_fin: '2026-03-04',
+    duree_journaliere: 0.5,
+    statut: 'valide'
+  },
+  {
+    id: 13,
+    matricule: 'DEV002',
+    type: 'rtt',
+    date_debut: '2026-03-18',
+    date_fin: '2026-03-18',
+    duree_journaliere: 0.5,
+    statut: 'valide'
+  },
+  {
+    id: 14,
+    matricule: 'DEV002',
+    type: 'rtt',
+    date_debut: '2026-03-25',
+    date_fin: '2026-03-25',
+    duree_journaliere: 0.5,
+    statut: 'valide'
+  },
+
+  // --- Marie Dupont (MOD001) ---
+  // Formation 2 jours
   {
     id: 4,
     matricule: 'MOD001',
@@ -50,15 +154,26 @@ const absences = [
     duree_journaliere: 1.0,
     statut: 'valide'
   },
+  // Conges payes 3 jours (lun-mer)
   {
-    id: 5,
-    matricule: 'DEV002',
+    id: 15,
+    matricule: 'MOD001',
     type: 'conges_payes',
-    date_debut: '2026-02-26',
-    date_fin: '2026-02-27',
+    date_debut: '2026-03-02',
+    date_fin: '2026-03-04',
+    duree_journaliere: 1.0,
+    statut: 'valide'
+  },
+  // Demi-journee RTT un vendredi
+  {
+    id: 16,
+    matricule: 'MOD001',
+    type: 'rtt',
+    date_debut: '2026-03-20',
+    date_fin: '2026-03-20',
     duree_journaliere: 0.5,
     statut: 'valide'
-  }
+  },
 ];
 
 // Donnees fictives des employes - alignees avec les seeders SAND

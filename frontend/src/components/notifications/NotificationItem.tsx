@@ -4,6 +4,7 @@ import {
   DocumentArrowDownIcon,
   InformationCircleIcon,
   ClockIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -12,6 +13,7 @@ import type { Notification, NotificationType } from '../../types';
 interface NotificationItemProps {
   notification: Notification;
   onMarkRead: (id: string) => void;
+  onDelete: (id: string) => void;
   onResolveConflict: (notification: Notification) => void;
 }
 
@@ -54,6 +56,7 @@ const typeConfig: Record<
 export default function NotificationItem({
   notification,
   onMarkRead,
+  onDelete,
   onResolveConflict,
 }: NotificationItemProps) {
   const config = typeConfig[notification.type] ?? typeConfig.systeme;
@@ -68,6 +71,21 @@ export default function NotificationItem({
   const handleResoudre = (e: React.MouseEvent) => {
     e.stopPropagation();
     onResolveConflict(notification);
+  };
+
+  const handleSupprimer = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete(notification.id);
+  };
+
+  const handleTelecharger = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const donnees = notification.donnees as Record<string, unknown> | undefined;
+    const exportId = donnees?.export_id;
+    if (exportId) {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      window.open(`${baseUrl}/exports/${exportId}/download`, '_blank');
+    }
   };
 
   const dateRelative = formatDistanceToNow(new Date(notification.createdAt), {
@@ -109,14 +127,35 @@ export default function NotificationItem({
         <div className="mt-2 flex items-center justify-between gap-2">
           <span className="text-xs text-gray-500">{dateRelative}</span>
 
-          {notification.type === 'conflit_absence' && !notification.estLu && (
-            <button
-              onClick={handleResoudre}
-              className="text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors"
-            >
-              Resoudre
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {notification.type === 'conflit_absence' && !notification.estLu && (
+              <button
+                onClick={handleResoudre}
+                className="text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                Resoudre
+              </button>
+            )}
+
+            {notification.type === 'export_pret' && (notification.donnees as Record<string, unknown>)?.export_id && (
+              <button
+                onClick={handleTelecharger}
+                className="text-xs font-medium text-green-600 hover:text-green-800 transition-colors"
+              >
+                Telecharger
+              </button>
+            )}
+
+            {notification.estLu && (
+              <button
+                onClick={handleSupprimer}
+                className="p-1 text-gray-400 hover:text-red-500 transition-colors rounded"
+                title="Supprimer"
+              >
+                <TrashIcon className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
