@@ -1,61 +1,91 @@
-"Statistiques agregees"
+"Statistiques agregees sur une periode"
 type Statistics {
+    "Temps total en ETP sur la periode"
     tempsTotal: Float!
+    "Repartition du temps par projet"
     parProjet: [ProjectStat!]!
+    "Repartition du temps par activite"
     parActivite: [ActivityStat!]!
+    "Repartition du temps par utilisateur (moderateurs/admins)"
     parUtilisateur: [UserStat!]!
+    "Detail jour par jour"
     parJour: [DayStat!]!
 }
 
 "Statistiques par projet"
 type ProjectStat {
+    "Projet concerne"
     projet: Project!
+    "Temps total en ETP"
     tempsTotal: Float!
+    "Pourcentage du temps total"
     pourcentage: Float!
 }
 
 "Statistiques par activite"
 type ActivityStat {
+    "Activite concernee"
     activite: Activity!
+    "Temps total en ETP"
     tempsTotal: Float!
+    "Pourcentage du temps total"
     pourcentage: Float!
 }
 
 "Statistiques par utilisateur"
 type UserStat {
+    "Utilisateur concerne"
     utilisateur: User!
+    "Temps total en ETP"
     tempsTotal: Float!
+    "Taux de completion par rapport aux jours ouvres (%)"
     tauxCompletion: Float!
 }
 
 "Statistiques par jour"
 type DayStat {
+    "Date du jour"
     date: Date!
+    "Temps total en ETP"
     tempsTotal: Float!
+    "Indique si le jour est complet (total ~= 1.0 ETP)"
     estComplet: Boolean!
 }
 
-"Anomalie detectee"
+"Anomalie detectee dans les saisies"
 type Anomaly {
+    "Identifiant unique"
     id: ID!
+    "Type d'anomalie"
     type: AnomalyType!
+    "Utilisateur concerne"
     utilisateur: User!
+    "Date de l'anomalie (si applicable)"
     date: Date
+    "Semaine de l'anomalie (format ISO, si applicable)"
     semaine: String
+    "Description de l'anomalie"
     detail: String!
+    "Projet concerne (si applicable)"
     projet: Project
 }
 
-"Job d'export"
+"Job d'export asynchrone"
 type ExportJob {
+    "Identifiant unique"
     id: ID!
+    "Statut du job"
     statut: ExportStatus!
+    "URL de telechargement (disponible quand termine)"
     urlTelechargement: String
+    "Date d'expiration du fichier"
     expireLe: DateTime
 }
 
-"Payload d'authentification"
+"Payload retourne apres authentification"
 type AuthPayload {
+    "Utilisateur authentifie"
     user: User!
+    "Token d'acces (si applicable)"
     token: String
 }

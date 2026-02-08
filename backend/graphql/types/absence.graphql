@@ -1,15 +1,26 @@
 "Absence d'un utilisateur"
 type Absence {
+    "Identifiant unique"
     id: ID!
+    "Code du type d'absence"
     type: String!
+    "Libelle du type d'absence"
     typeLibelle: String! @rename(attribute: "type_libelle")
+    "Date de debut de l'absence"
     dateDebut: Date! @rename(attribute: "date_debut")
+    "Date de fin de l'absence"
     dateFin: Date! @rename(attribute: "date_fin")
+    "Duree journaliere en ETP (0.5 ou 1.0)"
     dureeJournaliere: Float! @rename(attribute: "duree_journaliere")
+    "Statut de l'absence (validee, en_attente, etc.)"
     statut: String!
+    "Reference dans le systeme RH externe"
     referenceExterne: String @rename(attribute: "reference_externe")
+    "Date d'import depuis l'API RH"
     importeLe: DateTime @rename(attribute: "importe_le")
+    "Date de creation"
     createdAt: DateTime! @rename(attribute: "created_at")
+    "Date de derniere modification"
     updatedAt: DateTime! @rename(attribute: "updated_at")
 
     "Nombre de jours d'absence"
@@ -24,7 +35,10 @@ type Absence {
 
 "Resultat d'une synchronisation d'absences"
 type SyncResult {
+    "Nombre d'absences importees"
     importes: Int!
+    "Nombre de conflits detectes"
     conflits: Int!
+    "Liste des messages d'erreur"
     erreurs: [String!]!
 }

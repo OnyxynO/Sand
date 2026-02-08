@@ -1,21 +1,35 @@
 "Creation d'un projet"
 input CreateProjectInput {
+    "Nom du projet"
     nom: String! @rules(apply: ["required", "max:255"])
+    "Code court unique"
     code: String! @rules(apply: ["required", "max:50", "unique:projects,code"])
+    "Description du projet"
     description: String
+    "Date de debut du projet"
     dateDebut: Date @rename(attribute: "date_debut")
+    "Date de fin du projet"
     dateFin: Date @rename(attribute: "date_fin")
+    "Activer ou desactiver le projet"
     estActif: Boolean @rename(attribute: "est_actif")
+    "IDs des moderateurs a assigner"
     moderateurIds: [ID!] @rename(attribute: "moderateur_ids")
+    "IDs des activites a activer"
     activiteIds: [ID!] @rename(attribute: "activite_ids")
 }
 
 "Modification d'un projet"
 input UpdateProjectInput {
+    "Nom du projet"
     nom: String @rules(apply: ["max:255"])
+    "Code court"
     code: String @rules(apply: ["max:50"])
+    "Description du projet"
     description: String
+    "Date de debut du projet"
     dateDebut: Date @rename(attribute: "date_debut")
+    "Date de fin du projet"
     dateFin: Date @rename(attribute: "date_fin")
+    "Activer ou desactiver le projet"
     estActif: Boolean @rename(attribute: "est_actif")
 }

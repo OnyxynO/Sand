@@ -1,13 +1,22 @@
 "Utilisateur du systeme"
 type User {
+    "Identifiant unique"
     id: ID!
+    "Matricule interne (optionnel)"
     matricule: String
+    "Nom de famille"
     nom: String!
+    "Prenom"
     prenom: String!
+    "Adresse email"
     email: String!
+    "Role dans le systeme"
     role: UserRole!
+    "Indique si le compte est actif"
     estActif: Boolean! @rename(attribute: "est_actif")
+    "Date de creation du compte"
     createdAt: DateTime! @rename(attribute: "created_at")
+    "Date de derniere modification"
     updatedAt: DateTime! @rename(attribute: "updated_at")
 
     "Nom complet (prenom + nom)"

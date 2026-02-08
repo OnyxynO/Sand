@@ -1,9 +1,15 @@
 "Restriction de visibilite d'une activite pour un utilisateur"
 type ActivityVisibility {
+    "Identifiant unique"
     id: ID!
+    "Activite concernee"
     activite: Activity!
+    "Utilisateur concerne"
     utilisateur: User!
+    "Projet concerne"
     projet: Project!
+    "Indique si l'activite est visible pour cet utilisateur"
     estVisible: Boolean! @rename(attribute: "est_visible")
+    "Date de creation de la restriction"
     createdAt: DateTime! @rename(attribute: "created_at")
 }

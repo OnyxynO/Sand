@@ -1,8 +1,13 @@
 "Donnees d'une absence"
 input AbsenceInput {
+    "Identifiant de l'utilisateur concerne"
     userId: ID! @rename(attribute: "user_id") @rules(apply: ["required", "exists:users,id"])
+    "Code du type d'absence"
     type: String! @rules(apply: ["required"])
+    "Date de debut de l'absence"
     dateDebut: Date! @rename(attribute: "date_debut") @rules(apply: ["required", "date"])
+    "Date de fin de l'absence"
     dateFin: Date! @rename(attribute: "date_fin") @rules(apply: ["required", "date", "after_or_equal:date_debut"])
+    "Duree journaliere en ETP (0.5 a 1.0)"
     dureeJournaliere: Float @rename(attribute: "duree_journaliere") @rules(apply: ["numeric", "min:0.5", "max:1"])
 }

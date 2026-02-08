@@ -1,10 +1,16 @@
 "Saisie de temps"
 type TimeEntry {
+    "Identifiant unique"
     id: ID!
+    "Date de la saisie"
     date: Date!
+    "Duree en ETP (0.01 a 1.00)"
     duree: Float!
+    "Commentaire optionnel"
     commentaire: String
+    "Date de creation"
     createdAt: DateTime! @rename(attribute: "created_at")
+    "Date de derniere modification"
     updatedAt: DateTime! @rename(attribute: "updated_at")
 
     "Utilisateur qui a fait la saisie"
@@ -22,12 +28,19 @@ type TimeEntry {
 
 "Historique d'une saisie"
 type TimeEntryLog {
+    "Identifiant unique"
     id: ID!
+    "Type d'action effectuee"
     action: LogAction!
+    "Duree avant modification"
     ancienneDuree: Float @rename(attribute: "ancienne_duree")
+    "Duree apres modification"
     nouvelleDuree: Float @rename(attribute: "nouvelle_duree")
+    "Commentaire avant modification"
     ancienCommentaire: String @rename(attribute: "ancien_commentaire")
+    "Commentaire apres modification"
     nouveauCommentaire: String @rename(attribute: "nouveau_commentaire")
+    "Date de la modification"
     createdAt: DateTime! @rename(attribute: "created_at")
 
     "Utilisateur ayant fait la modification"

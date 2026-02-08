@@ -1,12 +1,20 @@
 "Notification utilisateur"
 type Notification {
+    "Identifiant unique"
     id: ID!
+    "Type de notification"
     type: String!
+    "Titre de la notification"
     titre: String!
+    "Contenu de la notification"
     message: String!
+    "Donnees supplementaires (JSON)"
     donnees: JSON
+    "Indique si la notification a ete lue"
     estLu: Boolean! @rename(attribute: "est_lu")
+    "Date de lecture"
     luLe: DateTime @rename(attribute: "lu_le")
+    "Date d'envoi"
     createdAt: DateTime! @rename(attribute: "created_at")
 
     "Utilisateur destinataire"

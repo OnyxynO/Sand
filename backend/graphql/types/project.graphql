@@ -1,13 +1,22 @@
 "Projet"
 type Project {
+    "Identifiant unique"
     id: ID!
+    "Nom du projet"
     nom: String!
+    "Code court unique"
     code: String!
+    "Description du projet"
     description: String
+    "Date de debut du projet"
     dateDebut: Date @rename(attribute: "date_debut")
+    "Date de fin du projet"
     dateFin: Date @rename(attribute: "date_fin")
+    "Indique si le projet est actif"
     estActif: Boolean! @rename(attribute: "est_actif")
+    "Date de creation"
     createdAt: DateTime! @rename(attribute: "created_at")
+    "Date de derniere modification"
     updatedAt: DateTime! @rename(attribute: "updated_at")
 
     "Utilisateurs affectes au projet"
