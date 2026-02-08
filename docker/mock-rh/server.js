@@ -15,6 +15,26 @@ const PORT = 3001;
 // Donnees fictives d'absences - dates en fevrier/mars 2026 pour les tests
 const absences = [
   // --- Jean Martin (DEV001) ---
+  // Semaine 1-7 fev : RTT mercredi 4 fev
+  {
+    id: 17,
+    matricule: 'DEV001',
+    type: 'rtt',
+    date_debut: '2026-02-04',
+    date_fin: '2026-02-04',
+    duree_journaliere: 1.0,
+    statut: 'valide'
+  },
+  // Semaine 1-7 fev : demi-journee maladie vendredi 6 fev
+  {
+    id: 18,
+    matricule: 'DEV001',
+    type: 'maladie',
+    date_debut: '2026-02-06',
+    date_fin: '2026-02-06',
+    duree_journaliere: 0.5,
+    statut: 'valide'
+  },
   // Semaine complete de conges (lun-ven)
   {
     id: 1,
@@ -84,6 +104,16 @@ const absences = [
   },
 
   // --- Pierre Bernard (DEV002) ---
+  // Semaine 1-7 fev : conges lundi-mardi 2-3 fev
+  {
+    id: 19,
+    matricule: 'DEV002',
+    type: 'conges_payes',
+    date_debut: '2026-02-02',
+    date_fin: '2026-02-03',
+    duree_journaliere: 1.0,
+    statut: 'valide'
+  },
   // Maladie 1 jour
   {
     id: 2,
@@ -144,6 +174,16 @@ const absences = [
   },
 
   // --- Marie Dupont (MOD001) ---
+  // Semaine 1-7 fev : demi-journee RTT mercredi 4 fev
+  {
+    id: 20,
+    matricule: 'MOD001',
+    type: 'rtt',
+    date_debut: '2026-02-04',
+    date_fin: '2026-02-04',
+    duree_journaliere: 0.5,
+    statut: 'valide'
+  },
   // Formation 2 jours
   {
     id: 4,
