@@ -1,11 +1,18 @@
 "Equipe ou service"
 type Team {
+    "Identifiant unique"
     id: ID!
+    "Nom de l'equipe"
     nom: String!
+    "Code court unique"
     code: String!
+    "Description de l'equipe"
     description: String
+    "Indique si l'equipe est active"
     estActif: Boolean! @rename(attribute: "est_actif")
+    "Date de creation"
     createdAt: DateTime! @rename(attribute: "created_at")
+    "Date de derniere modification"
     updatedAt: DateTime! @rename(attribute: "updated_at")
 
     "Membres de l'equipe"

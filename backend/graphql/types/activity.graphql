@@ -1,16 +1,28 @@
 "Activite (arborescence)"
 type Activity {
+    "Identifiant unique"
     id: ID!
+    "Nom de l'activite"
     nom: String!
+    "Code court (optionnel)"
     code: String
+    "Description de l'activite"
     description: String
+    "Chemin ltree dans l'arborescence"
     chemin: String!
+    "Niveau de profondeur dans l'arborescence (0 = racine)"
     niveau: Int!
+    "Ordre d'affichage parmi les freres"
     ordre: Int!
+    "Indique si c'est une feuille saisissable"
     estFeuille: Boolean! @rename(attribute: "est_feuille")
+    "Indique si c'est une activite systeme protegee"
     estSysteme: Boolean! @rename(attribute: "est_systeme")
+    "Indique si l'activite est active"
     estActif: Boolean! @rename(attribute: "est_actif")
+    "Date de creation"
     createdAt: DateTime! @rename(attribute: "created_at")
+    "Date de derniere modification"
     updatedAt: DateTime! @rename(attribute: "updated_at")
 
     "Activite parente"

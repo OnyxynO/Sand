@@ -1,50 +1,73 @@
 "Role d'un utilisateur dans le systeme"
 enum UserRole {
+    "Utilisateur standard (saisie personnelle uniquement)"
     UTILISATEUR @enum(value: "utilisateur")
+    "Moderateur (gestion des equipes et projets assignes)"
     MODERATEUR @enum(value: "moderateur")
+    "Administrateur (configuration globale du systeme)"
     ADMIN @enum(value: "admin")
 }
 
 "Type d'action dans l'historique"
 enum LogAction {
+    "Creation d'un enregistrement"
     CREATION @enum(value: "creation")
+    "Modification d'un enregistrement"
     MODIFICATION @enum(value: "modification")
+    "Suppression d'un enregistrement"
     SUPPRESSION @enum(value: "suppression")
 }
 
 "Type de notification"
 enum NotificationType {
+    "Saisie incomplete sur un ou plusieurs jours"
     SAISIE_INCOMPLETE @enum(value: "saisie_incomplete")
+    "Absence importee depuis l'API RH"
     ABSENCE_IMPORTEE @enum(value: "absence_importee")
+    "Conflit entre une absence et des saisies existantes"
     CONFLIT_ABSENCE @enum(value: "conflit_absence")
+    "Export CSV pret a telecharger"
     EXPORT_PRET @enum(value: "export_pret")
+    "Notification systeme generale"
     SYSTEME @enum(value: "systeme")
 }
 
 "Type d'anomalie detectee"
 enum AnomalyType {
+    "Jour avec total ETP inferieur a 1.0"
     JOUR_INCOMPLET
+    "Jour avec total ETP superieur a 1.0"
     JOUR_DEPASSE
+    "Semaine sans aucune saisie"
     SEMAINE_VIDE
+    "Conflit entre absence et saisie sur la meme date"
     CONFLIT_ABSENCE
 }
 
 "Resolution d'un conflit d'absence"
 enum ConflictResolution {
+    "Ecraser les saisies existantes par l'absence"
     ECRASER
+    "Ignorer l'absence et conserver les saisies"
     IGNORER
+    "Ajuster la duree de l'absence"
     AJUSTER
 }
 
 "Format d'export"
 enum ExportFormat {
+    "Export au format CSV"
     CSV
 }
 
 "Statut d'un job d'export"
 enum ExportStatus {
+    "Export en attente de traitement"
     EN_ATTENTE
+    "Export en cours de generation"
     EN_COURS
+    "Export termine et disponible"
     TERMINE
+    "Export echoue"
     ECHEC
 }
