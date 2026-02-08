@@ -11,7 +11,7 @@ const liens = [
 
 export default function NavAdmin() {
   return (
-    <div className="flex gap-1 mb-6 border-b">
+    <div className="flex gap-1 mb-6 border-b overflow-x-auto">
       {liens.map((lien) => (
         <NavLink
           key={lien.href}
