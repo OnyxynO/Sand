@@ -6,62 +6,75 @@ extend type Query {
     # ─── Users ──────────────────────────────────────
     "Liste des utilisateurs"
     users(
+        "Filtrer par equipe"
         equipeId: ID @where(key: "equipe_id")
+        "Filtrer par role"
         role: UserRole @where(key: "role")
+        "Recherche par nom (partielle)"
         search: String @where(key: "nom", operator: "like")
+        "Afficher uniquement les utilisateurs actifs"
         actifSeulement: Boolean @scope(name: "actif")
     ): [User!]! @paginate(defaultCount: 20, model: "App\\Models\\User") @guard
 
     "Un utilisateur par ID"
-    user(id: ID! @eq): User @find(model: "App\\Models\\User") @guard
+    user("Identifiant de l'utilisateur" id: ID! @eq): User @find(model: "App\\Models\\User") @guard
 
     # ─── Teams ──────────────────────────────────────
     "Liste des equipes"
     equipes(
+        "Afficher uniquement les equipes actives"
         actifSeulement: Boolean @scope(name: "actif")
     ): [Team!]! @all(model: "App\\Models\\Team") @guard
 
     "Une equipe par ID"
-    equipe(id: ID! @eq): Team @find(model: "App\\Models\\Team") @guard
+    equipe("Identifiant de l'equipe" id: ID! @eq): Team @find(model: "App\\Models\\Team") @guard
 
     # ─── Projects ───────────────────────────────────
     "Liste des projets"
     projets(
+        "Filtrer par statut actif/inactif"
         actif: Boolean @where(key: "est_actif")
+        "Filtrer par moderateur assigne"
         moderateurId: ID @builder(method: "App\\GraphQL\\Builders\\ProjectBuilder@filterByModerateur")
     ): [Project!]! @all(model: "App\\Models\\Project") @guard
 
     "Un projet par ID"
-    projet(id: ID! @eq): Project @find(model: "App\\Models\\Project") @guard
+    projet("Identifiant du projet" id: ID! @eq): Project @find(model: "App\\Models\\Project") @guard
 
     # ─── Activities ─────────────────────────────────
     "Arborescence complete des activites"
     arbreActivites: [Activity!]!
         @all(model: "App\\Models\\Activity", scopes: ["racine", "trierParOrdre"])
+        @cache(maxAge: 300)
         @guard
 
     "Activites disponibles pour un projet"
-    activitesDisponibles(projetId: ID!): [Activity!]!
+    activitesDisponibles("Identifiant du projet" projetId: ID!): [Activity!]!
         @field(resolver: "App\\GraphQL\\Queries\\ActivitesDisponiblesQuery")
         @guard
 
     "Une activite par ID"
-    activite(id: ID! @eq): Activity @find(model: "App\\Models\\Activity") @guard
+    activite("Identifiant de l'activite" id: ID! @eq): Activity @find(model: "App\\Models\\Activity") @guard
 
     # ─── Time Entries ───────────────────────────────
     "Saisies de temps (filtrees par droits d'acces)"
     saisies(
+        "Filtrer par utilisateur"
         userId: ID @where(key: "user_id")
+        "Filtrer par projet"
         projetId: ID @where(key: "project_id")
+        "Filtrer par activite"
         activiteId: ID @where(key: "activity_id")
+        "Date de debut de la periode"
         dateDebut: Date! @where(key: "date", operator: ">=")
+        "Date de fin de la periode"
         dateFin: Date! @where(key: "date", operator: "<=")
     ): [TimeEntry!]!
         @field(resolver: "App\\GraphQL\\Queries\\SaisiesQuery")
         @guard
 
     "Saisies de la semaine (pour soi-meme ou un utilisateur modere)"
-    mesSaisiesSemaine(semaine: String!, userId: ID): [TimeEntry!]!
+    mesSaisiesSemaine("Semaine au format ISO (ex: 2024-W03)" semaine: String!, "Utilisateur cible (moderateurs/admins)" userId: ID): [TimeEntry!]!
         @field(resolver: "App\\GraphQL\\Queries\\MesSaisiesSemaineQuery")
         @guard
 
@@ -73,15 +86,20 @@ extend type Query {
     # ─── Absences ───────────────────────────────────
     "Absences"
     absences(
+        "Filtrer par utilisateur"
         userId: ID @where(key: "user_id")
+        "Date de debut de la periode"
         dateDebut: Date! @where(key: "date_debut", operator: ">=")
+        "Date de fin de la periode"
         dateFin: Date! @where(key: "date_fin", operator: "<=")
     ): [Absence!]! @all(model: "App\\Models\\Absence", scopes: ["valide"]) @guard
 
     # ─── Notifications ──────────────────────────────
     "Mes notifications"
     mesNotifications(
+        "Afficher uniquement les non lues"
         nonLuSeulement: Boolean @scope(name: "nonLu")
+        "Nombre maximum de notifications"
         limite: Int
     ): [Notification!]!
         @field(resolver: "App\\GraphQL\\Queries\\MesNotificationsQuery")
@@ -93,25 +111,36 @@ extend type Query {
         @guard
 
     # ─── Statistics ─────────────────────────────────
-    "Statistiques"
+    "Statistiques agregees sur une periode"
     statistiques(
+        "Filtrer par projet"
         projetId: ID
+        "Filtrer par equipe"
         equipeId: ID
+        "Filtrer par utilisateur"
         userId: ID
+        "Date de debut de la periode"
         dateDebut: Date!
+        "Date de fin de la periode"
         dateFin: Date!
     ): Statistics!
         @field(resolver: "App\\GraphQL\\Queries\\StatistiquesQuery")
         @guard
 
     # ─── Anomalies ──────────────────────────────────
-    "Anomalies detectees"
+    "Anomalies detectees dans les saisies"
     anomalies(
+        "Filtrer par projet"
         projetId: ID
+        "Filtrer par equipe"
         equipeId: ID
+        "Filtrer par utilisateur"
         userId: ID
+        "Date de debut de la periode"
         dateDebut: Date!
+        "Date de fin de la periode"
         dateFin: Date!
+        "Types d'anomalies a inclure"
         types: [AnomalyType!]
     ): [Anomaly!]!
         @field(resolver: "App\\GraphQL\\Queries\\AnomaliesQuery")
@@ -122,11 +151,11 @@ extend type Query {
     parametres: [Setting!]! @all(model: "App\\Models\\Setting") @guard
 
     "Un parametre par cle"
-    parametre(cle: String! @eq): Setting @find(model: "App\\Models\\Setting") @guard
+    parametre("Cle du parametre" cle: String! @eq): Setting @find(model: "App\\Models\\Setting") @guard
 
     # ─── Visibilite ─────────────────────────────────
     "Restrictions de visibilite d'un projet"
-    restrictionsVisibilite(projetId: ID!): [ActivityVisibility!]!
+    restrictionsVisibilite("Identifiant du projet" projetId: ID!): [ActivityVisibility!]!
         @field(resolver: "App\\GraphQL\\Queries\\RestrictionsVisibiliteQuery")
         @guard
 }
