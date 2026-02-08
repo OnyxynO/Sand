@@ -111,7 +111,7 @@ class AnomaliesQuery
                     ->join('activities as act', 'te.activity_id', '=', 'act.id')
                     ->where('te.user_id', $targetUser->id)
                     ->whereBetween('te.date', [$dateDebut, $dateFin])
-                    ->where('a.est_valide', true)
+                    ->where('a.statut', 'valide')
                     ->where('act.est_systeme', false) // Exclure l'activite Absence
                     ->select('te.date', 'te.duree')
                     ->get();
