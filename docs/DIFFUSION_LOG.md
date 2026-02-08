@@ -267,6 +267,25 @@ Ce document repertorie les problemes rencontres lors du developpement et leurs s
 - **Cause** : `whereHas('user')` au lieu de `whereHas('utilisateur')` (noms de relations en francais)
 - **Solution** : Corriger dans `app/GraphQL/Queries/StatistiquesQuery.php`
 
+### Phase 5 (suite) - Performance, documentation, responsive
+
+#### 33. Directive @cache necessite le package Lighthouse cache
+- **Contexte** : Ajout de `@cache(maxAge: 300)` sur la query `arbreActivites`
+- **Prerequis** : Le package `mll-lab/graphql-php-scalars` doit etre installe (deja present)
+- **Note** : Lighthouse utilise le driver de cache configure dans Laravel (Redis en production)
+- **Commande** : Vider le cache Lighthouse apres modification : `php artisan lighthouse:clear-cache`
+
+#### 34. GraphiQL config publiee
+- **Action** : `php artisan vendor:publish --tag=graphiql-config`
+- **Fichier cree** : `backend/config/graphiql.php`
+- **Note** : Route `/graphiql` accessible uniquement en environnement local/dev
+- **Prerequis** : Package `mll-lab/laravel-graphiql` (deja en require-dev)
+
+#### 35. React.lazy et exports par defaut
+- **Contexte** : Code splitting avec `React.lazy(() => import('./pages/...'))` sur 12 pages
+- **Prerequis** : Chaque page doit avoir un `export default` (deja le cas dans SAND)
+- **Note** : `Layout` et `ProtectedRoute` restent en import statique (shell de l'app)
+
 ---
 
 ## Phase Bonus - Documentation et facilite d'installation
@@ -302,9 +321,10 @@ Ce document repertorie les problemes rencontres lors du developpement et leurs s
 - [ ] Ajouter des healthchecks dans docker-compose.yml
 - [ ] Attendre que PostgreSQL soit pret avant de lancer les migrations
 
-#### 6. Documentation API
-- [ ] Exporter le schema GraphQL
-- [ ] Generer une documentation automatique (Spectaql ou similaire)
+#### 6. Documentation API ✅
+- [x] GraphiQL active (/graphiql en dev)
+- [x] Schema entierement documente (descriptions sur types, inputs, enums, arguments)
+- [ ] Generer une documentation statique (Spectaql ou similaire) - optionnel
 
 ---
 
@@ -373,3 +393,6 @@ docker-compose exec app php artisan migrate --seed
 | 2026-02-06 | 5 | Apollo 4 toutes queries mockees | Mocker toutes les queries du composant |
 | 2026-02-06 | 5 | Heroicons/Recharts SVG happy-dom | Mocks globaux dans setup.ts |
 | 2026-02-06 | 5 | StatistiquesQuery mauvaise relation | whereHas('utilisateur') pas 'user' |
+| 2026-02-08 | 5 | @cache necessite cache driver | Redis configure dans Laravel |
+| 2026-02-08 | 5 | GraphiQL config a publier | vendor:publish --tag=graphiql-config |
+| 2026-02-08 | 5 | React.lazy necessite export default | Toutes les pages ont deja export default |

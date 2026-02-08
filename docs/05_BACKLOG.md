@@ -420,16 +420,18 @@ Finalisation et qualité.
 
 ### User Stories
 
-#### US-5.1 : Responsive design
+#### US-5.1 : Responsive design ✅
 > **En tant qu'** utilisateur mobile
 > **Je veux** utiliser l'app sur téléphone
 > **Afin de** saisir en déplacement
 
 **Critères d'acceptation :**
-- [ ] Breakpoints Tailwind (sm, md, lg)
-- [ ] Mobile : vue jour par jour
-- [ ] Tablette : grille scrollable
-- [ ] Menu hamburger sur petit écran
+- [x] Breakpoints Tailwind (sm, md, lg)
+- [x] Mobile : vue jour par jour (GrilleSemaineMobile)
+- [x] Tablette : grille scrollable
+- [x] Menu hamburger sur petit écran
+- [x] NavAdmin scrollable sur mobile
+- [x] Tables admin responsives (colonnes cachees sur xs)
 
 ---
 
@@ -461,28 +463,29 @@ Finalisation et qualité.
 
 ---
 
-#### US-5.4 : Documentation API
+#### US-5.4 : Documentation API ✅
 > **En tant que** développeur
 > **Je veux** une documentation API
 > **Afin de** faciliter le développement
 
 **Critères d'acceptation :**
-- [ ] GraphQL Playground accessible
-- [ ] Descriptions sur tous les types/champs
-- [ ] Exemples de requêtes
+- [x] GraphiQL accessible (/graphiql en dev)
+- [x] Descriptions sur tous les types/champs (11 types, 8 inputs, 7 enums)
+- [x] Descriptions sur tous les arguments de queries et mutations
 
 ---
 
-#### US-5.5 : Optimisations performance
+#### US-5.5 : Optimisations performance ✅
 > **En tant qu'** utilisateur
 > **Je veux** une app rapide
 > **Afin d'** avoir une bonne expérience
 
 **Critères d'acceptation :**
-- [ ] Cache arborescence activités
-- [ ] Lazy loading composants React
-- [ ] Pagination sur les listes longues
-- [ ] Index DB optimisés
+- [x] Cache arborescence activites (@cache TTL 5 min)
+- [x] Lazy loading composants React (React.lazy + Suspense)
+- [x] Pagination sur la liste des utilisateurs (Precedent/Suivant)
+- [x] Correction N+1 queries dans StatistiquesQuery (whereIn)
+- [x] TypePolicies Apollo (keyFields sur 8 types)
 
 ---
 

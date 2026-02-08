@@ -69,6 +69,17 @@ Les diagrammes dans `03_ARCHITECTURE.md` sont au format **Mermaid** :
 
 ## 📝 Changelog
 
+### v1.3 - Fevrier 2026 (Phase 5 - Polish)
+- **170 tests backend** (PHPUnit) - 670 assertions, 0 echecs
+- **101 tests frontend** (Vitest) - 0 echecs
+- Correction N+1 queries dans StatistiquesQuery
+- Code splitting React.lazy (12 pages)
+- TypePolicies Apollo (cache normalise)
+- Cache @cache(maxAge: 300) sur arbreActivites
+- Pagination liste utilisateurs
+- GraphiQL active + schema entierement documente (types, inputs, enums, arguments)
+- Responsive admin (NavAdmin scrollable, tables adaptatives)
+
 ### v1.2 - Fevrier 2026
 - **119 tests backend** (PHPUnit) - 504 assertions, 0 echecs
 - **66 tests frontend** (Vitest) - 0 echecs
