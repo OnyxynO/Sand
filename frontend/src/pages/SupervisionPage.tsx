@@ -17,7 +17,7 @@ import { useAuthStore } from '../stores/authStore';
 
 interface Anomalie {
   id: string;
-  type: 'JOUR_INCOMPLET' | 'JOUR_DEPASSE' | 'SEMAINE_VIDE' | 'CONFLIT_ABSENCE';
+  type: 'JOUR_INCOMPLET' | 'JOUR_DEPASSE' | 'SEMAINE_VIDE' | 'CONFLIT_ABSENCE' | 'JOUR_MANQUANT' | 'SAISIE_SUR_ABSENCE';
   date?: string;
   semaine?: string;
   detail: string;
@@ -68,6 +68,16 @@ const typeConfig: Record<string, { label: string; couleur: string; icone: typeof
   CONFLIT_ABSENCE: {
     label: 'Conflit absence',
     couleur: 'bg-amber-100 text-amber-800',
+    icone: ExclamationTriangleIcon,
+  },
+  JOUR_MANQUANT: {
+    label: 'Jour manquant',
+    couleur: 'bg-yellow-100 text-yellow-800',
+    icone: CalendarDaysIcon,
+  },
+  SAISIE_SUR_ABSENCE: {
+    label: 'Saisie sur absence',
+    couleur: 'bg-purple-100 text-purple-800',
     icone: ExclamationTriangleIcon,
   },
 };

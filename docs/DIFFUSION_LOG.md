@@ -288,6 +288,47 @@ Ce document repertorie les problemes rencontres lors du developpement et leurs s
 
 ---
 
+### Phase 6 - Tests manuels (2026-02-08)
+
+#### 36. Login - Espace visible dans le champ email
+- **Probleme** : L'utilisateur peut saisir un espace en fin d'email, l'espace reste visible dans le champ
+- **Symptome** : `"admin@sand.local "` affiche avec l'espace, meme si le trim est fait au submit
+- **Cause** : Le trim est applique uniquement au `handleSubmit`, pas au `onChange` ni au `onBlur`
+- **Impact** : Confusion UX - l'utilisateur pense que l'espace va poser probleme
+- **Solution** : Ajouter un `onBlur` avec trim sur le champ email pour nettoyer visuellement
+- **Fichier** : `frontend/src/pages/LoginPage.tsx`
+
+#### 37. Supervision - Internal server error (enum manquantes)
+- **Probleme** : La page Supervision affiche "Internal server error"
+- **Cause** : Le resolver `AnomaliesQuery.php` genere 2 types d'anomalies (`JOUR_MANQUANT`, `SAISIE_SUR_ABSENCE`) qui ne sont pas declares dans l'enum `AnomalyType` du schema GraphQL. Lighthouse echoue a serialiser la reponse.
+- **Solution** : Ajouter les 2 valeurs dans l'enum `AnomalyType` + mettre a jour le type TypeScript et la config visuelle dans `SupervisionPage.tsx`
+- **Fichiers** :
+  - `backend/graphql/types/enums.graphql` (ajout enum)
+  - `frontend/src/pages/SupervisionPage.tsx` (ajout types + config visuelle)
+
+#### 38. Configuration - NavAdmin manquant
+- **Probleme** : La page Configuration perd le sous-menu de navigation admin
+- **Cause** : `ConfigurationPage.tsx` est la seule page admin qui n'inclut pas le composant `<NavAdmin />`
+- **Solution** : Ajouter l'import et l'utilisation de `NavAdmin` en haut du contenu
+- **Fichier** : `frontend/src/pages/admin/ConfigurationPage.tsx`
+
+#### 39. Export CSV - Notification non cliquable
+- **Probleme** : L'export s'execute correctement mais le clic sur la notification "Export pret" ne mene nulle part
+- **Cause** : `NotificationItem` ne gere pas le type `export_pret` pour la navigation. De plus, l'historique des exports est en state local React (perdu au refresh).
+- **Solution** : Ajouter un bouton "Telecharger" sur les notifications `export_pret` avec lien vers `/exports/{id}/download`
+- **Fichier** : `frontend/src/components/notifications/NotificationItem.tsx`
+
+#### 40. Notifications - Pas de suppression
+- **Probleme** : Les notifications lues restent dans la liste, aucun moyen de les supprimer
+- **Cause** : La mutation `deleteNotification` existe cote backend mais n'est pas branchee cote frontend
+- **Solution** : Ajouter la mutation GraphQL cote frontend + bouton supprimer dans `NotificationItem` + handler dans `NotificationPanel`
+- **Fichiers** :
+  - `frontend/src/graphql/operations/notifications.ts` (ajout mutation)
+  - `frontend/src/components/notifications/NotificationItem.tsx` (bouton supprimer)
+  - `frontend/src/components/notifications/NotificationPanel.tsx` (handler)
+
+---
+
 ## Phase Bonus - Documentation et facilite d'installation
 
 ### Idees a implementer
@@ -396,3 +437,8 @@ docker-compose exec app php artisan migrate --seed
 | 2026-02-08 | 5 | @cache necessite cache driver | Redis configure dans Laravel |
 | 2026-02-08 | 5 | GraphiQL config a publier | vendor:publish --tag=graphiql-config |
 | 2026-02-08 | 5 | React.lazy necessite export default | Toutes les pages ont deja export default |
+| 2026-02-08 | 6 | Login espace visible dans email | Ajout onBlur trim |
+| 2026-02-08 | 6 | Supervision enum manquantes | Ajout JOUR_MANQUANT, SAISIE_SUR_ABSENCE |
+| 2026-02-08 | 6 | Config NavAdmin manquant | Ajout NavAdmin dans ConfigurationPage |
+| 2026-02-08 | 6 | Export notification non cliquable | Bouton Telecharger dans notification |
+| 2026-02-08 | 6 | Notifications pas de suppression | Branchement mutation deleteNotification |

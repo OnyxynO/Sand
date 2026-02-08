@@ -14,6 +14,7 @@ import {
   NOMBRE_NOTIFICATIONS_NON_LUES,
   MARK_NOTIFICATION_READ,
   MARK_ALL_NOTIFICATIONS_READ,
+  DELETE_NOTIFICATION,
 } from '../../graphql/operations/notifications';
 import NotificationItem from './NotificationItem';
 import ConflitResolutionModal from './ConflitResolutionModal';
@@ -44,6 +45,13 @@ export default function NotificationPanel() {
     ],
   });
 
+  const [deleteNotification] = useMutation(DELETE_NOTIFICATION, {
+    refetchQueries: [
+      { query: NOMBRE_NOTIFICATIONS_NON_LUES },
+      { query: MES_NOTIFICATIONS, variables: { limite: 50 } },
+    ],
+  });
+
   const notifications: Notification[] = data?.mesNotifications ?? [];
   const hasNonLues = notifications.some((n) => !n.estLu);
 
@@ -53,6 +61,10 @@ export default function NotificationPanel() {
 
   const handleMarkAllRead = () => {
     markAllRead();
+  };
+
+  const handleDelete = (id: string) => {
+    deleteNotification({ variables: { id } });
   };
 
   const handleResolveConflict = (notification: Notification) => {
@@ -142,6 +154,7 @@ export default function NotificationPanel() {
                                 key={notification.id}
                                 notification={notification}
                                 onMarkRead={handleMarkRead}
+                                onDelete={handleDelete}
                                 onResolveConflict={handleResolveConflict}
                               />
                             ))}
