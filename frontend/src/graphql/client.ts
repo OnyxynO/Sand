@@ -38,7 +38,18 @@ const authLink = setContext((_, { headers }) => {
 // Client Apollo
 export const apolloClient = new ApolloClient({
   link: ApolloLink.from([authLink, httpLink]),
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      User: { keyFields: ['id'] },
+      Project: { keyFields: ['id'] },
+      Activity: { keyFields: ['id'] },
+      Team: { keyFields: ['id'] },
+      TimeEntry: { keyFields: ['id'] },
+      Absence: { keyFields: ['id'] },
+      Notification: { keyFields: ['id'] },
+      Setting: { keyFields: ['id'] },
+    },
+  }),
   defaultOptions: {
     watchQuery: {
       fetchPolicy: 'cache-and-network',
