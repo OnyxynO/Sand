@@ -2,13 +2,15 @@
 
 import { useState, useMemo } from 'react';
 import { useQuery } from '@apollo/client/react';
+import { useNavigate } from 'react-router-dom';
 import {
   ExclamationTriangleIcon,
   CalendarDaysIcon,
   ClockIcon,
   FunnelIcon,
+  EyeIcon,
 } from '@heroicons/react/24/outline';
-import { format, startOfWeek, endOfWeek, subWeeks, addWeeks } from 'date-fns';
+import { format, startOfWeek, endOfWeek, subWeeks, addWeeks, getISOWeek, getISOWeekYear } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ANOMALIES_QUERY } from '../graphql/operations/supervision';
 import { PROJETS_QUERY } from '../graphql/operations/projects';
@@ -82,9 +84,20 @@ const typeConfig: Record<string, { label: string; couleur: string; icone: typeof
   },
 };
 
+/**
+ * Calcule la semaine ISO (YYYY-WNN) depuis une date string.
+ */
+function dateVersSemaineISO(dateStr: string): string {
+  const date = new Date(dateStr);
+  const annee = getISOWeekYear(date);
+  const semaine = getISOWeek(date);
+  return `${annee}-W${semaine.toString().padStart(2, '0')}`;
+}
+
 export default function SupervisionPage() {
   const { utilisateur } = useAuthStore();
   const estAdmin = utilisateur?.role === 'ADMIN';
+  const navigate = useNavigate();
 
   // Periode par defaut : semaine courante
   const aujourdHui = new Date();
@@ -164,6 +177,12 @@ export default function SupervisionPage() {
     const debut = addWeeks(new Date(dateDebut), 1);
     setDateDebut(format(startOfWeek(debut, { weekStartsOn: 1 }), 'yyyy-MM-dd'));
     setDateFin(format(endOfWeek(debut, { weekStartsOn: 1 }), 'yyyy-MM-dd'));
+  };
+
+  // Navigation vers la page de saisie d'un utilisateur
+  const voirSaisie = (userId: string, dateStr?: string) => {
+    const semaine = dateVersSemaineISO(dateStr || dateDebut);
+    navigate(`/saisie?userId=${userId}&semaine=${semaine}`);
   };
 
   const labelPeriode = useMemo(() => {
@@ -326,9 +345,19 @@ export default function SupervisionPage() {
                       {utilisateur.equipe?.nom || 'Sans equipe'} • {utilisateur.email}
                     </p>
                   </div>
-                  <span className="ml-auto text-sm text-gray-500">
-                    {userAnomalies.length} anomalie{userAnomalies.length > 1 ? 's' : ''}
-                  </span>
+                  <div className="ml-auto flex items-center gap-3">
+                    <span className="text-sm text-gray-500">
+                      {userAnomalies.length} anomalie{userAnomalies.length > 1 ? 's' : ''}
+                    </span>
+                    <button
+                      onClick={() => voirSaisie(utilisateur.id, userAnomalies[0]?.date || undefined)}
+                      className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                      title="Voir la saisie de cet utilisateur"
+                    >
+                      <EyeIcon className="w-3.5 h-3.5" />
+                      Voir saisie
+                    </button>
+                  </div>
                 </div>
 
                 <div className="ml-13 space-y-2">
@@ -339,7 +368,16 @@ export default function SupervisionPage() {
                     return (
                       <div
                         key={anomalie.id}
-                        className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg"
+                        className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
+                        onClick={() => voirSaisie(utilisateur.id, anomalie.date || undefined)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            voirSaisie(utilisateur.id, anomalie.date || undefined);
+                          }
+                        }}
                       >
                         <div className={`p-1.5 rounded ${config.couleur}`}>
                           <IconComponent className="w-4 h-4" />

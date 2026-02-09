@@ -81,6 +81,37 @@ export const ACTIVITES_DISPONIBLES = gql`
   }
 `;
 
+// Historique d'une saisie
+export const HISTORIQUE_SAISIE = gql`
+  query HistoriqueSaisie($semaineISO: String!, $userId: ID) {
+    mesSaisiesSemaine(semaine: $semaineISO, userId: $userId) {
+      id
+      date
+      duree
+      projet {
+        id
+        code
+      }
+      activite {
+        id
+        nom
+      }
+      historique {
+        id
+        action
+        ancienneDuree
+        nouvelleDuree
+        ancienCommentaire
+        nouveauCommentaire
+        createdAt
+        auteur {
+          nomComplet
+        }
+      }
+    }
+  }
+`;
+
 // Mutations
 
 export const CREATE_TIME_ENTRY = gql`

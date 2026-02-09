@@ -1,6 +1,7 @@
 // Tests pour SupervisionPage - verifie le rendu des anomalies et tous les types
 
 import { render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 
 // Mock authStore - moderateur par defaut
@@ -70,19 +71,19 @@ describe('SupervisionPage', () => {
 
   it('affiche le titre', () => {
     configurerMock([]);
-    render(<SupervisionPage />);
+    render(<MemoryRouter><SupervisionPage /></MemoryRouter>);
     expect(screen.getByText('Supervision')).toBeInTheDocument();
   });
 
   it('affiche chargement', () => {
     configurerMock([], true);
-    render(<SupervisionPage />);
+    render(<MemoryRouter><SupervisionPage /></MemoryRouter>);
     expect(screen.getByText('Chargement...')).toBeInTheDocument();
   });
 
   it('affiche "aucune anomalie" quand liste vide', () => {
     configurerMock([]);
-    render(<SupervisionPage />);
+    render(<MemoryRouter><SupervisionPage /></MemoryRouter>);
     expect(screen.getByText('Aucune anomalie')).toBeInTheDocument();
   });
 
@@ -99,7 +100,7 @@ describe('SupervisionPage', () => {
       },
     ]);
 
-    render(<SupervisionPage />);
+    render(<MemoryRouter><SupervisionPage /></MemoryRouter>);
 
     expect(screen.getByText('Jour incomplet')).toBeInTheDocument();
     expect(screen.getByText('Total du jour: 0.50 ETP (attendu: 1.00)')).toBeInTheDocument();
@@ -119,7 +120,7 @@ describe('SupervisionPage', () => {
       },
     ]);
 
-    render(<SupervisionPage />);
+    render(<MemoryRouter><SupervisionPage /></MemoryRouter>);
 
     expect(screen.getByText('Jour manquant')).toBeInTheDocument();
     expect(screen.getByText('Aucune saisie pour ce jour ouvre')).toBeInTheDocument();
@@ -138,7 +139,7 @@ describe('SupervisionPage', () => {
       },
     ]);
 
-    render(<SupervisionPage />);
+    render(<MemoryRouter><SupervisionPage /></MemoryRouter>);
 
     expect(screen.getByText('Saisie sur absence')).toBeInTheDocument();
     expect(screen.getByText("Saisie de 0.50 ETP sur un jour d'absence")).toBeInTheDocument();
@@ -146,7 +147,7 @@ describe('SupervisionPage', () => {
 
   it('affiche erreur quand la query echoue', () => {
     configurerMock([], false, new Error('Erreur serveur'));
-    render(<SupervisionPage />);
+    render(<MemoryRouter><SupervisionPage /></MemoryRouter>);
     expect(screen.getByText(/Erreur/)).toBeInTheDocument();
   });
 
@@ -188,7 +189,7 @@ describe('SupervisionPage', () => {
       },
     ]);
 
-    render(<SupervisionPage />);
+    render(<MemoryRouter><SupervisionPage /></MemoryRouter>);
 
     expect(screen.getByText('Jean Martin')).toBeInTheDocument();
     expect(screen.getByText('Pierre Bernard')).toBeInTheDocument();
@@ -218,7 +219,7 @@ describe('SupervisionPage', () => {
       },
     ]);
 
-    render(<SupervisionPage />);
+    render(<MemoryRouter><SupervisionPage /></MemoryRouter>);
 
     expect(screen.getByText('2 anomalies detectees')).toBeInTheDocument();
   });
