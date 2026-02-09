@@ -1,6 +1,7 @@
 // Page principale de saisie hebdomadaire
 
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import NavigationSemaine from '../components/saisie/NavigationSemaine';
 import GrilleSemaine from '../components/saisie/GrilleSemaine';
 import GrilleSemaineMobile from '../components/saisie/GrilleSemaineMobile';
@@ -8,6 +9,7 @@ import BoutonSauvegarde from '../components/saisie/BoutonSauvegarde';
 import SelecteurUtilisateur from '../components/saisie/SelecteurUtilisateur';
 import { useSaisieHebdo } from '../hooks/useSaisieHebdo';
 import { useAuthStore } from '../stores/authStore';
+import { useSaisieStore } from '../stores/saisieStore';
 
 // Hook pour detecter la taille d'ecran
 function useIsMobile(breakpoint = 768) {
@@ -29,12 +31,33 @@ function useIsMobile(breakpoint = 768) {
 
 export default function SaisiePage() {
   const isMobile = useIsMobile();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [userIdModeration, setUserIdModeration] = useState<string | null>(null);
   const { erreur, aDesModifications, sauvegarde, sauvegarder } = useSaisieHebdo(userIdModeration);
   const utilisateur = useAuthStore((state) => state.utilisateur);
+  const setSemaine = useSaisieStore((state) => state.setSemaine);
 
   // Afficher le selecteur si moderateur ou admin
   const estModerateurOuAdmin = utilisateur?.role === 'MODERATEUR' || utilisateur?.role === 'ADMIN';
+
+  // Lire les query params au montage (navigation depuis supervision)
+  useEffect(() => {
+    const userIdParam = searchParams.get('userId');
+    const semaineParam = searchParams.get('semaine');
+
+    if (userIdParam && estModerateurOuAdmin) {
+      setUserIdModeration(userIdParam);
+    }
+
+    if (semaineParam && /^\d{4}-W\d{2}$/.test(semaineParam)) {
+      setSemaine(semaineParam);
+    }
+
+    // Nettoyer les query params apres utilisation
+    if (userIdParam || semaineParam) {
+      setSearchParams({}, { replace: true });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className={`space-y-4 ${aDesModifications || erreur ? 'pb-20' : ''}`}>

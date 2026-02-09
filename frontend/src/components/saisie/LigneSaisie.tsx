@@ -11,9 +11,10 @@ interface LigneSaisieProps {
   jours: JourSemaine[];
   indexLigne: number;
   onNavigate?: (ligneIndex: number, jourIndex: number) => void;
+  onHistorique?: (ligneId: string, dateStr: string) => void;
 }
 
-export default function LigneSaisie({ ligne, jours, indexLigne, onNavigate }: LigneSaisieProps) {
+export default function LigneSaisie({ ligne, jours, indexLigne, onNavigate, onHistorique }: LigneSaisieProps) {
   const { supprimerLigne, getTotalLigne } = useSaisieStore();
 
   const total = getTotalLigne(ligne.id);
@@ -86,6 +87,7 @@ export default function LigneSaisie({ ligne, jours, indexLigne, onNavigate }: Li
             jour={jour}
             cellule={cellule}
             onNavigate={(direction) => handleCellNavigate(jourIndex, direction)}
+            onHistorique={onHistorique ? () => onHistorique(ligne.id, jour.dateStr) : undefined}
           />
         );
       })}

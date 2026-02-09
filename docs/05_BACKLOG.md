@@ -242,7 +242,7 @@ Implémenter la saisie des temps et l'administration.
 **Critères d'acceptation :**
 - [x] Log créé à chaque create/update/delete
 - [x] Stockage old_value/new_value en JSON
-- [ ] Affichage dans détail d'une saisie (UI non faite)
+- [x] Affichage dans détail d'une saisie (modale historique timeline)
 - [x] Qui a modifié + quand
 
 ---
@@ -320,7 +320,7 @@ Intégrer les absences et la modération.
 - [x] Filtres (projet, équipe, période, type)
 - [x] Navigation par semaine
 - [x] Groupement par utilisateur
-- [ ] Clic → accès à la saisie de l'utilisateur (lien direct non implémenté)
+- [x] Clic → accès à la saisie de l'utilisateur (navigation avec query params)
 - [x] Modérateur : ses projets uniquement (via backend policy)
 - [x] Admin : tous les projets
 

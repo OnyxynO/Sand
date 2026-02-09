@@ -1,7 +1,8 @@
 // Composant cellule editable de la grille de saisie
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import type { KeyboardEvent, FocusEvent } from 'react';
+import type { KeyboardEvent, FocusEvent, MouseEvent } from 'react';
+import { ClockIcon } from '@heroicons/react/24/outline';
 import { useSaisieStore } from '../../stores/saisieStore';
 import { formatDuree, parseDuree } from '../../utils/semaineUtils';
 import type { CelluleSaisieData, JourSemaine } from '../../types';
@@ -11,9 +12,10 @@ interface CelluleSaisieProps {
   jour: JourSemaine;
   cellule: CelluleSaisieData;
   onNavigate?: (direction: 'up' | 'down' | 'left' | 'right') => void;
+  onHistorique?: () => void;
 }
 
-export default function CelluleSaisie({ ligneId, jour, cellule, onNavigate }: CelluleSaisieProps) {
+export default function CelluleSaisie({ ligneId, jour, cellule, onNavigate, onHistorique }: CelluleSaisieProps) {
   const { modifierCellule } = useSaisieStore();
   const [enEdition, setEnEdition] = useState(false);
   const [valeurTemp, setValeurTemp] = useState('');
@@ -130,11 +132,17 @@ export default function CelluleSaisie({ ligneId, jour, cellule, onNavigate }: Ce
     );
   }
 
+  // Clic sur l'icone historique
+  const handleHistorique = (e: MouseEvent) => {
+    e.stopPropagation();
+    onHistorique?.();
+  };
+
   // Mode affichage
   return (
     <td className="px-1 py-1">
       <div
-        className={cellClasses}
+        className={`${cellClasses} relative group/cell`}
         onClick={() => setEnEdition(true)}
         onFocus={() => setEnEdition(true)}
         tabIndex={0}
@@ -144,6 +152,16 @@ export default function CelluleSaisie({ ligneId, jour, cellule, onNavigate }: Ce
         <span className="leading-10">
           {aValeur ? formatDuree(cellule.duree) : ''}
         </span>
+        {/* Icone historique sur les saisies existantes */}
+        {cellule.id && onHistorique && (
+          <button
+            onClick={handleHistorique}
+            className="absolute -top-1 -right-1 p-0.5 bg-white rounded-full shadow-sm border border-gray-200 opacity-0 group-hover/cell:opacity-100 transition-opacity"
+            title="Voir l'historique"
+          >
+            <ClockIcon className="w-3 h-3 text-gray-400" />
+          </button>
+        )}
       </div>
     </td>
   );

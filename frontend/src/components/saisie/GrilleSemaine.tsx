@@ -1,17 +1,67 @@
 // Grille de saisie hebdomadaire (version desktop)
 
 import { useState, useRef, useCallback } from 'react';
+import { useQuery } from '@apollo/client/react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { useSaisieStore } from '../../stores/saisieStore';
 import { formatJourEnTete } from '../../utils/semaineUtils';
+import { HISTORIQUE_SAISIE } from '../../graphql/operations/saisie';
 import LigneSaisie from './LigneSaisie';
 import TotauxJournaliers from './TotauxJournaliers';
 import SelecteurProjetActivite from './SelecteurProjetActivite';
+import HistoriqueModal from './HistoriqueModal';
+
+interface HistoriqueState {
+  ouvert: boolean;
+  ligneId: string;
+  dateStr: string;
+}
 
 export default function GrilleSemaine() {
-  const { lignes, jours, chargement } = useSaisieStore();
+  const { lignes, jours, chargement, semaineISO } = useSaisieStore();
   const [modaleOuverte, setModaleOuverte] = useState(false);
+  const [historique, setHistorique] = useState<HistoriqueState>({
+    ouvert: false,
+    ligneId: '',
+    dateStr: '',
+  });
   const tableRef = useRef<HTMLTableElement>(null);
+
+  // Charger l'historique des saisies de la semaine
+  const { data: historiqueData } = useQuery(HISTORIQUE_SAISIE, {
+    variables: { semaineISO },
+    skip: !historique.ouvert,
+    fetchPolicy: 'cache-and-network',
+  });
+
+  // Ouvrir la modale d'historique pour une cellule
+  const handleHistorique = useCallback((ligneId: string, dateStr: string) => {
+    setHistorique({ ouvert: true, ligneId, dateStr });
+  }, []);
+
+  // Trouver l'historique de la saisie selectionnee
+  const historiqueEntries = (() => {
+    if (!historique.ouvert || !historiqueData?.mesSaisiesSemaine) return [];
+    const ligne = lignes.find((l) => l.id === historique.ligneId);
+    if (!ligne) return [];
+
+    const saisie = historiqueData.mesSaisiesSemaine.find(
+      (s: { date: string; projet: { id: string }; activite: { id: string }; historique: unknown[] }) =>
+        s.date === historique.dateStr &&
+        s.projet.id === ligne.projetId &&
+        s.activite.id === ligne.activiteId
+    );
+    return saisie?.historique || [];
+  })();
+
+  const historiqueInfo = (() => {
+    if (!historique.ouvert) return { activiteNom: '', projetCode: '' };
+    const ligne = lignes.find((l) => l.id === historique.ligneId);
+    return {
+      activiteNom: ligne?.activiteNom || '',
+      projetCode: ligne?.projetCode || '',
+    };
+  })();
 
   // Navigation entre cellules avec les fleches / Tab
   const handleCellNavigate = useCallback(
@@ -90,6 +140,7 @@ export default function GrilleSemaine() {
                   jours={jours}
                   indexLigne={index}
                   onNavigate={handleCellNavigate}
+                  onHistorique={handleHistorique}
                 />
               ))}
 
@@ -125,6 +176,16 @@ export default function GrilleSemaine() {
       <SelecteurProjetActivite
         ouvert={modaleOuverte}
         onFermer={() => setModaleOuverte(false)}
+      />
+
+      {/* Modale d'historique */}
+      <HistoriqueModal
+        ouvert={historique.ouvert}
+        onFermer={() => setHistorique({ ouvert: false, ligneId: '', dateStr: '' })}
+        historique={historiqueEntries}
+        activiteNom={historiqueInfo.activiteNom}
+        projetCode={historiqueInfo.projetCode}
+        date={historique.dateStr || new Date().toISOString().slice(0, 10)}
       />
     </>
   );
