@@ -1,137 +1,171 @@
-# CLAUDE.md
+# CLAUDE.md - SAND
 
-Ce fichier fournit des directives à Claude Code (claude.ai/code) pour travailler dans ce répertoire.
+Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte necessaire pour travailler sur ce projet.
 
 ## Projet
 
-**SAND** (Saisie d'Activité Numérique Déclarative) - Application web de saisie d'activités professionnelles permettant aux collaborateurs de déclarer leur temps de travail par projet. Successeur de l'ancienne application SAEL.
-
-Documentation complète dans `/docs/` :
-- `01_SPEC_FONCTIONNELLE.md` - Règles métier, rôles, fonctionnalités
-- `02_SPEC_TECHNIQUE.md` - Stack, décisions techniques, schéma BDD
-- `03_ARCHITECTURE.md` - Diagrammes Mermaid (ERD, flux, C4)
-- `04_API_GRAPHQL.md` - Schéma GraphQL complet
-- `05_BACKLOG.md` - User stories par phase
+**SAND** (Saisie d'Activite Numerique Declarative) - Application web de saisie d'activites professionnelles. Successeur de SAEL.
 
 ## Stack technique
 
 | Couche | Technologies |
 |--------|--------------|
-| Backend | Laravel 11, PHP 8.3, Lighthouse (GraphQL), Sanctum |
-| Frontend | React 18, TypeScript, Apollo Client, Tailwind CSS, Zustand |
-| Base de données | PostgreSQL 16 |
+| Backend | Laravel 12, PHP 8.4, Lighthouse 6 (GraphQL), Sanctum |
+| Frontend | React 18, TypeScript, Apollo Client 4, Tailwind CSS, Zustand |
+| Base de donnees | PostgreSQL 16 (extension ltree) |
 | Cache/Queue | Redis |
 | Conteneurisation | Docker, Docker Compose |
-| Tests | PHPUnit (backend), Vitest (frontend) |
-| Linting | Laravel Pint (PHP), ESLint + Prettier (JS/TS) |
+| Tests | PHPUnit (172 tests, 675 assertions), Vitest (125 tests) |
 
-## Commandes de développement
+## Etat du projet
+
+**Toutes les phases du backlog sont terminees** (Phases 1 a 5).
+
+### Evolutions implementees
+- EV-01 : Warning saisie non enregistree (useBlocker + beforeunload)
+- EV-05 : Reset parametres par defaut
+- EV-07 : Absences dans grille de saisie
+
+### Evolutions restantes (non implementees)
+- EV-02 : Changement de parent d'une activite
+- EV-03 : Drag and drop activites (necessite EV-02)
+- EV-04 : Vue texte simplifiee des activites
+- EV-06 : Suppression donnees RGPD
+
+Voir `docs/06_EVOLUTIONS.md` pour le detail.
+
+## Commandes essentielles
+
+Tout tourne dans Docker. Ne pas lancer les commandes depuis l'hote.
 
 ```bash
-# Environnement Docker
+# Demarrer l'environnement
 docker-compose up -d
 
-# Backend (Laravel)
-cd backend
-composer install
-php artisan migrate --seed
-php artisan serve                    # API sur localhost:8080
+# Tests backend (PostgreSQL obligatoire, ltree incompatible SQLite)
+docker-compose exec app php artisan test
 
-# Frontend (React)
-cd frontend
-npm install
-npm run dev                          # Dev server sur localhost:5173
+# Tests frontend
+docker-compose exec frontend npm run test
 
-# Tests
-cd backend && php artisan test       # Tests PHPUnit
-cd frontend && npm run test          # Tests Vitest
+# Apres modification du schema GraphQL : vider le cache Lighthouse
+docker-compose exec app php artisan lighthouse:clear-cache
+
+# Donnees de demo realistes (30 activites, 3 projets, 491 saisies, 3 absences)
+docker-compose exec app php artisan db:seed --class=DemoSeeder
 
 # Linting
-cd backend && ./vendor/bin/pint      # Laravel Pint
-cd frontend && npm run lint          # ESLint
+docker-compose exec app ./vendor/bin/pint
+docker-compose exec frontend npm run lint
 ```
+
+## Acces
+
+- **Frontend** : http://localhost:5173
+- **API Backend** : http://localhost:8080
+- **GraphQL Playground** : http://localhost:8080/graphiql
+- **Mock API RH** : http://localhost:3001
+
+### Comptes de test (mot de passe : `password`)
+- Admin : admin@sand.local
+- Moderateur : marie.dupont@sand.local
+- Utilisateur : jean.martin@sand.local
 
 ## Architecture
 
 ```
-sand/
-├── backend/                 # Laravel 11
-│   ├── app/
-│   │   ├── Models/          # Eloquent (User, Project, Activity, TimeEntry...)
-│   │   ├── GraphQL/         # Resolvers et types Lighthouse
-│   │   ├── Policies/        # Autorisations Laravel
-│   │   ├── Jobs/            # Export CSV asynchrone
-│   │   └── Services/        # Logique métier
-│   └── database/
-│       ├── migrations/
-│       └── seeders/
-├── frontend/                # React 18 + TypeScript
-│   └── src/
-│       ├── components/
-│       ├── pages/
-│       ├── hooks/
-│       ├── graphql/         # Queries et mutations Apollo
-│       └── stores/          # Zustand
-├── docker/                  # Configs Docker (php, nginx, node, mock-rh)
-└── docs/                    # Spécifications
+backend/                     # Laravel 12
+├── app/
+│   ├── Models/              # Eloquent (User, Project, Activity, TimeEntry, Absence...)
+│   ├── GraphQL/             # Resolvers Lighthouse (Queries/, Mutations/)
+│   ├── Policies/            # Autorisations Laravel
+│   ├── Jobs/                # Export CSV asynchrone
+│   └── Services/            # Logique metier (RhApiClient, AbsenceService...)
+└── database/
+    ├── migrations/
+    └── seeders/             # DatabaseSeeder, DemoSeeder
+
+frontend/                    # React 18 + TypeScript
+└── src/
+    ├── components/          # Composants reutilisables
+    ├── pages/               # Pages (SaisiePage, SupervisionPage, StatsPage...)
+    ├── hooks/               # Hooks custom (useSaisieHebdo, useAuth...)
+    ├── graphql/             # Queries et mutations Apollo
+    ├── stores/              # Zustand (auth, saisie, notification)
+    └── types/               # Types TypeScript
+
+docker/                      # Configs Docker (php, nginx, node, mock-rh)
+docs/                        # Specifications
 ```
 
-## Concepts métier clés
+## Concepts metier cles
 
-- **Activités** : Arborescence hiérarchique globale avec ltree PostgreSQL (`chemin` de type ltree). Seules les feuilles (`est_feuille = true`) sont saisissables. Activité "Absence" système (protégée, `est_systeme = true`).
-- **Projets** : Activent/désactivent des activités via système tri-state (vide → tout activé → vide).
-- **Saisies** : Par jour, en ETP (0.01 à 1.00, 2 décimales max), unicité `user + date + activité + projet`. Warning si total jour ≠ 1.0.
-- **Rôles** : Utilisateur (saisie perso), Modérateur (gestion équipe/projets assignés), Admin (configuration globale).
-- **Absences** : Importées depuis API RH externe (mock en dev), gestion des conflits avec saisies existantes.
+- **Activites** : Arborescence hierarchique avec ltree PostgreSQL (`chemin`). Seules les feuilles (`est_feuille = true`) sont saisissables. Activite "Absence" systeme protegee (`est_systeme = true`).
+- **Projets** : Activent/desactivent des activites via systeme tri-state (vide → tout active → vide).
+- **Saisies** : Par jour, en ETP (0.01 a 1.00, 2 decimales max), unicite `user + date + activite + projet`. Warning si total jour != 1.0.
+- **Roles** : Utilisateur (saisie perso), Moderateur (gestion equipe/projets assignes), Admin (configuration globale).
+- **Absences** : Importees depuis API RH externe (mock en dev), gestion des conflits avec saisies existantes.
 
-## Décisions techniques
+## Decisions techniques
 
 - **Auth** : Sanctum SPA avec cookies HttpOnly + CSRF (pas de JWT)
-- **Arborescence ltree** : Extension PostgreSQL native pour l'arborescence des activités. Opérateurs `<@` (descendants), `@>` (ancêtres), index GiST. Niveau calculé dynamiquement (`nlevel(chemin) - 1`), plus stocké en base.
-- **Soft delete** : Sur users, projects, activities, time_entries (préserve historique stats)
-- **Model events** : `est_feuille` recalculé automatiquement via événements `deleted`/`restored`
-- **Notifications** : Rafraîchissement au chargement de page (pas de WebSocket en v1)
-- **Export CSV** : Job queue Redis asynchrone, notification quand prêt, lien avec expiration
+- **ltree** : Extension PostgreSQL native. Operateurs `<@` (descendants), `@>` (ancetres), index GiST. Niveau = `nlevel(chemin) - 1`
+- **Soft delete** : Sur users, projects, activities, time_entries
+- **Model events** : `est_feuille` recalcule automatiquement via evenements `deleted`/`restored`
+- **Export CSV** : Job queue Redis asynchrone, notification quand pret
 - **Tests** : PostgreSQL obligatoire (ltree incompatible SQLite), base `sand_test`
+
+## Documentation
+
+| Fichier | Contenu |
+|---------|---------|
+| `docs/01_SPEC_FONCTIONNELLE.md` | Regles metier, roles, fonctionnalites |
+| `docs/02_SPEC_TECHNIQUE.md` | Stack, decisions techniques, schema BDD |
+| `docs/03_ARCHITECTURE.md` | Diagrammes Mermaid (ERD, flux, C4) |
+| `docs/04_API_GRAPHQL.md` | Schema GraphQL complet |
+| `docs/05_BACKLOG.md` | User stories par phase (toutes terminees) |
+| `docs/06_EVOLUTIONS.md` | Evolutions futures |
+| `docs/DIFFUSION_LOG.md` | Journal des sessions de travail |
+| `docs/archive/` | Fichiers obsoletes archives |
+
+## Pieges connus
+
+- **Cache Lighthouse** : Toujours vider apres modification du schema GraphQL (`php artisan lighthouse:clear-cache`)
+- **Tests dans Docker** : DB_HOST=db (hostname Docker), pas accessible depuis l'hote
+- **Apollo Client 4** : Imports depuis `@apollo/client/react` (pas `@apollo/client`)
+- **Query absences** : Utilise un resolver custom (pas @where) pour detecter les chevauchements de periodes
 
 ## Serveur Ollama local
 
-Serveur Ollama disponible sur le réseau local. **Utilise-le pour les tâches répétitives et économiser les tokens Claude.**
+Serveur Ollama disponible sur le reseau local. **Utilise-le pour les taches repetitives et economiser les tokens Claude.**
 
 - **URL** : `http://10.0.0.100:11434`
-- **qwen2.5-coder:7b** : tâches simples, rapide (~3s)
+- **qwen3:8b** : taches simples, rapide (~3s). Ajouter `/no_think` au prompt pour reponses directes.
 - **deepseek-coder-v2:16b** : gros contextes (>10 Ko, ~6s+)
 
-Si Ollama ne répond pas, continuer avec Claude uniquement.
+Si Ollama ne repond pas, continuer avec Claude uniquement.
 
-### Délégation par type de tâche (projet SAND)
+### Delegation par type de tache
 
-| Tâche | Modèle | Exemple |
-|-------|--------|---------|
-| Générer un Model Eloquent | qwen | `php artisan make:model` + attributs |
-| Écrire une migration Laravel | qwen | Ajout de colonne, index |
-| Composant React simple | qwen | Formulaire, bouton, liste |
-| Requête GraphQL / mutation | qwen | CRUD basique Apollo |
-| Tests unitaires PHPUnit | qwen | Tests d'un Service ou Policy |
-| Tests Vitest pour un hook | qwen | Hook React isolé |
-| Analyser un gros resolver | deepseek | Resolver GraphQL complexe multi-relations |
-| Refactoring d'un Service | deepseek | Logique métier lourde |
-| Architecture multi-fichiers | **Claude** | Nouveau module complet |
-| Logique ltree / arborescence | **Claude** | Requêtes ltree complexes, récursion |
-| Debugging cross-stack | **Claude** | Problème Laravel ↔ GraphQL ↔ React |
-| Décisions d'architecture | **Claude** | Choix de patterns, structure |
+| Tache | Modele |
+|-------|--------|
+| Generer un Model/migration/composant simple | qwen |
+| Tests unitaires (PHPUnit, Vitest) | qwen |
+| Requete GraphQL / mutation CRUD | qwen |
+| Analyser un gros resolver ou refactoring | deepseek |
+| Architecture multi-fichiers, ltree, debugging cross-stack | **Claude** |
 
 ### Appel rapide (qwen)
 ```bash
 curl -s http://10.0.0.100:11434/api/generate -d '{
-  "model": "qwen2.5-coder:7b",
-  "prompt": "PROMPT ICI. Code uniquement.",
+  "model": "qwen3:8b",
+  "prompt": "/no_think PROMPT ICI. Code uniquement.",
   "stream": false,
   "options": {"num_ctx": 4096, "temperature": 0.2}
 }' | jq -r '.response'
 ```
 
-### Appel contexte étendu (deepseek)
+### Appel contexte etendu (deepseek)
 ```bash
 curl -s http://10.0.0.100:11434/api/generate -d '{
   "model": "deepseek-coder-v2:16b",

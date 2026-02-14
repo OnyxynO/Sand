@@ -5,20 +5,19 @@
 
 ---
 
-## EV-01 : Warning saisie non enregistree
+## EV-01 : Warning saisie non enregistree ✅
 
 **En tant qu'** utilisateur
 **Je veux** etre prevenu si je quitte la page de saisie sans avoir enregistre
 **Afin de** ne pas perdre mes modifications
 
-**Description** :
-Actuellement, si l'utilisateur modifie des cellules dans la grille hebdomadaire puis navigue vers une autre page, les modifications sont perdues silencieusement. Il faudrait detecter l'etat "dirty" (modifications non sauvegardees) et afficher un avertissement.
+**Statut** : Implementee
 
-**Implementation envisagee** :
-- Detecter les modifications non sauvegardees (dirty state) dans le store ou le composant
-- Intercepter la navigation avec `useBlocker` de React Router
-- Intercepter la fermeture d'onglet avec `beforeunload`
-- Afficher un dialogue de confirmation "Modifications non enregistrees. Quitter quand meme ?"
+**Modifications realisees** :
+- Detection dirty state dans le composant SaisiePage
+- Interception navigation avec `useBlocker` de React Router
+- Interception fermeture d'onglet avec `beforeunload`
+- Dialogue de confirmation affiche
 
 **Complexite** : Moyenne
 
@@ -104,17 +103,18 @@ Absence (systeme)
 
 ---
 
-## EV-05 : Reset par defaut des parametres
+## EV-05 : Reset par defaut des parametres ✅
 
 **En tant qu'** admin
 **Je veux** pouvoir reinitialiser les parametres a leurs valeurs par defaut
 **Afin de** revenir a la configuration initiale en cas de probleme
 
-**Implementation envisagee** :
+**Statut** : Implementee
+
+**Modifications realisees** :
 - Bouton "Reinitialiser les valeurs par defaut" dans la page Configuration
 - Dialogue de confirmation
-- Valeurs par defaut definies cote backend (dans `SettingSeeder` ou constantes)
-- Mutation `resetSettings` ou reutilisation de `updateSettings` avec les valeurs par defaut
+- Mutation `resetSettings` cote backend
 
 **Complexite** : Faible
 
@@ -173,16 +173,16 @@ Frontend :
 
 ## Resume et priorisation proposee
 
-| ID | Evolution | Complexite | Prerequis |
-|----|-----------|------------|-----------|
-| EV-01 | Warning saisie non enregistree | Moyenne | - |
-| EV-02 | Changement de parent activite | Moyenne | - |
-| EV-03 | Drag and drop activites | Elevee | EV-02 |
-| EV-04 | Vue texte activites | Elevee | - |
-| EV-05 | Reset parametres par defaut | Faible | - |
-| EV-06a | Suppression donnees RGPD | Moyenne | - |
-| EV-06b | Purge totale | Moyenne | - |
-| EV-07 | Absences dans grille de saisie | Moyenne | - | ✅ |
+| ID | Evolution | Complexite | Statut |
+|----|-----------|------------|--------|
+| EV-01 | Warning saisie non enregistree | Moyenne | ✅ |
+| EV-02 | Changement de parent activite | Moyenne | A faire |
+| EV-03 | Drag and drop activites | Elevee | A faire (necessite EV-02) |
+| EV-04 | Vue texte activites | Elevee | A faire |
+| EV-05 | Reset parametres par defaut | Faible | ✅ |
+| EV-06a | Suppression donnees RGPD | Moyenne | A faire |
+| EV-06b | Purge totale | Moyenne | A faire |
+| EV-07 | Absences dans grille de saisie | Moyenne | ✅ |
 
 ---
 
