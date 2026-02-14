@@ -91,7 +91,7 @@ describe('TotauxJournaliers', () => {
     render(
       <table>
         <tbody>
-          <TotauxJournaliers jours={[jours[0]]} />
+          <TotauxJournaliers jours={[jours[0]]} absencesParJour={{}} />
         </tbody>
       </table>
     );
@@ -107,7 +107,7 @@ describe('TotauxJournaliers', () => {
     render(
       <table>
         <tbody>
-          <TotauxJournaliers jours={[jours[0]]} />
+          <TotauxJournaliers jours={[jours[0]]} absencesParJour={{}} />
         </tbody>
       </table>
     );
@@ -128,7 +128,7 @@ describe('TotauxJournaliers', () => {
     render(
       <table>
         <tbody>
-          <TotauxJournaliers jours={[jours[0]]} />
+          <TotauxJournaliers jours={[jours[0]]} absencesParJour={{}} />
         </tbody>
       </table>
     );
@@ -149,7 +149,7 @@ describe('TotauxJournaliers', () => {
     render(
       <table>
         <tbody>
-          <TotauxJournaliers jours={[jours[3]]} />
+          <TotauxJournaliers jours={[jours[3]]} absencesParJour={{}} />
         </tbody>
       </table>
     );

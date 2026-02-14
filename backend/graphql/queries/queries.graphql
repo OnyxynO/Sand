@@ -84,15 +84,17 @@ extend type Query {
         @guard
 
     # ─── Absences ───────────────────────────────────
-    "Absences"
+    "Absences (avec detection des chevauchements)"
     absences(
         "Filtrer par utilisateur"
-        userId: ID @where(key: "user_id")
+        userId: ID
         "Date de debut de la periode"
-        dateDebut: Date! @where(key: "date_debut", operator: ">=")
+        dateDebut: Date!
         "Date de fin de la periode"
-        dateFin: Date! @where(key: "date_fin", operator: "<=")
-    ): [Absence!]! @all(model: "App\\Models\\Absence", scopes: ["valide"]) @guard
+        dateFin: Date!
+    ): [Absence!]!
+        @field(resolver: "App\\GraphQL\\Queries\\AbsencesQuery")
+        @guard
 
     # ─── Notifications ──────────────────────────────
     "Mes notifications"

@@ -295,6 +295,7 @@ type Query {
   moderatableUsers: [User!]!
 
   # ─── Absences ───────────────────────────────────
+  # Resolver custom pour detecter les chevauchements (scope periode)
   absences(
     userId: ID
     startDate: Date!

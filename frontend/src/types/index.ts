@@ -177,3 +177,20 @@ export interface AbsenceDetails {
   dateFin: string;
   dureeJournaliere: number;
 }
+
+// Absence pour un jour donne (utilise dans la grille de saisie)
+export interface AbsenceJour {
+  type: string;
+  typeLibelle: string;
+  dureeJournaliere: number;
+}
+
+// Absence retournee par la query GraphQL
+export interface AbsenceAPI {
+  id: string;
+  type: string;
+  typeLibelle: string;
+  dateDebut: string;
+  dateFin: string;
+  dureeJournaliere: number;
+}

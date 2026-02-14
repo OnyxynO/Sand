@@ -2,14 +2,19 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { useQuery } from '@apollo/client/react';
-import { PlusIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { useSaisieStore } from '../../stores/saisieStore';
-import { formatJourEnTete } from '../../utils/semaineUtils';
+import { formatJourEnTete, formatDuree } from '../../utils/semaineUtils';
 import { HISTORIQUE_SAISIE } from '../../graphql/operations/saisie';
 import LigneSaisie from './LigneSaisie';
 import TotauxJournaliers from './TotauxJournaliers';
 import SelecteurProjetActivite from './SelecteurProjetActivite';
 import HistoriqueModal from './HistoriqueModal';
+import type { AbsenceJour } from '../../types';
+
+interface GrilleSemaineProps {
+  absencesParJour: Record<string, AbsenceJour>;
+}
 
 interface HistoriqueState {
   ouvert: boolean;
@@ -17,7 +22,7 @@ interface HistoriqueState {
   dateStr: string;
 }
 
-export default function GrilleSemaine() {
+export default function GrilleSemaine({ absencesParJour }: GrilleSemaineProps) {
   const { lignes, jours, chargement, semaineISO } = useSaisieStore();
   const [modaleOuverte, setModaleOuverte] = useState(false);
   const [historique, setHistorique] = useState<HistoriqueState>({
@@ -66,13 +71,13 @@ export default function GrilleSemaine() {
   // Navigation entre cellules avec les fleches / Tab
   const handleCellNavigate = useCallback(
     (ligneIndex: number, jourIndex: number) => {
-      // Trouver la cellule cible et la focus
-      // Cette implementation basique pourrait etre amelioree avec des refs
       const table = tableRef.current;
       if (!table) return;
 
       const rows = table.querySelectorAll('tbody tr');
-      const targetRow = rows[ligneIndex];
+      // +1 pour sauter la ligne d'absence si elle existe
+      const offset = aDesAbsences ? 1 : 0;
+      const targetRow = rows[ligneIndex + offset];
       if (!targetRow) return;
 
       // +1 pour la colonne projet/activite
@@ -83,11 +88,14 @@ export default function GrilleSemaine() {
       const focusable = targetCell.querySelector('[tabindex], input, button');
       if (focusable instanceof HTMLElement) {
         focusable.focus();
-        focusable.click(); // Pour les cellules en mode lecture
+        focusable.click();
       }
     },
     []
   );
+
+  // Verifier s'il y a au moins une absence dans la semaine
+  const aDesAbsences = Object.keys(absencesParJour).length > 0;
 
   if (chargement) {
     return (
@@ -132,6 +140,39 @@ export default function GrilleSemaine() {
             </thead>
 
             <tbody className="divide-y divide-gray-100">
+              {/* Ligne d'absences (si au moins un jour a une absence) */}
+              {aDesAbsences && (
+                <tr className="bg-indigo-50/60">
+                  <td className="px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      <CalendarDaysIcon className="w-4 h-4 text-indigo-500 flex-shrink-0" />
+                      <span className="text-sm font-medium text-indigo-700">Absence</span>
+                    </div>
+                  </td>
+                  {jours.map((jour) => {
+                    const absence = absencesParJour[jour.dateStr];
+                    return (
+                      <td key={jour.dateStr} className="px-1 py-2 text-center">
+                        {absence ? (
+                          <div className="text-xs">
+                            <div className="font-medium text-indigo-700">{absence.typeLibelle}</div>
+                            <div className="text-indigo-500">{formatDuree(absence.dureeJournaliere)}</div>
+                          </div>
+                        ) : null}
+                      </td>
+                    );
+                  })}
+                  {/* Total absences semaine */}
+                  <td className="px-3 py-2 text-center">
+                    <span className="text-xs font-medium text-indigo-700">
+                      {formatDuree(
+                        jours.reduce((sum, j) => sum + (absencesParJour[j.dateStr]?.dureeJournaliere || 0), 0)
+                      )}
+                    </span>
+                  </td>
+                </tr>
+              )}
+
               {/* Lignes de saisie */}
               {lignes.map((ligne, index) => (
                 <LigneSaisie
@@ -158,7 +199,7 @@ export default function GrilleSemaine() {
               </tr>
 
               {/* Ligne des totaux */}
-              <TotauxJournaliers jours={jours} />
+              <TotauxJournaliers jours={jours} absencesParJour={absencesParJour} />
             </tbody>
           </table>
         </div>
