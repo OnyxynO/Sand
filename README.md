@@ -1,18 +1,19 @@
-# SAND - Saisie d'Activité Numérique Déclarative
+# SAND - Saisie d'Activite Numerique Declarative
 
-Application web de saisie d'activités professionnelles permettant aux collaborateurs de déclarer leur temps de travail par projet.
+Application web de saisie d'activites professionnelles permettant aux collaborateurs de declarer leur temps de travail par projet. Successeur de l'ancienne application SAEL.
 
 ## Stack technique
 
 | Couche | Technologies |
 |--------|--------------|
-| Backend | Laravel 11, PHP 8.3, Lighthouse (GraphQL), Sanctum |
-| Frontend | React 18, TypeScript, Apollo Client, Tailwind CSS, Zustand |
-| Base de données | PostgreSQL 16 |
+| Backend | Laravel 12, PHP 8.4, Lighthouse (GraphQL), Sanctum |
+| Frontend | React 18, TypeScript, Apollo Client 4, Tailwind CSS, Zustand |
+| Base de donnees | PostgreSQL 16 (ltree) |
 | Cache/Queue | Redis |
 | Conteneurisation | Docker, Docker Compose |
+| Tests | PHPUnit (172 tests), Vitest (125 tests) |
 
-## Prérequis
+## Prerequis
 
 - Docker et Docker Compose
 - Git
@@ -30,56 +31,67 @@ cp .env.example .env
 # Lancer les conteneurs Docker
 docker-compose up -d
 
-# Installer les dépendances backend
+# Installer les dependances et initialiser
 docker-compose exec app composer install
-
-# Générer la clé d'application Laravel
 docker-compose exec app php artisan key:generate
-
-# Exécuter les migrations
 docker-compose exec app php artisan migrate --seed
-
-# Installer les dépendances frontend
 docker-compose exec frontend npm install
 ```
 
-## Accès
+### Donnees de demonstration
 
+Pour charger des donnees realistes (30 activites, 3 projets, 491 saisies, 3 absences) :
+
+```bash
+docker-compose exec app php artisan db:seed --class=DemoSeeder
+```
+
+## Acces
+
+- **Frontend** : http://localhost:5173
 - **API Backend** : http://localhost:8080
 - **GraphQL Playground** : http://localhost:8080/graphiql
-- **Frontend** : http://localhost:5173
 - **Mock API RH** : http://localhost:3001
 
-## Documentation
+### Comptes de test
 
-La documentation complète se trouve dans le dossier `/docs/` :
-
-- `01_SPEC_FONCTIONNELLE.md` - Règles métier, rôles, fonctionnalités
-- `02_SPEC_TECHNIQUE.md` - Stack, décisions techniques, schéma BDD
-- `03_ARCHITECTURE.md` - Diagrammes Mermaid (ERD, flux, C4)
-- `04_API_GRAPHQL.md` - Schéma GraphQL complet
-- `05_BACKLOG.md` - User stories par phase
+| Role | Email | Mot de passe |
+|------|-------|--------------|
+| Admin | admin@sand.local | password |
+| Moderateur | marie.dupont@sand.local | password |
+| Utilisateur | jean.martin@sand.local | password |
 
 ## Commandes utiles
 
 ```bash
-# Logs des conteneurs
-docker-compose logs -f
-
-# Accès au conteneur PHP
-docker-compose exec app bash
-
-# Tests backend
+# Tests backend (172 tests)
 docker-compose exec app php artisan test
 
-# Tests frontend
+# Tests frontend (125 tests)
 docker-compose exec frontend npm run test
 
 # Linting
 docker-compose exec app ./vendor/bin/pint
 docker-compose exec frontend npm run lint
+
+# Logs
+docker-compose logs -f
+
+# Acces shell conteneur PHP
+docker-compose exec app bash
 ```
+
+## Documentation
+
+La documentation complete se trouve dans `/docs/` :
+
+- `01_SPEC_FONCTIONNELLE.md` - Regles metier, roles, fonctionnalites
+- `02_SPEC_TECHNIQUE.md` - Stack, decisions techniques, schema BDD
+- `03_ARCHITECTURE.md` - Diagrammes Mermaid (ERD, flux, C4)
+- `04_API_GRAPHQL.md` - Schema GraphQL complet
+- `05_BACKLOG.md` - User stories par phase (toutes terminees)
+- `06_EVOLUTIONS.md` - Evolutions futures identifiees
 
 ## Licence
 
-Projet privé - Tous droits réservés
+Projet prive - Tous droits reserves
