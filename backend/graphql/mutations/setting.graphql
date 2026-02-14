@@ -10,4 +10,10 @@ extend type Mutation {
         @field(resolver: "App\\GraphQL\\Mutations\\SettingMutator@updateMultiple")
         @guard
         @can(ability: "update", model: "App\\Models\\Setting")
+
+    "Reinitialiser tous les parametres a leurs valeurs par defaut (Admin)"
+    resetSettings: [Setting!]!
+        @field(resolver: "App\\GraphQL\\Mutations\\SettingMutator@reset")
+        @guard
+        @can(ability: "update", model: "App\\Models\\Setting")
 }

@@ -12,6 +12,7 @@ const creerIconeMock = (nom: string) => {
 
 vi.mock('@heroicons/react/24/outline', () => ({
   ArrowDownTrayIcon: creerIconeMock('ArrowDownTrayIcon'),
+  ArrowPathIcon: creerIconeMock('ArrowPathIcon'),
   ArrowTrendingUpIcon: creerIconeMock('ArrowTrendingUpIcon'),
   ArrowTrendingDownIcon: creerIconeMock('ArrowTrendingDownIcon'),
   BellIcon: creerIconeMock('BellIcon'),

@@ -28,6 +28,26 @@ class Setting extends Model
     public const CLE_AFFICHER_WEEKENDS = 'afficher_weekends';
     public const CLE_PREMIER_JOUR_SEMAINE = 'premier_jour_semaine';
 
+    // Valeurs par defaut
+    public const VALEURS_PAR_DEFAUT = [
+        self::CLE_JOURS_RETRO => ['valeur' => 7, 'description' => 'Nombre de jours retroactifs autorises pour la saisie'],
+        self::CLE_PERIODE_SAISIE => ['valeur' => 'semaine', 'description' => 'Periode d\'affichage par defaut (jour, semaine, mois)'],
+        self::CLE_RAPPEL_SAISIE => ['valeur' => true, 'description' => 'Activer les rappels de saisie'],
+        self::CLE_DELAI_ANNULATION => ['valeur' => 5, 'description' => 'Delai d\'annulation en secondes'],
+        self::CLE_AFFICHER_WEEKENDS => ['valeur' => false, 'description' => 'Afficher les weekends dans la grille'],
+        self::CLE_PREMIER_JOUR_SEMAINE => ['valeur' => 1, 'description' => 'Premier jour de la semaine (0=dimanche, 1=lundi)'],
+    ];
+
+    /**
+     * Reinitialise tous les parametres a leurs valeurs par defaut.
+     */
+    public static function reinitialiser(): void
+    {
+        foreach (self::VALEURS_PAR_DEFAUT as $cle => $config) {
+            static::set($cle, $config['valeur'], $config['description']);
+        }
+    }
+
     /**
      * Recupere une valeur de configuration (avec cache)
      */
