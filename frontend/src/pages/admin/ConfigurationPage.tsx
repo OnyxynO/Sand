@@ -3,8 +3,9 @@ import { useQuery, useMutation } from '@apollo/client/react';
 import {
   Cog6ToothIcon,
   CheckIcon,
+  ArrowPathIcon,
 } from '@heroicons/react/24/outline';
-import { PARAMETRES_QUERY, UPDATE_SETTINGS } from '../../graphql/operations/settings';
+import { PARAMETRES_QUERY, UPDATE_SETTINGS, RESET_SETTINGS } from '../../graphql/operations/settings';
 import NavAdmin from '../../components/admin/NavAdmin';
 
 interface Parametre {
@@ -71,6 +72,7 @@ export default function ConfigurationPage() {
   const [valeurs, setValeurs] = useState<Record<string, unknown>>({});
   const [modifie, setModifie] = useState(false);
   const [succes, setSucces] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
 
   const { data, loading, error } = useQuery(PARAMETRES_QUERY, {
     fetchPolicy: 'network-only',
@@ -79,6 +81,16 @@ export default function ConfigurationPage() {
   const [updateSettings, { loading: saving }] = useMutation(UPDATE_SETTINGS, {
     onCompleted: () => {
       setModifie(false);
+      setSucces(true);
+      setTimeout(() => setSucces(false), 3000);
+    },
+    refetchQueries: [{ query: PARAMETRES_QUERY }],
+  });
+
+  const [resetSettings, { loading: resetting }] = useMutation(RESET_SETTINGS, {
+    onCompleted: () => {
+      setModifie(false);
+      setConfirmReset(false);
       setSucces(true);
       setTimeout(() => setSucces(false), 3000);
     },
@@ -199,7 +211,15 @@ export default function ConfigurationPage() {
 
           {/* Barre d'actions */}
           <div className="p-6 flex items-center justify-between bg-gray-50 rounded-b-xl">
-            <div>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setConfirmReset(true)}
+                disabled={resetting}
+                className="inline-flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+              >
+                <ArrowPathIcon className="w-4 h-4" />
+                Reinitialiser
+              </button>
               {succes && (
                 <span className="inline-flex items-center gap-1 text-sm text-green-700">
                   <CheckIcon className="w-4 h-4" />
@@ -214,6 +234,35 @@ export default function ConfigurationPage() {
             >
               {saving ? 'Enregistrement...' : 'Enregistrer'}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modale de confirmation reset */}
+      {confirmReset && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-xl shadow-xl p-6 max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Reinitialiser les parametres ?
+            </h3>
+            <p className="mt-2 text-sm text-gray-600">
+              Tous les parametres seront remis a leurs valeurs par defaut. Cette action est irreversible.
+            </p>
+            <div className="mt-4 flex justify-end gap-3">
+              <button
+                onClick={() => setConfirmReset(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => resetSettings()}
+                disabled={resetting}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50"
+              >
+                {resetting ? 'Reinitialisation...' : 'Reinitialiser'}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -21,3 +21,14 @@ export const UPDATE_SETTINGS = gql`
     }
   }
 `;
+
+export const RESET_SETTINGS = gql`
+  mutation ResetSettings {
+    resetSettings {
+      id
+      cle
+      valeur
+      description
+    }
+  }
+`;

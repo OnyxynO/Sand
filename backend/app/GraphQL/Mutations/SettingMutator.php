@@ -54,6 +54,20 @@ class SettingMutator
     }
 
     /**
+     * Reinitialiser tous les parametres a leurs valeurs par defaut.
+     *
+     * @return array<Setting>
+     */
+    public function reset($root, array $args): array
+    {
+        $this->authorize();
+
+        Setting::reinitialiser();
+
+        return Setting::all()->all();
+    }
+
+    /**
      * Verifier l'autorisation (admin uniquement).
      */
     private function authorize(): void

@@ -89,6 +89,41 @@ class SettingMutatorGraphQLTest extends TestCase
         $this->assertGraphQLUnauthenticated($response);
     }
 
+    public function test_admin_peut_reinitialiser_les_parametres(): void
+    {
+        // Modifier un parametre
+        Setting::where('cle', 'jours_retroactifs')->update(['valeur' => 99]);
+
+        $response = $this->graphqlAsUser('
+            mutation ResetSettings {
+                resetSettings {
+                    cle
+                    valeur
+                }
+            }
+        ', [], $this->admin);
+
+        $this->assertGraphQLSuccess($response);
+        $data = $this->getGraphQLData($response, 'resetSettings');
+
+        // Verifier que les valeurs par defaut sont restaurees
+        $joursRetro = collect($data)->firstWhere('cle', 'jours_retroactifs');
+        $this->assertEquals(7, $joursRetro['valeur']);
+    }
+
+    public function test_utilisateur_non_admin_ne_peut_pas_reinitialiser(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->graphqlAsUser('
+            mutation ResetSettings {
+                resetSettings { cle }
+            }
+        ', [], $user);
+
+        $this->assertGraphQLError($response);
+    }
+
     public function test_modifier_parametre_inexistant_echoue(): void
     {
         $response = $this->graphqlAsUser('

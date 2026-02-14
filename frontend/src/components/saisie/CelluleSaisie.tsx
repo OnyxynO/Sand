@@ -135,6 +135,7 @@ export default function CelluleSaisie({ ligneId, jour, cellule, onNavigate, onHi
   // Clic sur l'icone historique
   const handleHistorique = (e: MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     onHistorique?.();
   };
 
@@ -144,10 +145,16 @@ export default function CelluleSaisie({ ligneId, jour, cellule, onNavigate, onHi
       <div
         className={`${cellClasses} relative group/cell`}
         onClick={() => setEnEdition(true)}
-        onFocus={() => setEnEdition(true)}
+        onDoubleClick={() => setEnEdition(true)}
         tabIndex={0}
         role="button"
         aria-label={`Saisir pour ${jour.jourComplet}`}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setEnEdition(true);
+          }
+        }}
       >
         <span className="leading-10">
           {aValeur ? formatDuree(cellule.duree) : ''}
@@ -156,10 +163,13 @@ export default function CelluleSaisie({ ligneId, jour, cellule, onNavigate, onHi
         {cellule.id && onHistorique && (
           <button
             onClick={handleHistorique}
-            className="absolute -top-1 -right-1 p-0.5 bg-white rounded-full shadow-sm border border-gray-200 opacity-0 group-hover/cell:opacity-100 transition-opacity"
+            onMouseDown={(e) => e.stopPropagation()}
+            onFocus={(e) => e.stopPropagation()}
+            className="absolute -top-2 -right-2 p-1 bg-white rounded-full shadow border border-gray-200 opacity-0 group-hover/cell:opacity-100 transition-opacity hover:bg-blue-50 hover:border-blue-300 z-10"
             title="Voir l'historique"
+            aria-label="Voir l'historique des modifications"
           >
-            <ClockIcon className="w-3 h-3 text-gray-400" />
+            <ClockIcon className="w-3.5 h-3.5 text-gray-500 hover:text-blue-600" />
           </button>
         )}
       </div>
