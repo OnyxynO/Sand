@@ -1,18 +1,22 @@
 // Vue mobile de la grille de saisie (cartes par jour)
 
 import { useState } from 'react';
-import { ChevronDownIcon, ChevronUpIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, ChevronUpIcon, PlusIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { useSaisieStore } from '../../stores/saisieStore';
 import { formatDuree, parseDuree } from '../../utils/semaineUtils';
 import SelecteurProjetActivite from './SelecteurProjetActivite';
-import type { JourSemaine } from '../../types';
+import type { JourSemaine, AbsenceJour } from '../../types';
+
+interface GrilleSemaineMobileProps {
+  absencesParJour: Record<string, AbsenceJour>;
+}
 
 // Carte pour un jour
-function CarteJour({ jour }: { jour: JourSemaine }) {
+function CarteJour({ jour, absence }: { jour: JourSemaine; absence?: AbsenceJour }) {
   const { lignes, getTotalJour, modifierCellule } = useSaisieStore();
   const [ouverte, setOuverte] = useState(jour.estAujourdhui);
 
-  const total = getTotalJour(jour.dateStr);
+  const total = getTotalJour(jour.dateStr) + (absence?.dureeJournaliere || 0);
   const estWarning = total > 0 && Math.abs(total - 1.0) >= 0.001;
 
   // Formater le nom du jour avec majuscule
@@ -57,7 +61,16 @@ function CarteJour({ jour }: { jour: JourSemaine }) {
       {/* Contenu depliable */}
       {ouverte && !jour.estFutur && (
         <div className="divide-y">
-          {lignes.length === 0 ? (
+          {/* Bandeau absence */}
+          {absence && (
+            <div className="px-4 py-2 bg-indigo-50/60 flex items-center gap-2">
+              <CalendarDaysIcon className="w-4 h-4 text-indigo-500 flex-shrink-0" />
+              <span className="text-sm font-medium text-indigo-700">{absence.typeLibelle}</span>
+              <span className="text-xs text-indigo-500 ml-auto">{formatDuree(absence.dureeJournaliere)} ETP</span>
+            </div>
+          )}
+
+          {lignes.length === 0 && !absence ? (
             <p className="px-4 py-4 text-sm text-gray-500 text-center">Aucune ligne de saisie</p>
           ) : (
             lignes.map((ligne) => {
@@ -104,7 +117,7 @@ function CarteJour({ jour }: { jour: JourSemaine }) {
   );
 }
 
-export default function GrilleSemaineMobile() {
+export default function GrilleSemaineMobile({ absencesParJour }: GrilleSemaineMobileProps) {
   const { jours, chargement } = useSaisieStore();
   const [modaleOuverte, setModaleOuverte] = useState(false);
 
@@ -133,7 +146,7 @@ export default function GrilleSemaineMobile() {
 
         {/* Cartes par jour */}
         {jours.map((jour) => (
-          <CarteJour key={jour.dateStr} jour={jour} />
+          <CarteJour key={jour.dateStr} jour={jour} absence={absencesParJour[jour.dateStr]} />
         ))}
       </div>
 

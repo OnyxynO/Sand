@@ -339,6 +339,19 @@ Ce document repertorie les problemes rencontres lors du developpement et leurs s
 
 ---
 
+### EV-07 - Absences dans la grille de saisie (2026-02-14)
+
+#### 42. Query absences - Chevauchements non detectes
+- **Probleme** : La query `absences` utilisait `@where(key: "date_debut", operator: ">=")` et `@where(key: "date_fin", operator: "<=")`, ce qui ne detectait que les absences **entierement contenues** dans la periode demandee
+- **Symptome** : Une absence de 2 semaines (ex: vacances du 3 au 14 fevrier) n'apparaissait pas quand on consultait la semaine du 10-16 fevrier, car `date_debut >= 2026-02-10` est faux
+- **Cause** : Les directives Lighthouse `@where` ne supportent pas les conditions OR complexes necessaires pour le chevauchement
+- **Solution** : Remplacer `@where` + `@all` par un resolver custom `AbsencesQuery.php` utilisant le scope `Absence::scopePeriode()` qui teste les 3 cas de chevauchement (debut dans la periode, fin dans la periode, ou absence englobant la periode)
+- **Fichiers** :
+  - `backend/app/GraphQL/Queries/AbsencesQuery.php` (nouveau)
+  - `backend/graphql/queries/queries.graphql` (modifie)
+
+---
+
 ## Phase Bonus - Documentation et facilite d'installation
 
 ### Idees a implementer
@@ -453,3 +466,4 @@ docker-compose exec app php artisan migrate --seed
 | 2026-02-08 | 6 | Export notification non cliquable | Bouton Telecharger dans notification |
 | 2026-02-08 | 6 | Notifications pas de suppression | Branchement mutation deleteNotification |
 | 2026-02-08 | 6 | Saisie moderation sauvegarde pour soi | BoutonSauvegarde recoit props au lieu de creer son propre hook |
+| 2026-02-14 | EV-07 | Query absences chevauchements non detectes | Resolver custom avec scope periode() |

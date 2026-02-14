@@ -1,15 +1,19 @@
 // Hook pour la logique de chargement et sauvegarde des saisies hebdomadaires
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { useLazyQuery, useMutation } from '@apollo/client/react';
 import { useSaisieStore } from '../stores/saisieStore';
 import {
   MES_SAISIES_SEMAINE,
+  ABSENCES_SEMAINE,
+  SYNC_ABSENCES,
   BULK_CREATE_TIME_ENTRIES,
   BULK_UPDATE_TIME_ENTRIES,
   DELETE_TIME_ENTRY,
 } from '../graphql/operations/saisie';
-import type { SaisieAPI, TimeEntryInput, BulkUpdateEntry } from '../types';
+import { parseSemaineISO } from '../utils/semaineUtils';
+import { endOfWeek, format, eachDayOfInterval, isAfter, isBefore } from 'date-fns';
+import type { SaisieAPI, TimeEntryInput, BulkUpdateEntry, AbsenceJour, AbsenceAPI } from '../types';
 
 interface UseSaisieHebdoResult {
   // Etat
@@ -17,10 +21,48 @@ interface UseSaisieHebdoResult {
   sauvegarde: boolean;
   erreur: string | null;
   aDesModifications: boolean;
+  absencesParJour: Record<string, AbsenceJour>;
 
   // Actions
   charger: () => void;
   sauvegarder: () => Promise<void>;
+}
+
+/**
+ * Transforme les absences API (plages de dates) en map jour→absence
+ * pour chaque jour de la semaine.
+ */
+function transformerAbsences(
+  absences: AbsenceAPI[],
+  semaineISO: string
+): Record<string, AbsenceJour> {
+  const result: Record<string, AbsenceJour> = {};
+
+  const lundi = parseSemaineISO(semaineISO);
+  const dimanche = endOfWeek(lundi, { weekStartsOn: 1 });
+
+  for (const absence of absences) {
+    const absDebut = new Date(absence.dateDebut + 'T00:00:00');
+    const absFin = new Date(absence.dateFin + 'T00:00:00');
+
+    // Borner aux jours de la semaine
+    const debut = isAfter(absDebut, lundi) ? absDebut : lundi;
+    const fin = isBefore(absFin, dimanche) ? absFin : dimanche;
+
+    if (isAfter(debut, fin)) continue;
+
+    const jours = eachDayOfInterval({ start: debut, end: fin });
+    for (const jour of jours) {
+      const dateStr = format(jour, 'yyyy-MM-dd');
+      result[dateStr] = {
+        type: absence.type,
+        typeLibelle: absence.typeLibelle,
+        dureeJournaliere: absence.dureeJournaliere,
+      };
+    }
+  }
+
+  return result;
 }
 
 /**
@@ -43,6 +85,16 @@ export function useSaisieHebdo(userId?: string | null): UseSaisieHebdoResult {
     getModifications,
   } = useSaisieStore();
 
+  // Calculer les dates de la semaine pour la query absences
+  const datesSemaine = useMemo(() => {
+    const lundi = parseSemaineISO(semaineISO);
+    const dimanche = endOfWeek(lundi, { weekStartsOn: 1 });
+    return {
+      dateDebut: format(lundi, 'yyyy-MM-dd'),
+      dateFin: format(dimanche, 'yyyy-MM-dd'),
+    };
+  }, [semaineISO]);
+
   // Query pour charger les saisies
   const [fetchSaisies, { loading: queryLoading, data, error: queryError }] = useLazyQuery<{
     mesSaisiesSemaine: SaisieAPI[];
@@ -50,10 +102,26 @@ export function useSaisieHebdo(userId?: string | null): UseSaisieHebdoResult {
     fetchPolicy: 'network-only', // Toujours recharger depuis le serveur
   });
 
+  // Query pour charger les absences
+  const [fetchAbsences, { data: absencesData }] = useLazyQuery<{
+    absences: AbsenceAPI[];
+  }>(ABSENCES_SEMAINE, {
+    fetchPolicy: 'network-only',
+  });
+
+  // Mutation de synchronisation (best effort, ignore les erreurs d'autorisation)
+  const [syncAbsences] = useMutation(SYNC_ABSENCES);
+
   // Mutations pour la sauvegarde
   const [bulkCreate] = useMutation(BULK_CREATE_TIME_ENTRIES);
   const [bulkUpdate] = useMutation(BULK_UPDATE_TIME_ENTRIES);
   const [deleteEntry] = useMutation(DELETE_TIME_ENTRY);
+
+  // Transformer les absences en map jour→absence
+  const absencesParJour = useMemo(() => {
+    if (!absencesData?.absences) return {};
+    return transformerAbsences(absencesData.absences, semaineISO);
+  }, [absencesData, semaineISO]);
 
   // Synchroniser l'etat de chargement
   useEffect(() => {
@@ -75,15 +143,28 @@ export function useSaisieHebdo(userId?: string | null): UseSaisieHebdoResult {
     }
   }, [queryError, setErreur]);
 
-  // Charger les saisies quand la semaine ou l'utilisateur cible change
+  // Charger les saisies et absences quand la semaine ou l'utilisateur cible change
   useEffect(() => {
-    fetchSaisies({
-      variables: {
-        semaine: semaineISO,
-        ...(userId ? { userId } : {}),
-      },
+    const variables = {
+      semaine: semaineISO,
+      ...(userId ? { userId } : {}),
+    };
+
+    fetchSaisies({ variables });
+
+    // Synchro absences (best effort, ignore les erreurs d'autorisation)
+    const absVariables = {
+      dateDebut: datesSemaine.dateDebut,
+      dateFin: datesSemaine.dateFin,
+      ...(userId ? { userId } : {}),
+    };
+
+    syncAbsences({ variables: absVariables }).catch(() => {
+      // Ignorer les erreurs (permission refusee pour les utilisateurs simples)
+    }).finally(() => {
+      fetchAbsences({ variables: absVariables });
     });
-  }, [semaineISO, userId, fetchSaisies]);
+  }, [semaineISO, userId, fetchSaisies, fetchAbsences, syncAbsences, datesSemaine]);
 
   // Fonction de chargement manuel
   const charger = useCallback(() => {
@@ -93,7 +174,14 @@ export function useSaisieHebdo(userId?: string | null): UseSaisieHebdoResult {
         ...(userId ? { userId } : {}),
       },
     });
-  }, [fetchSaisies, semaineISO, userId]);
+    fetchAbsences({
+      variables: {
+        dateDebut: datesSemaine.dateDebut,
+        dateFin: datesSemaine.dateFin,
+        ...(userId ? { userId } : {}),
+      },
+    });
+  }, [fetchSaisies, fetchAbsences, semaineISO, userId, datesSemaine]);
 
   // Fonction de sauvegarde
   const sauvegarder = useCallback(async () => {
@@ -190,6 +278,7 @@ export function useSaisieHebdo(userId?: string | null): UseSaisieHebdoResult {
     sauvegarde,
     erreur,
     aDesModifications: aDifficultes(),
+    absencesParJour,
     charger,
     sauvegarder,
   };

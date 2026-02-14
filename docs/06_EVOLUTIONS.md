@@ -144,24 +144,28 @@ Absence (systeme)
 
 ---
 
-## EV-07 : Affichage des absences dans la grille de saisie
+## EV-07 : Affichage des absences dans la grille de saisie ✅
 
 **En tant qu'** utilisateur
 **Je veux** voir mes absences (conges, RTT, maladie, formation) dans la grille de saisie hebdomadaire
 **Afin de** savoir quels jours sont deja couverts et eviter de saisir sur un jour d'absence
 
-**Etat actuel** :
-- Backend : query `absences` et mutation `syncAbsences` existent et fonctionnent
-- Mock RH : donnees d'absences presentes pour DEV001, DEV002, MOD001
-- Frontend : aucun code n'appelle ces endpoints, aucune absences affichee dans la grille
+**Statut** : Implementee (2026-02-14)
 
-**Implementation envisagee** :
-- Ajouter une operation GraphQL frontend pour `syncAbsences` + `absences`
-- Appeler `syncAbsences` au chargement de la page de saisie (ou sur action utilisateur)
-- Afficher les absences dans la grille : ligne speciale "Absence" ou indicateur visuel sur les jours concernes
-- Cellules en lecture seule (pas de saisie d'absence manuelle depuis la grille)
-- Prise en compte des demi-journees (0.5 ETP)
-- Affichage du type d'absence (conges, RTT, maladie, formation) via tooltip ou badge
+**Modifications realisees** :
+
+Backend :
+- Nouveau resolver `AbsencesQuery.php` utilisant le scope `periode()` pour detecter les chevauchements (absences debordant de la semaine)
+- Query `absences` dans `queries.graphql` : remplacement de `@where` + `@all` par `@field(resolver:)` (corrige le bug de non-detection des absences chevauchantes)
+
+Frontend :
+- Queries GraphQL `ABSENCES_SEMAINE` et mutation `SYNC_ABSENCES` dans `saisie.ts`
+- Types `AbsenceJour` et `AbsenceAPI` dans `types/index.ts`
+- Hook `useSaisieHebdo` : charge les absences en parallele des saisies, appelle `syncAbsences` au chargement (best effort - ignore les erreurs d'autorisation pour utilisateurs simples), transforme les plages de dates en map `jour→absence`, retourne `absencesParJour`
+- `GrilleSemaine.tsx` : ligne indigo en haut du tbody avec icone CalendarDaysIcon, type d'absence et duree par jour (affichee uniquement si au moins 1 absence)
+- `GrilleSemaineMobile.tsx` : bandeau indigo dans chaque carte jour avec type + duree ETP
+- `TotauxJournaliers.tsx` : inclut la duree d'absence dans le total journalier
+- `SaisiePage.tsx` : passe `absencesParJour` aux composants grille via props
 
 **Complexite** : Moyenne
 
@@ -178,7 +182,7 @@ Absence (systeme)
 | EV-05 | Reset parametres par defaut | Faible | - |
 | EV-06a | Suppression donnees RGPD | Moyenne | - |
 | EV-06b | Purge totale | Moyenne | - |
-| EV-07 | Absences dans grille de saisie | Moyenne | - |
+| EV-07 | Absences dans grille de saisie | Moyenne | - | ✅ |
 
 ---
 

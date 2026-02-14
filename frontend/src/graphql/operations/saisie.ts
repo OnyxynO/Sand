@@ -81,6 +81,31 @@ export const ACTIVITES_DISPONIBLES = gql`
   }
 `;
 
+// Absences de la semaine
+export const ABSENCES_SEMAINE = gql`
+  query AbsencesSemaine($dateDebut: Date!, $dateFin: Date!, $userId: ID) {
+    absences(dateDebut: $dateDebut, dateFin: $dateFin, userId: $userId) {
+      id
+      type
+      typeLibelle
+      dateDebut
+      dateFin
+      dureeJournaliere
+    }
+  }
+`;
+
+// Mutation de synchronisation des absences depuis l'API RH
+export const SYNC_ABSENCES = gql`
+  mutation SyncAbsences($dateDebut: Date!, $dateFin: Date!, $userId: ID) {
+    syncAbsences(dateDebut: $dateDebut, dateFin: $dateFin, userId: $userId) {
+      importes
+      conflits
+      erreurs
+    }
+  }
+`;
+
 // Historique d'une saisie
 export const HISTORIQUE_SAISIE = gql`
   query HistoriqueSaisie($semaineISO: String!, $userId: ID) {

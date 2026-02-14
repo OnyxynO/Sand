@@ -2,19 +2,20 @@
 
 import { useSaisieStore } from '../../stores/saisieStore';
 import { formatDuree, calculerTotal } from '../../utils/semaineUtils';
-import type { JourSemaine } from '../../types';
+import type { JourSemaine, AbsenceJour } from '../../types';
 
 interface TotauxJournaliersProps {
   jours: JourSemaine[];
+  absencesParJour: Record<string, AbsenceJour>;
 }
 
-export default function TotauxJournaliers({ jours }: TotauxJournaliersProps) {
+export default function TotauxJournaliers({ jours, absencesParJour }: TotauxJournaliersProps) {
   const { getTotalJour } = useSaisieStore();
 
-  // Calculer les totaux pour chaque jour
+  // Calculer les totaux pour chaque jour (saisies + absences)
   const totauxJours = jours.map((jour) => ({
     jour,
-    total: getTotalJour(jour.dateStr),
+    total: getTotalJour(jour.dateStr) + (absencesParJour[jour.dateStr]?.dureeJournaliere || 0),
   }));
 
   // Total general de la semaine
@@ -29,28 +30,18 @@ export default function TotauxJournaliers({ jours }: TotauxJournaliersProps) {
 
       {/* Totaux par jour */}
       {totauxJours.map(({ jour, total }) => {
-        // Determiner le style selon le total
-        // - Jours passes non saisis sans valeur : warning leger
-        // - Total != 1.0 pour jours travailles : warning orange
-        // - Total == 1.0 : ok vert
-        // - Jours futurs : gris
-
         let cellClasses = 'text-center font-medium text-sm';
         let bgClasses = '';
 
         if (jour.estFutur) {
-          // Jour futur
           cellClasses += ' text-gray-400';
           bgClasses = 'bg-gray-100';
         } else if (total === 0) {
-          // Pas de saisie (pas forcement un probleme pour weekend)
           cellClasses += ' text-gray-500';
         } else if (Math.abs(total - 1.0) < 0.001) {
-          // Total = 1.0 (avec tolerance pour erreurs flottants)
           cellClasses += ' text-green-700';
           bgClasses = 'bg-green-50';
         } else {
-          // Total != 1.0 (warning)
           cellClasses += ' text-orange-700';
           bgClasses = 'bg-orange-50';
         }
