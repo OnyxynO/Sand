@@ -32,7 +32,7 @@ interface UseSaisieHebdoResult {
  * Transforme les absences API (plages de dates) en map jour→absence
  * pour chaque jour de la semaine.
  */
-function transformerAbsences(
+export function transformerAbsences(
   absences: AbsenceAPI[],
   semaineISO: string
 ): Record<string, AbsenceJour> {

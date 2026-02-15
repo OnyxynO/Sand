@@ -171,10 +171,9 @@ Toutes les evolutions fonctionnelles sont implementees. Il reste des taches de q
 
 ### Tests manquants
 
-| ID | Description | Technique | Priorite |
-|----|-------------|-----------|----------|
-| T1.2 | Tests unitaires `RhApiClient` | `Http::fake()` Laravel, tester succes/timeout/erreur | Moyenne |
-| T3.1 | Tests du hook `useSaisieHebdo` | Mock Apollo Client, c'est le hook le plus critique | Moyenne |
+Tous les tests identifies ont ete implementes :
+- ✅ T1.2 : Tests unitaires `RhApiClient` (11 tests, `Http::fake()`)
+- ✅ T3.1 : Tests de `transformerAbsences` dans `useSaisieHebdo` (8 tests)
 
 ### Outillage et documentation
 
