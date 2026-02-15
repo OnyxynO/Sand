@@ -23,81 +23,57 @@
 
 ---
 
-## EV-02 : Changement de parent d'une activite
+## EV-02 : Changement de parent d'une activite ✅
 
 **En tant qu'** admin
 **Je veux** pouvoir deplacer une activite sous un autre parent
 **Afin de** reorganiser l'arborescence sans tout supprimer/recreer
 
-**Description** :
-Actuellement, on ne peut que monter/descendre une activite parmi ses freres. On ne peut pas deplacer une activite d'un parent a un autre (ex: deplacer "Dev Frontend" de "Developpement" vers "Conception").
+**Statut** : Implementee
 
-**Implementation envisagee** :
-- Nouvelle mutation GraphQL `moveActivity(id, newParentId, position)`
-- Recalcul du chemin ltree et de tous les descendants
-- Mise a jour de `est_feuille` sur l'ancien et le nouveau parent
-- Interface : bouton "Deplacer" ouvrant une modale de selection du nouveau parent (arbre simplifie)
-- Validation : empecher les cycles (deplacer un parent sous son enfant)
+**Modifications realisees** :
+- Mutation GraphQL `moveActivity(id, parentId, ordre)` (backend existant)
+- Composant `SelectionParentModal.tsx` : modale de selection du nouveau parent dans l'arbre
+- Bouton "Deplacer" sur chaque activite non-systeme dans `ActivitesPage.tsx`
+- Validation : empeche les cycles (ne peut pas deplacer un parent sous son enfant)
 
-**Complexite** : Moyenne (ltree simplifie le recalcul des chemins)
+**Complexite** : Moyenne
 
 ---
 
-## EV-03 : Drag and drop des activites
+## EV-03 : Drag and drop des activites ✅
 
 **En tant qu'** admin
 **Je veux** pouvoir reorganiser les activites par drag and drop
 **Afin de** reorganiser rapidement l'arborescence
 
-**Description** :
-Permettre le glisser-deposer d'une activite (avec ses enfants) pour la placer a n'importe quel endroit de l'arbre. C'est une extension de EV-02 avec une interface plus intuitive.
+**Statut** : Implementee
 
-**Implementation envisagee** :
-- Bibliotheque : `@dnd-kit/core` ou `react-dnd` (a evaluer)
-- Indicateurs visuels : ligne d'insertion, zone de depot, indentation
-- Support du deplacement entre niveaux (changement de parent + reordonnancement)
-- Mise a jour optimiste cote Apollo + rollback en cas d'erreur
-- Preservation des enfants attaches lors du deplacement
-
-**Prerequis** : EV-02 (mutation moveActivity)
+**Modifications realisees** :
+- Bibliotheque `@dnd-kit/core` + `@dnd-kit/sortable` + `@dnd-kit/utilities`
+- Hook `useArbreDnd.ts` : gestion du drag-and-drop sur arbre aplati, detection du type de drop (entre-freres ou devenir-enfant), validation (activites systeme non deplacables)
+- Composant `LigneActiviteDnd` : poignee de drag, indicateurs visuels (ligne bleue, surbrillance)
+- Overlay de drag avec `DragPreview`
+- Tests : `useArbreDnd.test.ts` (18 tests), `ActivitesPage.dnd.test.tsx` (5 tests)
 
 **Complexite** : Elevee
 
 ---
 
-## EV-04 : Vue texte simplifiee des activites
+## EV-04 : Vue texte simplifiee des activites ✅
 
 **En tant qu'** admin
 **Je veux** editer l'arborescence des activites sous forme de texte
 **Afin de** visualiser et modifier rapidement la structure
 
-**Description** :
-Vue alternative a l'arbre interactif : un simple champ texte multi-lignes ou les niveaux sont representes par des tabulations. L'admin peut copier-coller une structure entiere.
+**Statut** : Implementee
 
-**Exemple** :
-```
-Developpement
-    Dev Frontend
-    Dev Backend
-    Tests
-Conception
-    UX Design
-    Architecture
-Absence (systeme)
-```
-
-**Implementation envisagee** :
-- Onglet "Vue texte" / "Vue arbre" dans la page Activites
-- Parser le texte : indentation (tab ou 4 espaces) = niveau
-- Validation stricte : sanitisation anti-injection, noms uniques par niveau
-- Diff avec l'arbre existant : creations, suppressions, deplacements
-- Confirmation avant application des changements
-- Protection des activites systeme (Absence ne peut pas etre modifiee/supprimee)
-
-**Securite** :
-- Sanitisation des noms (pas de HTML, pas de caracteres speciaux ltree)
-- Validation longueur max des noms
-- Preview des changements avant application
+**Modifications realisees** :
+- Hook `useParserArbreTexte.ts` : 4 fonctions pures (`arbreVersTexte`, `texteVersArbre`, `validerTexte`, `calculerDiff`)
+- Composant `VueTexteActivites.tsx` : interface en 3 etapes (edition textarea, previsualisation diff coloree, application sequentielle des mutations)
+- Onglets "Vue arbre" / "Vue texte" dans `ActivitesPage.tsx`
+- Validation : noms vides, trop longs, codes trop longs, sauts de niveau, doublons freres, caracteres interdits ltree, protection des activites systeme
+- Tests : `useParserArbreTexte.test.ts` (24 tests), `VueTexteActivites.test.tsx` (7 tests)
 
 **Complexite** : Elevee
 
@@ -176,9 +152,9 @@ Frontend :
 | ID | Evolution | Complexite | Statut |
 |----|-----------|------------|--------|
 | EV-01 | Warning saisie non enregistree | Moyenne | ✅ |
-| EV-02 | Changement de parent activite | Moyenne | A faire |
-| EV-03 | Drag and drop activites | Elevee | A faire (necessite EV-02) |
-| EV-04 | Vue texte activites | Elevee | A faire |
+| EV-02 | Changement de parent activite | Moyenne | ✅ |
+| EV-03 | Drag and drop activites | Elevee | ✅ |
+| EV-04 | Vue texte activites | Elevee | ✅ |
 | EV-05 | Reset parametres par defaut | Faible | ✅ |
 | EV-06a | Suppression donnees RGPD | Moyenne | A faire |
 | EV-06b | Purge totale | Moyenne | A faire |
