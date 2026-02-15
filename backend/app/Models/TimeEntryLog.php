@@ -18,11 +18,13 @@ class TimeEntryLog extends Model
         'nouvelle_duree',
         'ancien_commentaire',
         'nouveau_commentaire',
+        'user_anonymise',
     ];
 
     protected $casts = [
         'ancienne_duree' => 'decimal:2',
         'nouvelle_duree' => 'decimal:2',
+        'user_anonymise' => 'boolean',
     ];
 
     // Relations

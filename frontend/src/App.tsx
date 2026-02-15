@@ -15,6 +15,7 @@ const UtilisateursPage = lazy(() => import('./pages/admin/UtilisateursPage'));
 const EquipesPage = lazy(() => import('./pages/admin/EquipesPage'));
 const ActivitesPage = lazy(() => import('./pages/admin/ActivitesPage'));
 const ConfigurationPage = lazy(() => import('./pages/admin/ConfigurationPage'));
+const RgpdPage = lazy(() => import('./pages/admin/RgpdPage'));
 const ProjetsPage = lazy(() => import('./pages/ProjetsPage'));
 
 // Composants (shell app - import statique)
@@ -76,6 +77,7 @@ function AppContent() {
           <Route path="/admin/equipes" element={<EquipesPage />} />
           <Route path="/admin/activites" element={<ActivitesPage />} />
           <Route path="/admin/configuration" element={<ConfigurationPage />} />
+          <Route path="/admin/rgpd" element={<RgpdPage />} />
 
           {/* Projets */}
           <Route path="/projets" element={<ProjetsPage />} />
