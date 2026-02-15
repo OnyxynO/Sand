@@ -27,6 +27,7 @@ vi.mock('@heroicons/react/24/outline', () => ({
   ClockIcon: creerIconeMock('ClockIcon'),
   Cog6ToothIcon: creerIconeMock('Cog6ToothIcon'),
   ExclamationTriangleIcon: creerIconeMock('ExclamationTriangleIcon'),
+  ShieldExclamationIcon: creerIconeMock('ShieldExclamationIcon'),
   EyeIcon: creerIconeMock('EyeIcon'),
   FunnelIcon: creerIconeMock('FunnelIcon'),
   MagnifyingGlassIcon: creerIconeMock('MagnifyingGlassIcon'),

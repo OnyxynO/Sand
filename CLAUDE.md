@@ -15,7 +15,7 @@ Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte 
 | Base de donnees | PostgreSQL 16 (extension ltree) |
 | Cache/Queue | Redis |
 | Conteneurisation | Docker, Docker Compose |
-| Tests | PHPUnit (172 tests, 675 assertions), Vitest (193 tests) |
+| Tests | PHPUnit (180 tests, 709 assertions), Vitest (202 tests) |
 
 ## Etat du projet
 
@@ -28,9 +28,10 @@ Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte 
 - EV-04 : Vue texte simplifiee des activites (parser + diff + onglets)
 - EV-05 : Reset parametres par defaut
 - EV-07 : Absences dans grille de saisie
+- EV-06 : Suppression donnees RGPD (droit a l'oubli + purge totale)
 
 ### Evolutions restantes (non implementees)
-- EV-06 : Suppression donnees RGPD
+Aucune - toutes les evolutions sont implementees.
 
 Voir `docs/06_EVOLUTIONS.md` pour le detail.
 

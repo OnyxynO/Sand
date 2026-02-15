@@ -96,27 +96,31 @@
 
 ---
 
-## EV-06 : Suppression des donnees (RGPD)
+## EV-06 : Suppression des donnees (RGPD) ✅
 
 **En tant qu'** admin
 **Je veux** pouvoir supprimer les donnees d'un utilisateur ou de toute l'application
 **Afin de** respecter le droit a l'oubli (RGPD) et permettre une remise a zero
 
-**Deux niveaux** :
+**Statut** : Implementee (2026-02-15)
 
-### EV-06a : Suppression donnees utilisateur (RGPD)
-- Supprimer toutes les saisies, absences, notifications d'un utilisateur
-- Anonymiser les logs d'historique (remplacer le nom par "Utilisateur supprime")
-- Conserver la trace de l'action (qui a demande, quand)
-- Confirmer par double saisie ou mot de passe admin
+**Modifications realisees** :
 
-### EV-06b : Purge totale des donnees
-- Supprimer toutes les saisies, absences, notifications, exports, logs
-- Conserver la structure (utilisateurs, equipes, projets, activites, parametres)
-- Confirmer par saisie d'une phrase de securite (ex: "CONFIRMER SUPPRESSION")
-- Reservation admin uniquement
+Backend :
+- Migration : colonne `user_anonymise` sur `time_entry_logs`
+- Service `RgpdService` : deux methodes transactionnelles (`supprimerDonneesUtilisateur`, `purgerToutesDonnees`)
+- Schema GraphQL : types `ResultatSuppressionRgpd` et `ResultatPurge`, mutations `supprimerDonneesUtilisateur` et `purgerToutesDonnees`
+- Resolver `RgpdMutator` : verification admin + confirmation nom/phrase
+- Gestion FK cascade : les logs lies aux saisies de l'utilisateur sont supprimes, les logs ou l'utilisateur est auteur de modifications sur d'autres saisies sont anonymises (`user_anonymise = true`)
+- Tests : 8 tests (suppression OK, anonymisation logs moderateur, refus non-admin, mauvais nom, purge OK, structure conservee, refus non-admin, mauvaise phrase)
 
-**Complexite** : Moyenne (EV-06a) / Moyenne (EV-06b)
+Frontend :
+- Operations GraphQL : mutations `SUPPRIMER_DONNEES_UTILISATEUR` et `PURGER_TOUTES_DONNEES`
+- Page `/admin/rgpd` (`RgpdPage.tsx`) : deux sections (suppression utilisateur avec select + modale de confirmation nom, purge totale avec modale de confirmation phrase), affichage des compteurs apres operation
+- Navigation : onglet RGPD dans `NavAdmin.tsx`, route dans `App.tsx`
+- Tests : 9 tests (titre, chargement utilisateurs, selection, modale suppression, bouton desactive, resultats suppression, modale purge, bouton purge desactive, resultats purge)
+
+**Complexite** : Moyenne
 
 ---
 
@@ -156,8 +160,7 @@ Frontend :
 | EV-03 | Drag and drop activites | Elevee | ✅ |
 | EV-04 | Vue texte activites | Elevee | ✅ |
 | EV-05 | Reset parametres par defaut | Faible | ✅ |
-| EV-06a | Suppression donnees RGPD | Moyenne | A faire |
-| EV-06b | Purge totale | Moyenne | A faire |
+| EV-06 | Suppression donnees RGPD + purge | Moyenne | ✅ |
 | EV-07 | Absences dans grille de saisie | Moyenne | ✅ |
 
 ---

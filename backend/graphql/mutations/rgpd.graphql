@@ -1,0 +1,27 @@
+type ResultatSuppressionRgpd {
+    saisiesSupprimees: Int!
+    absencesSupprimees: Int!
+    notificationsSupprimees: Int!
+    exportsSupprimees: Int!
+    logsAnonymises: Int!
+}
+
+type ResultatPurge {
+    saisiesSupprimees: Int!
+    logsSupprimees: Int!
+    absencesSupprimees: Int!
+    notificationsSupprimees: Int!
+    exportsSupprimees: Int!
+}
+
+extend type Mutation {
+    "Supprimer les donnees d'un utilisateur (RGPD droit a l'oubli, Admin)"
+    supprimerDonneesUtilisateur(userId: ID!, confirmationNom: String!): ResultatSuppressionRgpd!
+        @field(resolver: "App\\GraphQL\\Mutations\\RgpdMutator@supprimerDonneesUtilisateur")
+        @guard
+
+    "Purger toutes les donnees transactionnelles (Admin)"
+    purgerToutesDonnees(confirmationPhrase: String!): ResultatPurge!
+        @field(resolver: "App\\GraphQL\\Mutations\\RgpdMutator@purgerToutesDonnees")
+        @guard
+}
