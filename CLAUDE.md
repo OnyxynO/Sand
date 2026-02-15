@@ -15,7 +15,7 @@ Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte 
 | Base de donnees | PostgreSQL 16 (extension ltree) |
 | Cache/Queue | Redis |
 | Conteneurisation | Docker, Docker Compose |
-| Tests | PHPUnit (180 tests, 709 assertions), Vitest (202 tests) |
+| Tests | PHPUnit (191 tests, 726 assertions), Vitest (210 tests) |
 
 ## Etat du projet
 
