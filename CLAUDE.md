@@ -15,7 +15,7 @@ Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte 
 | Base de donnees | PostgreSQL 16 (extension ltree) |
 | Cache/Queue | Redis |
 | Conteneurisation | Docker, Docker Compose |
-| Tests | PHPUnit (172 tests, 675 assertions), Vitest (125 tests) |
+| Tests | PHPUnit (172 tests, 675 assertions), Vitest (193 tests) |
 
 ## Etat du projet
 
@@ -23,13 +23,13 @@ Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte 
 
 ### Evolutions implementees
 - EV-01 : Warning saisie non enregistree (useBlocker + beforeunload)
+- EV-02 : Changement de parent d'une activite (modale de selection)
+- EV-03 : Drag and drop activites (@dnd-kit/core)
+- EV-04 : Vue texte simplifiee des activites (parser + diff + onglets)
 - EV-05 : Reset parametres par defaut
 - EV-07 : Absences dans grille de saisie
 
 ### Evolutions restantes (non implementees)
-- EV-02 : Changement de parent d'une activite
-- EV-03 : Drag and drop activites (necessite EV-02)
-- EV-04 : Vue texte simplifiee des activites
 - EV-06 : Suppression donnees RGPD
 
 Voir `docs/06_EVOLUTIONS.md` pour le detail.

@@ -1,8 +1,23 @@
 // Page de gestion de l'arborescence des activites (Admin)
 
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, useCallback, Fragment } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { Dialog, Transition } from '@headlessui/react';
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import {
   PlusIcon,
   PencilSquareIcon,
@@ -12,7 +27,9 @@ import {
   ChevronDownIcon,
   ArrowUpIcon,
   ArrowDownIcon,
+  ArrowRightIcon,
   LockClosedIcon,
+  Bars3Icon,
 } from '@heroicons/react/24/outline';
 import {
   ARBRE_ACTIVITES,
@@ -22,6 +39,10 @@ import {
   MOVE_ACTIVITY,
 } from '../../graphql/operations/activities';
 import NavAdmin from '../../components/admin/NavAdmin';
+import SelectionParentModal from '../../components/admin/SelectionParentModal';
+import VueTexteActivites from '../../components/admin/VueTexteActivites';
+import useArbreDnd from '../../hooks/useArbreDnd';
+import type { InfoDrop } from '../../hooks/useArbreDnd';
 
 interface Activite {
   id: string;
@@ -46,8 +67,8 @@ interface ActiviteFormData {
   estActif: boolean;
 }
 
-// Composant ligne d'activite recursive
-function LigneActivite({
+// Composant ligne d'activite avec drag-and-drop (rendu aplati)
+function LigneActiviteDnd({
   activite,
   niveau,
   ouverts,
@@ -57,8 +78,11 @@ function LigneActivite({
   onAjouterEnfant,
   onMonter,
   onDescendre,
+  onDeplacer,
   estPremier,
   estDernier,
+  activeDragId,
+  infoDrop,
 }: {
   activite: Activite;
   niveau: number;
@@ -69,20 +93,64 @@ function LigneActivite({
   onAjouterEnfant: (parentId: string) => void;
   onMonter: (a: Activite) => void;
   onDescendre: (a: Activite) => void;
+  onDeplacer: (a: Activite) => void;
   estPremier: boolean;
   estDernier: boolean;
+  activeDragId: string | null;
+  infoDrop: InfoDrop | null;
 }) {
   const aEnfants = activite.enfants && activite.enfants.length > 0;
   const estOuvert = ouverts.has(activite.id);
+  const estEnDrag = activeDragId === activite.id;
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: activite.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  // Indicateur visuel de drop
+  const estCibleDrop = infoDrop?.cibleId === activite.id;
+  const typeDrop = estCibleDrop ? infoDrop?.type : null;
 
   return (
-    <>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`relative ${estEnDrag ? 'opacity-30' : ''}`}
+    >
+      {/* Indicateur de drop entre freres (ligne bleue au-dessus) */}
+      {typeDrop === 'entre-freres' && (
+        <div
+          className="absolute top-0 left-0 right-0 h-0.5 bg-blue-500 z-10"
+          style={{ marginLeft: `${niveau * 24 + 12}px` }}
+        />
+      )}
+
       <div
         className={`group flex items-center gap-2 py-2 px-3 hover:bg-gray-50 border-b ${
           !activite.estActif ? 'opacity-50' : ''
-        }`}
+        } ${typeDrop === 'devenir-enfant' ? 'bg-blue-50 ring-2 ring-blue-300 ring-inset' : ''}`}
         style={{ paddingLeft: `${niveau * 24 + 12}px` }}
       >
+        {/* Poignee de drag */}
+        <button
+          {...attributes}
+          {...listeners}
+          className="p-0.5 rounded cursor-grab opacity-0 group-hover:opacity-100 hover:bg-gray-200 touch-none"
+          title="Glisser pour deplacer"
+          data-testid={`drag-handle-${activite.id}`}
+        >
+          <Bars3Icon className="w-4 h-4 text-gray-400" />
+        </button>
+
         {/* Chevron */}
         <button
           onClick={() => toggleOuvert(activite.id)}
@@ -136,6 +204,17 @@ function LigneActivite({
             <ArrowDownIcon className="w-4 h-4" />
           </button>
 
+          {/* Deplacer */}
+          {!activite.estSysteme && (
+            <button
+              onClick={() => onDeplacer(activite)}
+              className="p-1 text-gray-400 hover:text-purple-600 rounded hover:bg-purple-50"
+              title="Deplacer vers un autre parent"
+            >
+              <ArrowRightIcon className="w-4 h-4" />
+            </button>
+          )}
+
           {/* Ajouter enfant */}
           <button
             onClick={() => onAjouterEnfant(activite.id)}
@@ -168,29 +247,25 @@ function LigneActivite({
           )}
         </div>
       </div>
+    </div>
+  );
+}
 
-      {/* Enfants */}
-      {aEnfants && estOuvert && (
-        <div>
-          {activite.enfants!.map((enfant, index) => (
-            <LigneActivite
-              key={enfant.id}
-              activite={enfant}
-              niveau={niveau + 1}
-              ouverts={ouverts}
-              toggleOuvert={toggleOuvert}
-              onEditer={onEditer}
-              onSupprimer={onSupprimer}
-              onAjouterEnfant={onAjouterEnfant}
-              onMonter={onMonter}
-              onDescendre={onDescendre}
-              estPremier={index === 0}
-              estDernier={index === activite.enfants!.length - 1}
-            />
-          ))}
-        </div>
+// Overlay affiche pendant le drag (apercu flottant)
+function DragPreview({ activite }: { activite: Activite }) {
+  return (
+    <div className="flex items-center gap-2 py-2 px-3 bg-white rounded-lg shadow-lg border border-blue-200 opacity-90">
+      <Bars3Icon className="w-4 h-4 text-gray-400" />
+      <span className="font-medium text-gray-900">{activite.nom}</span>
+      {activite.code && (
+        <span className="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
+          {activite.code}
+        </span>
       )}
-    </>
+      {activite.estSysteme && (
+        <LockClosedIcon className="w-4 h-4 text-orange-500" />
+      )}
+    </div>
   );
 }
 
@@ -418,11 +493,13 @@ function FormulaireActivite({
 
 // Page principale
 export default function ActivitesPage() {
+  const [vueActive, setVueActive] = useState<'arbre' | 'texte'>('arbre');
   const [ouverts, setOuverts] = useState<Set<string>>(new Set());
   const [modaleOuverte, setModaleOuverte] = useState(false);
   const [activiteEditee, setActiviteEditee] = useState<Activite | null>(null);
   const [parentIdPourCreation, setParentIdPourCreation] = useState<string | null>(null);
   const [confirmationSuppression, setConfirmationSuppression] = useState<Activite | null>(null);
+  const [activiteADeplacer, setActiviteADeplacer] = useState<Activite | null>(null);
 
   const { data, loading, refetch } = useQuery<{ arbreActivites: Activite[] }>(ARBRE_ACTIVITES, {
     fetchPolicy: 'cache-and-network',
@@ -432,6 +509,33 @@ export default function ActivitesPage() {
   const [moveActivity] = useMutation(MOVE_ACTIVITY);
 
   const activites = data?.arbreActivites || [];
+
+  // Callback pour le hook DnD
+  const handleMoveActivityDnd = useCallback(
+    async (id: string, parentId: string | null, ordre: number) => {
+      await moveActivity({ variables: { id, parentId, ordre } });
+      refetch();
+    },
+    [moveActivity, refetch],
+  );
+
+  // Hook DnD
+  const {
+    listeAplatie,
+    activeDragId,
+    activeDrag,
+    infoDrop,
+    handleDragStart,
+    handleDragOver,
+    handleDragEnd,
+    handleDragCancel,
+  } = useArbreDnd(activites, ouverts, handleMoveActivityDnd);
+
+  // Sensors DnD : activation apres 5px de deplacement (evite conflits avec clics)
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor),
+  );
 
   // Ouvrir tous les noeuds au chargement
   useEffect(() => {
@@ -526,7 +630,7 @@ export default function ActivitesPage() {
       await moveActivity({
         variables: {
           id: activite.id,
-          parentId: parentId, // passer le vrai parent (null = racine)
+          parentId: parentId,
           ordre: freres[index - 1].ordre,
         },
       });
@@ -547,7 +651,7 @@ export default function ActivitesPage() {
       await moveActivity({
         variables: {
           id: activite.id,
-          parentId: parentId, // passer le vrai parent (null = racine)
+          parentId: parentId,
           ordre: freres[index + 1].ordre,
         },
       });
@@ -555,6 +659,40 @@ export default function ActivitesPage() {
     } catch (err) {
       console.error('Erreur deplacement:', err);
     }
+  };
+
+  const handleDeplacerVersParent = async (nouveauParentId: string | null) => {
+    if (!activiteADeplacer) return;
+    try {
+      await moveActivity({
+        variables: {
+          id: activiteADeplacer.id,
+          parentId: nouveauParentId,
+          ordre: 0,
+        },
+      });
+      setActiviteADeplacer(null);
+      refetch();
+    } catch (err) {
+      console.error('Erreur deplacement:', err);
+    }
+  };
+
+  // Determiner estPremier/estDernier pour chaque element aplati
+  const estPremierDansFreres = (index: number): boolean => {
+    if (index === 0) return true;
+    const element = listeAplatie[index];
+    const precedent = listeAplatie[index - 1];
+    // Premier si le precedent a un niveau inferieur (= parent different)
+    return precedent.niveau < element.niveau;
+  };
+
+  const estDernierDansFreres = (index: number): boolean => {
+    if (index === listeAplatie.length - 1) return true;
+    const element = listeAplatie[index];
+    const suivant = listeAplatie[index + 1];
+    // Dernier si le suivant a un niveau inferieur ou egal mais parent different
+    return suivant.niveau <= element.niveau && suivant.parentId !== element.parentId;
   };
 
   return (
@@ -567,40 +705,93 @@ export default function ActivitesPage() {
           <h1 className="text-2xl font-bold text-gray-900">Activites</h1>
           <p className="text-sm text-gray-500">Arborescence des types d'activites</p>
         </div>
+        {vueActive === 'arbre' && (
+          <button
+            onClick={() => ouvrirCreation(null)}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+          >
+            <PlusIcon className="w-4 h-4" />
+            Nouvelle activite racine
+          </button>
+        )}
+      </div>
+
+      {/* Onglets */}
+      <div className="flex gap-1 border-b">
         <button
-          onClick={() => ouvrirCreation(null)}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+          onClick={() => setVueActive('arbre')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            vueActive === 'arbre'
+              ? 'border-blue-600 text-blue-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+          }`}
         >
-          <PlusIcon className="w-4 h-4" />
-          Nouvelle activite racine
+          Vue arbre
+        </button>
+        <button
+          onClick={() => setVueActive('texte')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+            vueActive === 'texte'
+              ? 'border-blue-600 text-blue-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          Vue texte
         </button>
       </div>
 
-      {/* Arborescence */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      {/* Vue texte */}
+      {vueActive === 'texte' && (
+        <VueTexteActivites activites={activites} onAppliquer={() => refetch()} />
+      )}
+
+      {/* Arborescence avec DnD */}
+      {vueActive === 'arbre' && <><div className="bg-white rounded-lg shadow-sm overflow-hidden">
         {loading && activites.length === 0 ? (
           <div className="p-8 text-center text-gray-500">Chargement...</div>
         ) : activites.length === 0 ? (
           <div className="p-8 text-center text-gray-500">Aucune activite</div>
         ) : (
-          <div className="divide-y-0">
-            {activites.map((activite, index) => (
-              <LigneActivite
-                key={activite.id}
-                activite={activite}
-                niveau={0}
-                ouverts={ouverts}
-                toggleOuvert={toggleOuvert}
-                onEditer={ouvrirEdition}
-                onSupprimer={setConfirmationSuppression}
-                onAjouterEnfant={ouvrirCreation}
-                onMonter={handleMonter}
-                onDescendre={handleDescendre}
-                estPremier={index === 0}
-                estDernier={index === activites.length - 1}
-              />
-            ))}
-          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+            onDragCancel={handleDragCancel}
+          >
+            <SortableContext
+              items={listeAplatie.map((e) => e.activite.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="divide-y-0">
+                {listeAplatie.map((element, index) => (
+                  <LigneActiviteDnd
+                    key={element.activite.id}
+                    activite={element.activite}
+                    niveau={element.niveau}
+                    ouverts={ouverts}
+                    toggleOuvert={toggleOuvert}
+                    onEditer={ouvrirEdition}
+                    onSupprimer={setConfirmationSuppression}
+                    onAjouterEnfant={ouvrirCreation}
+                    onMonter={handleMonter}
+                    onDescendre={handleDescendre}
+                    onDeplacer={setActiviteADeplacer}
+                    estPremier={estPremierDansFreres(index)}
+                    estDernier={estDernierDansFreres(index)}
+                    activeDragId={activeDragId}
+                    infoDrop={infoDrop}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+
+            {/* Overlay de drag */}
+            <DragOverlay>
+              {activeDrag ? <DragPreview activite={activeDrag as Activite} /> : null}
+            </DragOverlay>
+          </DndContext>
         )}
       </div>
 
@@ -615,6 +806,7 @@ export default function ActivitesPage() {
           = feuille (pas d'enfant)
         </span>
       </div>
+      </>}
 
       {/* Modal formulaire */}
       <FormulaireActivite
@@ -624,6 +816,17 @@ export default function ActivitesPage() {
         activite={activiteEditee}
         parentId={parentIdPourCreation}
       />
+
+      {/* Modal deplacement */}
+      {activiteADeplacer && (
+        <SelectionParentModal
+          ouverte={!!activiteADeplacer}
+          onFermer={() => setActiviteADeplacer(null)}
+          activite={activiteADeplacer}
+          arbre={activites}
+          onDeplacer={handleDeplacerVersParent}
+        />
+      )}
 
       {/* Modal confirmation suppression */}
       {confirmationSuppression && (
