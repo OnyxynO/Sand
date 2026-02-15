@@ -30,10 +30,20 @@ Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte 
 - EV-07 : Absences dans grille de saisie
 - EV-06 : Suppression donnees RGPD (droit a l'oubli + purge totale)
 
-### Evolutions restantes (non implementees)
-Aucune - toutes les evolutions sont implementees.
-
 Voir `docs/06_EVOLUTIONS.md` pour le detail.
+
+### Reste a faire (hors fonctionnel)
+
+**Tests manquants** :
+- Tests unitaires `RhApiClient` avec `Http::fake()` (appels API RH : succes, timeout, erreur connexion)
+- Tests du hook `useSaisieHebdo` (mock Apollo, le hook le plus critique du frontend)
+
+**Outillage / documentation** :
+- `.env.example` avec valeurs Docker pre-remplies
+- `README.md` complet (installation, troubleshooting, premiers pas)
+- Script `scripts/install.sh` automatise (docker-compose up + migrate + seed)
+- `.gitattributes` (forcer LF sur scripts shell)
+- Documentation API (export schema GraphQL lisible)
 
 ## Commandes essentielles
 
@@ -125,7 +135,7 @@ docs/                        # Specifications
 | `docs/03_ARCHITECTURE.md` | Diagrammes Mermaid (ERD, flux, C4) |
 | `docs/04_API_GRAPHQL.md` | Schema GraphQL complet |
 | `docs/05_BACKLOG.md` | User stories par phase (toutes terminees) |
-| `docs/06_EVOLUTIONS.md` | Evolutions futures |
+| `docs/06_EVOLUTIONS.md` | Evolutions (toutes terminees) + reste a faire |
 | `docs/DIFFUSION_LOG.md` | Journal des sessions de travail |
 | `docs/archive/` | Fichiers obsoletes archives |
 

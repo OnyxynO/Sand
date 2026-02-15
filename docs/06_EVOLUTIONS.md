@@ -165,4 +165,34 @@ Frontend :
 
 ---
 
-*Document cree le 2026-02-08*
+## Reste a faire (hors fonctionnel)
+
+Toutes les evolutions fonctionnelles sont implementees. Il reste des taches de qualite et d'outillage identifiees dans les archives (`docs/archive/PLAN_TESTS.md`, `docs/archive/AVANCEMENT.md`).
+
+### Tests manquants
+
+| ID | Description | Technique | Priorite |
+|----|-------------|-----------|----------|
+| T1.2 | Tests unitaires `RhApiClient` | `Http::fake()` Laravel, tester succes/timeout/erreur | Moyenne |
+| T3.1 | Tests du hook `useSaisieHebdo` | Mock Apollo Client, c'est le hook le plus critique | Moyenne |
+
+### Outillage et documentation
+
+| Tache | Description | Priorite |
+|-------|-------------|----------|
+| `.env.example` | Mettre a jour avec les valeurs Docker pre-remplies | Haute |
+| `README.md` | Guide complet : prerequis, installation, troubleshooting, comptes de test | Haute |
+| `scripts/install.sh` | Script automatise : docker-compose up + migrate + seed + smoke test | Moyenne |
+| `.gitattributes` | Forcer LF sur scripts shell (eviter problemes CRLF Windows) | Faible |
+| Documentation API | Export du schema GraphQL dans un format lisible (HTML ou MD) | Faible |
+
+### Deja fait (infrastructure)
+
+Ces taches bonus de `docs/archive/AVANCEMENT.md` sont deja realisees :
+- ✅ Healthchecks Docker (T0.2 : PostgreSQL, Redis, nginx, mock-rh)
+- ✅ Smoke tests (`tests/smoke-test.sh`)
+- ✅ Validation schema front/back (`graphql-codegen`)
+
+---
+
+*Document cree le 2026-02-08, mis a jour le 2026-02-15*
