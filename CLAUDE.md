@@ -35,8 +35,7 @@ Voir `docs/06_EVOLUTIONS.md` pour le detail.
 ### Reste a faire (hors fonctionnel)
 
 **Tests manquants** :
-- Tests unitaires `RhApiClient` avec `Http::fake()` (appels API RH : succes, timeout, erreur connexion)
-- Tests du hook `useSaisieHebdo` (mock Apollo, le hook le plus critique du frontend)
+- `LigneSaisie.test.tsx` : U-V03 (saisie 0.5 → modifierCellule) et U-V04 (valeur > 1 → rejetee) — voir CAMPAGNE_TESTS.md
 
 **Outillage / documentation** :
 - `.env.example` avec valeurs Docker pre-remplies
