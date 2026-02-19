@@ -276,8 +276,10 @@ Drag and drop, cas limites.
 | ⚛️ Vitest | `NavigationSemaine.test.tsx` | U-V06 |
 | ⚛️ Vitest | `BoutonSauvegarde.test.tsx` | U-V07 |
 | ⚛️ Vitest | `saisieStore.test.ts` | U-V09 (via `aDifficultes()`) |
+| ⚛️ Vitest | `useSaisieHebdo.test.ts` | U-V08 |
 | ⚛️ Vitest | `VueTexteActivites.test.tsx` | A-V01 à A-V04 |
 | ⚛️ Vitest | `useParserArbreTexte.test.ts` | A-V05/06 |
+| 🧪 PHPUnit | `SupervisionTest.php` | A-G03/04 |
 
 ### ⏳ Optionnels — non implémentés
 
@@ -295,16 +297,8 @@ Ces tests apporteraient de la valeur mais ont été déprioritisés.
 
 | ID | Cas | Remarque |
 |----|-----|---------|
-| A-G01 | `exportCsv` : démarre un job queue | Partiellement couvert par `ExportMutatorGraphQLTest` existant |
+| A-G01 | `exportCsv` : démarre un job queue | Couvert par `ExportMutatorGraphQLTest` existant |
 | A-G02 | `exportCsv` : UTILISATEUR refusé | Idem |
-| A-G03 | `supervisionAnomalies` : ADMIN voit tout | Partiellement couvert par `TimeEntryModeratorTest` |
-| A-G04 | `supervisionAnomalies` : MODERATEUR voit son équipe | Idem |
-
-#### ⚛️ Vitest — Hook useSaisieHebdo (P0, complexité élevée)
-
-| ID | Cas | Difficulté |
-|----|-----|-----------|
-| U-V08 | `useSaisieHebdo` : charge les saisies au montage | Nécessite de mocker simultanément 3 requêtes Apollo (MES_SAISIES_SEMAINE, ABSENCES_SEMAINE, SYNC_ABSENCES) + le store Zustand via `renderHook` |
 
 #### 🎭 E2E — Drag and drop (P2)
 
