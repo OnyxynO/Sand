@@ -144,9 +144,10 @@ export default function SelecteurProjetActivite({
                   </Dialog.Title>
                   <button
                     onClick={onFermer}
-                    className="p-1 rounded hover:bg-gray-100"
+                    className="p-1 rounded hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-blue-500"
+                    aria-label="Fermer"
                   >
-                    <XMarkIcon className="w-5 h-5 text-gray-500" />
+                    <XMarkIcon className="w-5 h-5 text-gray-500" aria-hidden="true" />
                   </button>
                 </div>
 
@@ -169,17 +170,18 @@ export default function SelecteurProjetActivite({
                 {/* Recherche */}
                 <div className="px-4 py-3 border-b">
                   <div className="relative">
-                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
                     <input
                       type="text"
                       value={recherche}
                       onChange={(e) => setRecherche(e.target.value)}
                       placeholder={
                         etape === 'projet'
-                          ? 'Rechercher un projet...'
-                          : 'Rechercher une activite...'
+                          ? 'Rechercher un projet…'
+                          : 'Rechercher une activité…'
                       }
-                      className="w-full pl-9 pr-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      aria-label={etape === 'projet' ? 'Rechercher un projet' : 'Rechercher une activité'}
+                      className="w-full pl-9 pr-4 py-2 text-sm border rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500"
                       autoFocus
                     />
                   </div>

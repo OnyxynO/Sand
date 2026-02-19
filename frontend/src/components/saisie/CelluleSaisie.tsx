@@ -121,12 +121,14 @@ export default function CelluleSaisie({ ligneId, jour, cellule, onNavigate, onHi
         <input
           ref={inputRef}
           type="text"
+          inputMode="decimal"
           value={valeurTemp}
           onChange={(e) => setValeurTemp(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
-          className="w-16 h-10 text-center text-sm border-2 border-blue-500 rounded focus:outline-none"
+          className="w-16 h-10 text-center text-sm border-2 border-blue-500 rounded focus-visible:ring-2 focus-visible:ring-blue-300"
           placeholder="0.00"
+          aria-label={`Saisir pour ${jour.jourComplet}`}
         />
       </td>
     );
@@ -142,19 +144,11 @@ export default function CelluleSaisie({ ligneId, jour, cellule, onNavigate, onHi
   // Mode affichage
   return (
     <td className="px-1 py-1">
-      <div
-        className={`${cellClasses} relative group/cell`}
+      <button
+        type="button"
+        className={`${cellClasses} relative group/cell focus-visible:ring-2 focus-visible:ring-blue-400`}
         onClick={() => setEnEdition(true)}
-        onDoubleClick={() => setEnEdition(true)}
-        tabIndex={0}
-        role="button"
         aria-label={`Saisir pour ${jour.jourComplet}`}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            setEnEdition(true);
-          }
-        }}
       >
         <span className="leading-10">
           {aValeur ? formatDuree(cellule.duree) : ''}
@@ -165,14 +159,13 @@ export default function CelluleSaisie({ ligneId, jour, cellule, onNavigate, onHi
             onClick={handleHistorique}
             onMouseDown={(e) => e.stopPropagation()}
             onFocus={(e) => e.stopPropagation()}
-            className="absolute -top-2 -right-2 p-1 bg-white rounded-full shadow border border-gray-200 opacity-0 group-hover/cell:opacity-100 transition-opacity hover:bg-blue-50 hover:border-blue-300 z-10"
-            title="Voir l'historique"
+            className="absolute -top-2 -right-2 p-1 bg-white rounded-full shadow border border-gray-200 opacity-0 group-hover/cell:opacity-100 transition-opacity hover:bg-blue-50 hover:border-blue-300 z-10 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-blue-400"
             aria-label="Voir l'historique des modifications"
           >
-            <ClockIcon className="w-3.5 h-3.5 text-gray-500 hover:text-blue-600" />
+            <ClockIcon className="w-3.5 h-3.5 text-gray-500 hover:text-blue-600" aria-hidden="true" />
           </button>
         )}
-      </div>
+      </button>
     </td>
   );
 }

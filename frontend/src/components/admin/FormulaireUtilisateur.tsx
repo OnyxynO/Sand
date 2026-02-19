@@ -198,9 +198,10 @@ export default function FormulaireUtilisateur({
                   </Dialog.Title>
                   <button
                     onClick={onFermer}
-                    className="p-1 rounded hover:bg-gray-100"
+                    className="p-1 rounded hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-blue-500"
+                    aria-label="Fermer"
                   >
-                    <XMarkIcon className="w-5 h-5 text-gray-500" />
+                    <XMarkIcon className="w-5 h-5 text-gray-500" aria-hidden="true" />
                   </button>
                 </div>
 
@@ -209,28 +210,32 @@ export default function FormulaireUtilisateur({
                   {/* Prenom + Nom */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Prenom *
+                      <label htmlFor="prenom" className="block text-sm font-medium text-gray-700 mb-1">
+                        Prénom *
                       </label>
                       <input
+                        id="prenom"
                         type="text"
                         name="prenom"
                         value={formData.prenom}
                         onChange={handleChange}
-                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        autoComplete="given-name"
+                        className="w-full px-3 py-2 border rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="nom" className="block text-sm font-medium text-gray-700 mb-1">
                         Nom *
                       </label>
                       <input
+                        id="nom"
                         type="text"
                         name="nom"
                         value={formData.nom}
                         onChange={handleChange}
-                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        autoComplete="family-name"
+                        className="w-full px-3 py-2 border rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500"
                         required
                       />
                     </div>
@@ -238,59 +243,68 @@ export default function FormulaireUtilisateur({
 
                   {/* Email */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                       Email *
                     </label>
                     <input
+                      id="email"
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      autoComplete="email"
+                      spellCheck={false}
+                      className="w-full px-3 py-2 border rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500"
                       required
                     />
                   </div>
 
                   {/* Mot de passe */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                       Mot de passe {!estEdition && '*'}
                     </label>
                     <input
+                      id="password"
                       type="password"
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
                       placeholder={estEdition ? 'Laisser vide pour ne pas changer' : ''}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      autoComplete={estEdition ? 'new-password' : 'new-password'}
+                      className="w-full px-3 py-2 border rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500"
                       required={!estEdition}
                     />
                   </div>
 
                   {/* Matricule */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="matricule" className="block text-sm font-medium text-gray-700 mb-1">
                       Matricule
                     </label>
                     <input
+                      id="matricule"
                       type="text"
                       name="matricule"
                       value={formData.matricule}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      autoComplete="off"
+                      spellCheck={false}
+                      className="w-full px-3 py-2 border rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500"
                     />
                   </div>
 
                   {/* Role */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Role *
+                    <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
+                      Rôle *
                     </label>
                     <select
+                      id="role"
                       name="role"
                       value={formData.role}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500"
                       required
                     >
                       {ROLES.map((role) => (
@@ -303,14 +317,15 @@ export default function FormulaireUtilisateur({
 
                   {/* Equipe */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Equipe
+                    <label htmlFor="equipeId" className="block text-sm font-medium text-gray-700 mb-1">
+                      Équipe
                     </label>
                     <select
+                      id="equipeId"
                       name="equipeId"
                       value={formData.equipeId}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500"
                     >
                       <option value="">Aucune equipe</option>
                       {dataEquipes?.equipes?.map((equipe) => (
@@ -343,7 +358,7 @@ export default function FormulaireUtilisateur({
                       disabled={enCours}
                       className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
                     >
-                      {enCours ? 'Enregistrement...' : estEdition ? 'Modifier' : 'Creer'}
+                      {enCours ? 'Enregistrement…' : estEdition ? 'Modifier' : 'Créer'}
                     </button>
                   </div>
                 </form>

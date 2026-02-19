@@ -74,23 +74,29 @@ export default function ToastAnnulation({
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 animate-slide-up">
+    <div
+      className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 animate-slide-up"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
       <div className="bg-gray-900 text-white rounded-lg shadow-lg overflow-hidden min-w-80">
         <div className="flex items-center justify-between px-4 py-3">
           <span className="text-sm">{message}</span>
           <div className="flex items-center gap-2 ml-4">
             <button
               onClick={handleAnnuler}
-              className="px-3 py-1 text-sm font-medium bg-white text-gray-900 rounded hover:bg-gray-100 transition-colors"
+              className="px-3 py-1 text-sm font-medium bg-white text-gray-900 rounded hover:bg-gray-100 transition-colors focus-visible:ring-2 focus-visible:ring-blue-400"
             >
               Annuler
             </button>
             {onFermer && (
               <button
                 onClick={handleFermer}
-                className="p-1 hover:bg-gray-700 rounded transition-colors"
+                className="p-1 hover:bg-gray-700 rounded transition-colors focus-visible:ring-2 focus-visible:ring-gray-400"
+                aria-label="Fermer"
               >
-                <XMarkIcon className="w-4 h-4" />
+                <XMarkIcon className="w-4 h-4" aria-hidden="true" />
               </button>
             )}
           </div>

@@ -105,7 +105,7 @@ describe('NavigationSemaine', () => {
     });
 
     render(<NavigationSemaine />);
-    fireEvent.click(screen.getByTitle('Semaine precedente'));
+    fireEvent.click(screen.getByRole('button', { name: 'Semaine précédente' }));
     expect(mockAllerSemainePrecedente).toHaveBeenCalledTimes(1);
   });
 
@@ -128,7 +128,7 @@ describe('NavigationSemaine', () => {
     });
 
     render(<NavigationSemaine />);
-    fireEvent.click(screen.getByTitle('Semaine suivante'));
+    fireEvent.click(screen.getByRole('button', { name: 'Semaine suivante' }));
     expect(mockAllerSemaineSuivante).toHaveBeenCalledTimes(1);
   });
 

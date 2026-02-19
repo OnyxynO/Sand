@@ -101,7 +101,7 @@ describe('GrilleSemaine', () => {
 
     renderAvecApollo(<GrilleSemaine absencesParJour={{}} />);
 
-    expect(screen.getByText('Chargement des saisies...')).toBeInTheDocument();
+    expect(screen.getByText('Chargement des saisies…')).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 

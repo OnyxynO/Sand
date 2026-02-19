@@ -102,7 +102,8 @@ function CarteJour({ jour, absence }: { jour: JourSemaine; absence?: AbsenceJour
                         }
                       }}
                       placeholder="0.00"
-                      className={`w-16 h-9 text-center text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      aria-label={`Saisir pour ${ligne.activiteNom} le ${jour.jourComplet}`}
+                      className={`w-16 h-9 text-center text-sm border rounded focus-visible:ring-2 focus-visible:ring-blue-500 ${
                         cellule?.estModifiee ? 'border-blue-400 bg-blue-50' : 'border-gray-200'
                       }`}
                     />
@@ -125,8 +126,8 @@ export default function GrilleSemaineMobile({ absencesParJour }: GrilleSemaineMo
     return (
       <div className="bg-white rounded-lg shadow-sm p-8">
         <div className="flex items-center justify-center gap-3 text-gray-500">
-          <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-          <span>Chargement...</span>
+          <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin motion-reduce:animate-none" aria-hidden="true" />
+          <span>Chargement…</span>
         </div>
       </div>
     );

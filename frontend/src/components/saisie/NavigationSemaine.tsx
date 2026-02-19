@@ -16,18 +16,18 @@ export default function NavigationSemaine() {
       <div className="flex items-center gap-2">
         <button
           onClick={allerSemainePrecedente}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          title="Semaine precedente"
+          className="p-2 rounded-lg hover:bg-gray-100 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+          aria-label="Semaine précédente"
         >
-          <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
+          <ChevronLeftIcon className="w-5 h-5 text-gray-600" aria-hidden="true" />
         </button>
 
         <button
           onClick={allerSemaineSuivante}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          title="Semaine suivante"
+          className="p-2 rounded-lg hover:bg-gray-100 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+          aria-label="Semaine suivante"
         >
-          <ChevronRightIcon className="w-5 h-5 text-gray-600" />
+          <ChevronRightIcon className="w-5 h-5 text-gray-600" aria-hidden="true" />
         </button>
 
         {!estCourante && (
