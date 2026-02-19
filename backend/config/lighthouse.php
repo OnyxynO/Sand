@@ -224,8 +224,11 @@ return [
     */
 
     'security' => [
-        'max_query_complexity' => GraphQL\Validator\Rules\QueryComplexity::DISABLED,
-        'max_query_depth' => GraphQL\Validator\Rules\QueryDepth::DISABLED,
+        // Complexite max : evite les requetes qui surchargent le serveur (DoS applicatif)
+        'max_query_complexity' => 200,
+        // Profondeur max : 7 niveaux suffisent largement pour ce schema
+        'max_query_depth' => 7,
+        // Introspection : desactivee en production via variable d'environnement
         'disable_introspection' => (bool) env('LIGHTHOUSE_SECURITY_DISABLE_INTROSPECTION', false)
             ? GraphQL\Validator\Rules\DisableIntrospection::ENABLED
             : GraphQL\Validator\Rules\DisableIntrospection::DISABLED,

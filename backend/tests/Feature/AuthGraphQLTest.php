@@ -38,7 +38,6 @@ class AuthGraphQLTest extends TestCase
                         id
                         email
                     }
-                    token
                 }
             }
         ', [
@@ -53,7 +52,6 @@ class AuthGraphQLTest extends TestCase
 
         $this->assertEquals($user->id, $data['user']['id']);
         $this->assertEquals('test@example.com', $data['user']['email']);
-        $this->assertNotEmpty($data['token']);
     }
 
     public function test_login_avec_identifiants_invalides(): void

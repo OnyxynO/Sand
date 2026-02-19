@@ -50,8 +50,7 @@ services:
       POSTGRES_DB: ${DB_DATABASE:-sand}
       POSTGRES_USER: ${DB_USERNAME:-sand}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
-    ports:
-      - "5432:5432"
+    # Port non exposé sur l'hôte — accès via docker-compose.override.yml en dev
     volumes:
       - sand-db-data:/var/lib/postgresql/data
     networks:
@@ -68,8 +67,7 @@ services:
     image: redis:7-alpine
     container_name: sand-redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
+    # Port non exposé sur l'hôte — accès via docker-compose.override.yml en dev
     volumes:
       - sand-redis-data:/data
     networks:

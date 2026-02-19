@@ -17,16 +17,13 @@ return [
 
     'paths' => ['api/*', 'graphql', 'sanctum/csrf-cookie'],
 
-    'allowed_methods' => ['*'],
+    // GET : GraphQL playground/introspection | POST : mutations et queries | OPTIONS : preflight
+    'allowed_methods' => ['GET', 'POST', 'OPTIONS'],
 
-    'allowed_origins' => [
+    // Origine unique via variable d'environnement — plus de ports dev hardcodes
+    'allowed_origins' => array_filter([
         env('FRONTEND_URL', 'http://localhost:5173'),
-        'http://localhost:5174',
-        'http://localhost:5175',
-        'http://localhost:5176',
-        'http://localhost:5177',
-        'http://localhost:5178',
-    ],
+    ]),
 
     'allowed_origins_patterns' => [],
 
