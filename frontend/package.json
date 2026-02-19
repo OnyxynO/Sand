@@ -11,7 +11,10 @@
     "codegen": "graphql-codegen --config codegen.ts",
     "codegen:watch": "graphql-codegen --config codegen.ts --watch",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "e2e": "playwright test",
+    "e2e:headed": "playwright test --headed",
+    "e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@apollo/client": "^4.1.2",
@@ -34,6 +37,7 @@
     "@graphql-codegen/client-preset": "^5.2.2",
     "@graphql-codegen/typescript": "^5.0.7",
     "@graphql-codegen/typescript-operations": "^5.0.7",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/vite": "^4.1.18",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
