@@ -56,8 +56,13 @@ docker-compose up -d
 # Tests backend (PostgreSQL obligatoire, ltree incompatible SQLite)
 docker-compose exec app php artisan test
 
-# Tests frontend
+# Tests frontend unitaires (Vitest, dans Docker)
 docker-compose exec frontend npm run test
+
+# Tests E2E Playwright (sur l'HOTE, pas dans Docker)
+cd frontend && npm run e2e            # headless
+cd frontend && npm run e2e:ui         # interface graphique
+cd frontend && npm run e2e:headed     # navigateur visible
 
 # Apres modification du schema GraphQL : vider le cache Lighthouse
 docker-compose exec app php artisan lighthouse:clear-cache
@@ -69,6 +74,34 @@ docker-compose exec app php artisan db:seed --class=DemoSeeder
 docker-compose exec app ./vendor/bin/pint
 docker-compose exec frontend npm run lint
 ```
+
+## Tests
+
+### Architecture des tests
+
+| Couche | Outil | Ou | Commande |
+|--------|-------|----|----------|
+| Backend (PHP) | PHPUnit | Docker (`app`) | `docker-compose exec app php artisan test` |
+| Frontend (composants) | Vitest + Testing Library | Docker (`frontend`) | `docker-compose exec frontend npm run test` |
+| E2E (navigateur) | Playwright | Hote (pas Docker) | `cd frontend && npm run e2e` |
+
+### Playwright E2E
+
+**Prerequis** : Docker running (`docker-compose up -d`), Chromium installe (`npx playwright install chromium`)
+
+Structure des tests E2E :
+```
+frontend/e2e/
+├── auth.setup.ts      # Login global → sauvegarde cookies dans .auth/utilisateur.json
+├── login.spec.ts      # Tests page connexion (sans session)
+└── saisie.spec.ts     # Tests page saisie (avec session, anti-regression)
+```
+
+Pieges Playwright specifiques a ce projet :
+- `__dirname` invalide en ESM → utiliser `fileURLToPath(import.meta.url)`
+- `getByRole('dialog')` retourne hidden avec Headless UI Transition → tester le titre `getByText('Choisir un projet')`
+- `locator('h1')` ambigu (Layout + page) → `getByRole('heading', { name: '...' })`
+- Sélecteur `title` des boutons navigation : `button[title="Semaine precedente"]` (sans accent)
 
 ## Acces
 
@@ -145,6 +178,9 @@ docs/                        # Specifications
 - **Tests dans Docker** : DB_HOST=db (hostname Docker), pas accessible depuis l'hote
 - **Apollo Client 4** : Imports depuis `@apollo/client/react` (pas `@apollo/client`)
 - **Query absences** : Utilise un resolver custom (pas @where) pour detecter les chevauchements de periodes
+- **Playwright ESM** : `__dirname` inexistant → `fileURLToPath(import.meta.url)` + `path.dirname()`
+- **Playwright Headless UI** : `getByRole('dialog')` donne hidden → tester le texte visible de la modale
+- **Playwright h1 ambigu** : Layout a son propre h1 → utiliser `getByRole('heading', { name: '...' })`
 
 ## Serveur Ollama local
 
