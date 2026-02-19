@@ -34,6 +34,11 @@ return [
             // Always set the `Accept: application/json` header.
             Nuwave\Lighthouse\Http\Middleware\AcceptJson::class,
 
+            // Requis pour l'auth Sanctum SPA (cookies HttpOnly) :
+            // initialise la session et lit le cookie de session pour les domaines stateful.
+            // Sans ce middleware, Sanctum ne peut pas authentifier via cookies (seulement via Bearer token).
+            Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+
             // Logs in a user if they are authenticated. In contrast to Laravel's 'auth'
             // middleware, this delegates auth and permission checks to the field level.
             Nuwave\Lighthouse\Http\Middleware\AttemptAuthentication::class,
