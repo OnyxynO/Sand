@@ -261,7 +261,7 @@ Drag and drop, cas limites.
 |--------|---------|-------------|
 | 🎭 E2E | `login.spec.ts` | AUTH-01 à AUTH-08 |
 | 🎭 E2E | `dashboard.spec.ts` | U-D01 à U-D04 |
-| 🎭 E2E | `saisie.spec.ts` | U-S01 à U-S06, U-S10 |
+| 🎭 E2E | `saisie.spec.ts` | U-S01 à U-S10 |
 | 🎭 E2E | `acces-refuses.spec.ts` | U-A01 à U-A03, M-A01/02 |
 | 🎭 E2E | `supervision.spec.ts` | M-SU01 à M-SU04 |
 | 🎭 E2E | `saisie-moderateur.spec.ts` | M-S01 à M-S03 |
@@ -285,14 +285,6 @@ Drag and drop, cas limites.
 ### ⏳ Optionnels — non implémentés
 
 Ces tests apporteraient de la valeur mais ont été déprioritisés.
-
-#### 🎭 E2E — Saisie P1 (comportements dynamiques, données incertaines)
-
-| ID | Cas | Difficulté |
-|----|-----|-----------|
-| U-S07 | Semaine future → cellules en lecture seule | Requiert que la date courante soit dans la semaine de test |
-| U-S08 | EV-01 : quitter avec saisie non sauvegardée → modale de confirmation | Fragile : nécessite d'interagir avec une cellule sans sauvegarder |
-| U-S09 | EV-07 : ligne d'absence visible dans la grille | Requiert qu'une absence existe en base pour l'utilisateur de test |
 
 #### 🎭 E2E — Drag and drop (P2)
 

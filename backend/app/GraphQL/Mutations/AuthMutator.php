@@ -3,9 +3,9 @@
 namespace App\GraphQL\Mutations;
 
 use App\Models\User;
+use GraphQL\Error\Error;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class AuthMutator
 {
@@ -21,15 +21,11 @@ class AuthMutator
         $user = User::where('email', $email)->first();
 
         if (!$user || !Hash::check($password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Les identifiants fournis sont incorrects.'],
-            ]);
+            throw new Error('Identifiants invalides.');
         }
 
         if (!$user->est_actif) {
-            throw ValidationException::withMessages([
-                'email' => ['Ce compte a ete desactive.'],
-            ]);
+            throw new Error('Ce compte a ete desactive.');
         }
 
         // Connexion session (pour SPA)
