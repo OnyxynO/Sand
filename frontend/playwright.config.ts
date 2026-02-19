@@ -13,33 +13,33 @@ export default defineConfig({
   },
   projects: [
     // ── Setups d'authentification (s'exécutent en premier) ──
-    {
-      name: 'setup',
-      testMatch: /auth\.setup\.ts$/,
-    },
-    {
-      name: 'setup-moderateur',
-      testMatch: /auth\.setup\.moderateur\.ts/,
-    },
+    { name: 'setup',           testMatch: /auth\.setup\.ts$/ },
+    { name: 'setup-moderateur', testMatch: /auth\.setup\.moderateur\.ts/ },
+    { name: 'setup-admin',      testMatch: /auth\.setup\.admin\.ts/ },
 
     // ── Tests Chromium par rôle ──
     {
       name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        storageState: 'e2e/.auth/utilisateur.json',
-      },
+      use: { ...devices['Desktop Chrome'], storageState: 'e2e/.auth/utilisateur.json' },
       dependencies: ['setup'],
-      testIgnore: ['**/supervision.spec.ts', '**/saisie-moderateur.spec.ts'],
+      testMatch: [
+        '**/login.spec.ts',
+        '**/dashboard.spec.ts',
+        '**/saisie.spec.ts',
+        '**/acces-refuses.spec.ts',
+      ],
     },
     {
       name: 'chromium-moderateur',
-      use: {
-        ...devices['Desktop Chrome'],
-        storageState: 'e2e/.auth/moderateur.json',
-      },
+      use: { ...devices['Desktop Chrome'], storageState: 'e2e/.auth/moderateur.json' },
       dependencies: ['setup-moderateur'],
       testMatch: ['**/supervision.spec.ts', '**/saisie-moderateur.spec.ts'],
+    },
+    {
+      name: 'chromium-admin',
+      use: { ...devices['Desktop Chrome'], storageState: 'e2e/.auth/admin.json' },
+      dependencies: ['setup-admin'],
+      testMatch: ['**/admin-activites.spec.ts', '**/admin-utilisateurs.spec.ts'],
     },
   ],
 });
