@@ -282,9 +282,68 @@ Drag and drop, cas limites.
 | 🧪 PHPUnit | `SupervisionTest.php` | A-G03/04 |
 | 🧪 PHPUnit | `ExportMutatorGraphQLTest.php` | A-G01/02 |
 
-### ⏳ Optionnels — non implémentés
+### ⏳ À implémenter — oubliés lors de la campagne
 
-Ces tests apporteraient de la valeur mais ont été déprioritisés.
+Ces tests étaient prévus dans la spec (P0/P1) mais n'ont pas été créés.
+
+| ID | Description | Fichier à créer | Priorité |
+|----|-------------|-----------------|----------|
+| U-V03 | `LigneSaisie` : saisie valeur 0.5 → `modifierCellule` appelé dans le store | `LigneSaisie.test.tsx` | P0 |
+| U-V04 | `LigneSaisie` : valeur > 1 → rejetée (validation `parseDuree`) | `LigneSaisie.test.tsx` | P1 |
+
+**Contexte** : La logique se trouve dans `CelluleSaisie.tsx` (input qui appelle `modifierCellule` du store Zustand) et `parseDuree` (rejet si > 1.0). Ces deux tests couvrent le chemin critique de saisie des heures.
+
+---
+
+## 🔒 Audit sécurité — avant mise en production
+
+Checklist à réaliser avant de considérer le projet production-ready.
+
+### Authentification & sessions
+
+| # | Vérification | Statut |
+|---|-------------|--------|
+| S-01 | Cookies `HttpOnly` + `SameSite=Strict` sur les cookies Sanctum | ⬜ |
+| S-02 | CSRF protection active sur toutes les mutations GraphQL | ⬜ |
+| S-03 | Rate limiting sur `/login` (protection brute force) | ⬜ |
+| S-04 | Expiration des tokens Sanctum configurée | ⬜ |
+| S-05 | Déconnexion révoque bien le token (`currentAccessToken()->delete()`) | ✅ |
+
+### Autorisation (Policies)
+
+| # | Vérification | Statut |
+|---|-------------|--------|
+| S-06 | Toutes les mutations GraphQL passent par une `@can` ou policy explicite | ⬜ |
+| S-07 | Un utilisateur ne peut pas accéder aux saisies d'un autre utilisateur | ⬜ |
+| S-08 | Les routes admin (`/admin/*`) sont protégées côté backend (pas seulement frontend) | ⬜ |
+| S-09 | La mutation RGPD `purgerUtilisateur` est réservée ADMIN | ⬜ |
+
+### Validation des entrées
+
+| # | Vérification | Statut |
+|---|-------------|--------|
+| S-10 | Les inputs GraphQL ont des règles de validation (`@rules`) | ⬜ |
+| S-11 | Pas d'injection possible dans les paramètres `chemin` (ltree) | ⬜ |
+| S-12 | La durée de saisie est bornée à [0.01, 1.00] côté backend | ⬜ |
+| S-13 | Les uploads (export CSV) ne permettent pas de path traversal | ⬜ |
+
+### Configuration & secrets
+
+| # | Vérification | Statut |
+|---|-------------|--------|
+| S-14 | `.env` absent du dépôt git (`.gitignore`) | ✅ |
+| S-15 | `APP_DEBUG=false` et `APP_ENV=production` en prod | ⬜ |
+| S-16 | Les credentials Ollama/RH API ne sont pas hardcodés | ⬜ |
+| S-17 | Headers sécurité HTTP : `X-Frame-Options`, `X-Content-Type`, `CSP` | ⬜ |
+| S-18 | GraphQL Introspection désactivée en production | ⬜ |
+
+### Données & RGPD
+
+| # | Vérification | Statut |
+|---|-------------|--------|
+| S-19 | Soft delete empêche la perte accidentelle de données | ✅ |
+| S-20 | La purge RGPD anonymise bien toutes les données liées | ⬜ |
+| S-21 | Les logs applicatifs ne contiennent pas de données personnelles | ⬜ |
 
 ---
 
