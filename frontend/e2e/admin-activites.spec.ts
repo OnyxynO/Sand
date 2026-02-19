@@ -92,4 +92,25 @@ test.describe('Admin — Activites', () => {
       await expect(modifications.nth(i)).not.toContainText('ABS');
     }
   });
+
+  // A-AC07 : deplacer une activite → ordre mis a jour
+  // Note : utilise les boutons Monter/Descendre (meme mutation moveActivity que le drag, plus fiable en CI)
+  test('A-AC07 : reordonner une activite - ordre mis a jour', async ({ page }) => {
+    const items = page.locator('span.font-medium.text-gray-900');
+
+    // Memoriser l'ordre initial des deux premieres activites non systeme
+    // DemoSeeder : Absence (systeme, idx 0), puis les activites racines par ordre croissant
+    const nomIdx1 = await items.nth(1).textContent();
+    const nomIdx2 = await items.nth(2).textContent();
+
+    // Cliquer "Descendre" sur la 2eme activite (index 1 dans la liste aplatie)
+    // force:true car les boutons sont opacity-0 tant qu'on ne survole pas la rangee
+    await page.locator('button[title="Descendre"]').nth(1).click({ force: true });
+
+    // Attendre que la liste se rafraichisse (refetch Apollo apres moveActivity)
+    await expect(items.nth(1)).toHaveText(nomIdx2 ?? '', { timeout: 5000 });
+
+    // Verifier que les deux activites ont echange de position
+    expect(await items.nth(2).textContent()).toBe(nomIdx1);
+  });
 });
