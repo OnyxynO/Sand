@@ -1,19 +1,32 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { useAuthStore } from '../stores/authStore';
 import { ME_QUERY } from '../graphql/operations/auth';
 import type { Utilisateur } from '../types';
 
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:8080/graphql').replace(
+  '/graphql',
+  '',
+);
+
 export function useAuthInit() {
+  const [csrfPret, setCsrfPret] = useState(false);
   const { setUtilisateur, setChargement } = useAuthStore();
 
+  // Initialiser le cookie CSRF avant toute requete GraphQL (requis par Sanctum SPA)
+  useEffect(() => {
+    fetch(`${API_BASE}/sanctum/csrf-cookie`, { credentials: 'include' }).finally(() =>
+      setCsrfPret(true),
+    );
+  }, []);
+
   const { data, loading, error } = useQuery<{ me: Utilisateur | null }>(ME_QUERY, {
-    // Toujours aller chercher sur le serveur (auth via cookie Sanctum)
+    skip: !csrfPret,
     fetchPolicy: 'network-only',
   });
 
   useEffect(() => {
-    if (loading) {
+    if (!csrfPret || loading) {
       return;
     }
 
@@ -25,5 +38,5 @@ export function useAuthInit() {
 
     // Utilisateur trouve, mettre a jour le store
     setUtilisateur(data.me);
-  }, [data, loading, error, setUtilisateur, setChargement]);
+  }, [csrfPret, data, loading, error, setUtilisateur, setChargement]);
 }

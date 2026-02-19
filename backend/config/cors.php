@@ -31,7 +31,7 @@ return [
 
     'exposed_headers' => [],
 
-    'max_age' => 0,
+    'max_age' => 7200, // Cache les preflights OPTIONS 2h (evite un aller-retour OPTIONS par requete)
 
     'supports_credentials' => true,
 
