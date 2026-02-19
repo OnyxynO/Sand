@@ -280,6 +280,7 @@ Drag and drop, cas limites.
 | ⚛️ Vitest | `VueTexteActivites.test.tsx` | A-V01 à A-V04 |
 | ⚛️ Vitest | `useParserArbreTexte.test.ts` | A-V05/06 |
 | 🧪 PHPUnit | `SupervisionTest.php` | A-G03/04 |
+| 🧪 PHPUnit | `ExportMutatorGraphQLTest.php` | A-G01/02 |
 
 ### ⏳ Optionnels — non implémentés
 
@@ -292,13 +293,6 @@ Ces tests apporteraient de la valeur mais ont été déprioritisés.
 | U-S07 | Semaine future → cellules en lecture seule | Requiert que la date courante soit dans la semaine de test |
 | U-S08 | EV-01 : quitter avec saisie non sauvegardée → modale de confirmation | Fragile : nécessite d'interagir avec une cellule sans sauvegarder |
 | U-S09 | EV-07 : ligne d'absence visible dans la grille | Requiert qu'une absence existe en base pour l'utilisateur de test |
-
-#### 🧪 PHPUnit — GraphQL admin (P1)
-
-| ID | Cas | Remarque |
-|----|-----|---------|
-| A-G01 | `exportCsv` : démarre un job queue | Couvert par `ExportMutatorGraphQLTest` existant |
-| A-G02 | `exportCsv` : UTILISATEUR refusé | Idem |
 
 #### 🎭 E2E — Drag and drop (P2)
 
