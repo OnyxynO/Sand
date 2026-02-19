@@ -1,6 +1,6 @@
 // Tests pour le composant NavigationSemaine
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { vi } from 'vitest';
 import NavigationSemaine from './NavigationSemaine';
 
@@ -83,6 +83,53 @@ describe('NavigationSemaine', () => {
 
     // Le bouton "Aujourd'hui" ne doit pas être visible
     expect(screen.queryByText('Aujourd\'hui')).not.toBeInTheDocument();
+  });
+
+  // U-V06 : boutons precedent/suivant appellent le store
+  it('clic sur bouton precedent appelle allerSemainePrecedente', () => {
+    vi.mocked(useSaisieStore).mockReturnValue({
+      semaineISO: '2025-W05',
+      allerSemainePrecedente: mockAllerSemainePrecedente,
+      allerSemaineSuivante: mockAllerSemaineSuivante,
+      allerSemaineActuelle: mockAllerSemaineActuelle,
+      lignes: [],
+      projetsDisponibles: [],
+      activitesDisponibles: [],
+      modifierCellule: vi.fn(),
+      chargerSemaine: vi.fn(),
+      ajouterLigne: vi.fn(),
+      supprimerLigne: vi.fn(),
+      sauvegarderModifications: vi.fn(),
+      annulerModifications: vi.fn(),
+      getTotalJour: vi.fn(),
+    });
+
+    render(<NavigationSemaine />);
+    fireEvent.click(screen.getByTitle('Semaine precedente'));
+    expect(mockAllerSemainePrecedente).toHaveBeenCalledTimes(1);
+  });
+
+  it('clic sur bouton suivant appelle allerSemaineSuivante', () => {
+    vi.mocked(useSaisieStore).mockReturnValue({
+      semaineISO: '2025-W05',
+      allerSemainePrecedente: mockAllerSemainePrecedente,
+      allerSemaineSuivante: mockAllerSemaineSuivante,
+      allerSemaineActuelle: mockAllerSemaineActuelle,
+      lignes: [],
+      projetsDisponibles: [],
+      activitesDisponibles: [],
+      modifierCellule: vi.fn(),
+      chargerSemaine: vi.fn(),
+      ajouterLigne: vi.fn(),
+      supprimerLigne: vi.fn(),
+      sauvegarderModifications: vi.fn(),
+      annulerModifications: vi.fn(),
+      getTotalJour: vi.fn(),
+    });
+
+    render(<NavigationSemaine />);
+    fireEvent.click(screen.getByTitle('Semaine suivante'));
+    expect(mockAllerSemaineSuivante).toHaveBeenCalledTimes(1);
   });
 
   it('bouton Aujourd\'hui visible quand pas semaine courante', () => {

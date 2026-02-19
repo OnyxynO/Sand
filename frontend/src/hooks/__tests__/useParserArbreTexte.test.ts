@@ -247,6 +247,26 @@ describe('calculerDiff', () => {
     expect(diff).toHaveLength(0);
   });
 
+  // A-V05 : anti-regression bug systeme ABS → ""
+  it('ignore les activites systeme dans les modifications de code', () => {
+    // Arbre avec activite systeme ayant un code (absenceCode = 'ABS')
+    const arbreAvecCodeSysteme = [
+      { id: '99', nom: 'Absence', code: 'ABS', niveau: 0, estSysteme: true, estActif: true, enfants: [] },
+    ];
+
+    // arbreVersTexte affiche "(systeme)" et non "(ABS)" pour les systemes
+    const texte = arbreVersTexte(arbreAvecCodeSysteme);
+    expect(texte).toBe('Absence (systeme)');
+
+    // Le texte parse n'a pas de code pour l'activite systeme
+    const nouvelArbre = texteVersArbre(texte);
+    const diff = calculerDiff(arbreAvecCodeSysteme, nouvelArbre);
+
+    // Aucune "modification" ne doit etre generee (code ABS → "" ignore pour systeme)
+    expect(diff.filter((c) => c.type === 'modification')).toHaveLength(0);
+    expect(diff).toHaveLength(0);
+  });
+
   it('detecte la suppression de React et Reunion', () => {
     const texte = 'Developpement (DEV)\n    Frontend (FE)\n    Backend (BE)\nAbsence (systeme)';
     const nouvelArbre = texteVersArbre(texte);

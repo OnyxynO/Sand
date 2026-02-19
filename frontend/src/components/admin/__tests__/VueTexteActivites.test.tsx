@@ -117,6 +117,32 @@ describe('VueTexteActivites', () => {
     expect(screen.getByTestId('textarea-arbre')).toBeInTheDocument();
   });
 
+  // A-V04 : anti-regression bug systeme ABS → "" — pas de fausse "Modification" pour activite systeme
+  it('activite systeme ne genere pas de modification dans la previsualisation', () => {
+    // Arbre avec activite systeme ayant un code (absenceCode = 'ABS' — le bug original)
+    const arbreAvecCodeSysteme = [
+      { id: '1', nom: 'Developpement', code: 'DEV', niveau: 0, estSysteme: false, estActif: true, enfants: [] },
+      { id: '2', nom: 'Absence', code: 'ABS', niveau: 0, estSysteme: true, estActif: true, enfants: [] },
+    ];
+
+    renderAvecApollo(
+      <VueTexteActivites activites={arbreAvecCodeSysteme} onAppliquer={vi.fn()} />,
+    );
+
+    const textarea = screen.getByTestId('textarea-arbre') as HTMLTextAreaElement;
+    // Ajouter une nouvelle feuille — la seule modification doit etre une "creation"
+    fireEvent.change(textarea, { target: { value: textarea.value + '\nNouvelleActivite' } });
+
+    fireEvent.click(screen.getByText('Appliquer les modifications'));
+
+    // La previsualisation doit montrer "Creation"
+    expect(screen.getByTestId('changement-creation')).toBeInTheDocument();
+
+    // Aucune "Modification" ne doit etre generee (bug corrige : systeme ignore dans calculerDiff)
+    const modifications = screen.queryAllByTestId('changement-modification');
+    expect(modifications).toHaveLength(0);
+  });
+
   it('reinitialise le texte', () => {
     renderAvecApollo(
       <VueTexteActivites activites={arbreTest} onAppliquer={vi.fn()} />,
