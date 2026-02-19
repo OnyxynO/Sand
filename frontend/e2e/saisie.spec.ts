@@ -108,4 +108,10 @@ test.describe('Page de saisie', () => {
     // La modale doit s'ouvrir : le titre "Choisir un projet" doit être visible
     await expect(page.getByText('Choisir un projet')).toBeVisible({ timeout: 3000 });
   });
+
+  // U-S10
+  test('selecteur utilisateur absent (reserve moderateur+)', async ({ page }) => {
+    await expect(page.locator('table')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Saisir pour :')).not.toBeVisible();
+  });
 });
