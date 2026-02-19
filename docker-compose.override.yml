@@ -1,0 +1,11 @@
+# Surcharge locale pour le développement — ne pas commiter en production
+# Active l'accès direct à la base de données et Redis depuis l'hôte
+# (TablePlus, Redis Insight, psql, redis-cli...)
+services:
+  db:
+    ports:
+      - "5432:5432"
+
+  redis:
+    ports:
+      - "6379:6379"

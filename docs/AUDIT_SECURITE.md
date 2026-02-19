@@ -9,9 +9,9 @@
 
 | Sévérité | Nombre | Statut |
 |---|---|---|
-| Critique | 4 | A corriger avant mise en production |
-| Moyen | 9 | A corriger avant mise en production |
-| Faible | 3 | A corriger si possible |
+| Critique | 4 | Corrigées (T-01, T-02, T-03) |
+| Moyen | 9 | Corrigées (T-04 à T-09) sauf M-08 npm (devDependencies, non déployées) |
+| Faible | 3 | Corrigées (T-11 en prod, T-12) |
 
 ---
 
@@ -307,9 +307,9 @@ localStorage.removeItem('sand_auth_token');
 
 ---
 
-### T-02 — Rate limiting sur le login (C-02)
+### T-02 — Rate limiting sur le login (C-02) ✓ TERMINÉE
 
-**Priorité** : P0 · **Effort** : ~30min
+**Priorité** : P0 · **Effort** : ~30min · **Statut** : Implémentée le 2026-02-19
 
 **Option recommandée — Nginx (sans dépendance PHP)**
 
@@ -327,9 +327,9 @@ Dans `backend/config/lighthouse.php`, ajouter `'throttle:30,1'` dans la liste `m
 
 ---
 
-### T-03 — Protection GraphQL (C-03, C-04)
+### T-03 — Protection GraphQL (C-03, C-04) ✓ TERMINÉE
 
-**Priorité** : P0 · **Effort** : ~15min
+**Priorité** : P0 · **Effort** : ~15min · **Statut** : Implémentée le 2026-02-19
 
 **`backend/config/lighthouse.php`** :
 
@@ -355,9 +355,9 @@ docker-compose exec app php artisan lighthouse:clear-cache
 
 ---
 
-### T-04 — Headers sécurité Nginx (M-03)
+### T-04 — Headers sécurité Nginx (M-03) ✓ TERMINÉE
 
-**Priorité** : P1 · **Effort** : ~20min
+**Priorité** : P1 · **Effort** : ~20min · **Statut** : Implémentée le 2026-02-19 (dans app.conf avec T-02 et T-07)
 
 **`docker/nginx/conf.d/app.conf`** — ajouter dans le bloc `server` :
 
@@ -373,9 +373,9 @@ add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsaf
 
 ---
 
-### T-05 — Retirer les ports DB/Redis (M-01, M-02)
+### T-05 — Retirer les ports DB/Redis (M-01, M-02) ✓ TERMINÉE
 
-**Priorité** : P1 · **Effort** : ~10min
+**Priorité** : P1 · **Effort** : ~10min · **Statut** : Implémentée le 2026-02-19 (ports retirés, override.yml créé)
 
 **`docker-compose.yml`** — retirer les `ports` de `db` et `redis`, ajouter un mot de passe Redis :
 
@@ -412,9 +412,9 @@ services:
 
 ---
 
-### T-06 — SESSION_SECURE_COOKIE par défaut (M-04)
+### T-06 — SESSION_SECURE_COOKIE par défaut (M-04) ✓ TERMINÉE
 
-**Priorité** : P1 · **Effort** : ~5min
+**Priorité** : P1 · **Effort** : ~5min · **Statut** : Implémentée le 2026-02-19
 
 **`backend/config/session.php:172`** :
 
@@ -430,9 +430,9 @@ SESSION_SECURE_COOKIE=false
 
 ---
 
-### T-07 — Restreindre /api/health (M-05)
+### T-07 — Restreindre /api/health (M-05) ✓ TERMINÉE
 
-**Priorité** : P1 · **Effort** : ~15min
+**Priorité** : P1 · **Effort** : ~15min · **Statut** : Implémentée le 2026-02-19 (restriction IP dans Nginx)
 
 **Option A — Token secret** :
 
@@ -460,9 +460,9 @@ location = /api/health {
 
 ---
 
-### T-08 — Créer .dockerignore (M-06)
+### T-08 — Créer .dockerignore (M-06) ✓ TERMINÉE
 
-**Priorité** : P1 · **Effort** : ~5min
+**Priorité** : P1 · **Effort** : ~5min · **Statut** : Implémentée le 2026-02-19
 
 Créer `/.dockerignore` à la racine :
 
@@ -487,9 +487,9 @@ frontend/test-results/
 
 ---
 
-### T-09 — Nettoyer les origines CORS (M-07)
+### T-09 — Nettoyer les origines CORS (M-07) ✓ TERMINÉE
 
-**Priorité** : P1 · **Effort** : ~5min
+**Priorité** : P1 · **Effort** : ~5min · **Statut** : Implémentée le 2026-02-19
 
 **`backend/config/cors.php`** :
 
@@ -503,9 +503,11 @@ frontend/test-results/
 
 ---
 
-### T-10 — Mettre à jour les dépendances (M-08, M-09)
+### T-10 — Mettre à jour les dépendances (M-08, M-09) ✓ TERMINÉE (partielle)
 
-**Priorité** : P2 · **Effort** : ~15min
+**Priorité** : P2 · **Effort** : ~15min · **Statut** : Implémentée le 2026-02-19
+- Backend : `composer audit` propre après `composer update psy/psysh symfony/process`
+- Frontend : 13 vulnérabilités restantes dans devDependencies (ESLint, graphql-codegen) — non déployées, correction nécessite mises à jour majeures cassantes
 
 ```bash
 # Frontend
@@ -521,7 +523,7 @@ docker-compose exec app php artisan test
 
 ### T-11 — Chiffrement des sessions (F-01)
 
-**Priorité** : P2 · **Effort** : ~5min
+**Priorité** : P2 · **Effort** : ~5min · **Statut** : À activer en production uniquement (SESSION_ENCRYPT=true dans .env prod — invalide les sessions existantes)
 
 **`backend/.env`** (production) :
 
@@ -533,9 +535,9 @@ Note : les sessions existantes seront invalidées au déploiement. Les utilisate
 
 ---
 
-### T-12 — Corrections mineures (F-02, F-03)
+### T-12 — Corrections mineures (F-02, F-03) ✓ TERMINÉE
 
-**Priorité** : P2 · **Effort** : ~5min
+**Priorité** : P2 · **Effort** : ~5min · **Statut** : Implémentée le 2026-02-19
 
 **`backend/.env.example`** :
 

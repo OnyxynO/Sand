@@ -169,7 +169,9 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    // true par défaut : cookie transmis uniquement en HTTPS
+    // Définir SESSION_SECURE_COOKIE=false dans .env pour le dev local sans HTTPS
+    'secure' => env('SESSION_SECURE_COOKIE', true),
 
     /*
     |--------------------------------------------------------------------------
