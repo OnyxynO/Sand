@@ -28,15 +28,11 @@ class AuthMutator
             throw new Error('Ce compte a ete desactive.');
         }
 
-        // Connexion session (pour SPA)
+        // Connexion session Sanctum (cookie HttpOnly)
         Auth::login($user);
-
-        // Generer un token API (pour tests CLI / mobile)
-        $token = $user->createToken('api')->plainTextToken;
 
         return [
             'user' => $user,
-            'token' => $token,
         ];
     }
 

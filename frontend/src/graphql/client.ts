@@ -1,43 +1,13 @@
-import { ApolloClient, InMemoryCache, createHttpLink, ApolloLink } from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
+import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 
-// Cle de stockage du token
-const TOKEN_KEY = 'sand_auth_token';
-
-// Fonctions utilitaires pour le token
-export const getToken = (): string | null => {
-  return localStorage.getItem(TOKEN_KEY);
-};
-
-export const setToken = (token: string): void => {
-  localStorage.setItem(TOKEN_KEY, token);
-};
-
-export const removeToken = (): void => {
-  localStorage.removeItem(TOKEN_KEY);
-};
-
-// Lien HTTP de base
+// Client Apollo — authentification via cookies Sanctum (HttpOnly)
 const httpLink = createHttpLink({
   uri: import.meta.env.VITE_API_URL || 'http://localhost:8080/graphql',
-  credentials: 'include', // Pour Sanctum (cookies)
+  credentials: 'include',
 });
 
-// Lien pour ajouter le token d'authentification
-const authLink = setContext((_, { headers }) => {
-  const token = getToken();
-
-  return {
-    headers: {
-      ...headers,
-      authorization: token ? `Bearer ${token}` : '',
-    },
-  };
-});
-
-// Client Apollo
 export const apolloClient = new ApolloClient({
-  link: ApolloLink.from([authLink, httpLink]),
+  link: httpLink,
   cache: new InMemoryCache({
     typePolicies: {
       User: { keyFields: ['id'] },

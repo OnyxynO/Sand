@@ -15,7 +15,6 @@ export const LOGIN_MUTATION = gql`
           code
         }
       }
-      token
     }
   }
 `;

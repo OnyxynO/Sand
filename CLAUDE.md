@@ -15,7 +15,7 @@ Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte 
 | Base de donnees | PostgreSQL 16 (extension ltree) |
 | Cache/Queue | Redis |
 | Conteneurisation | Docker, Docker Compose |
-| Tests | PHPUnit (191 tests, 726 assertions), Vitest (210 tests) |
+| Tests | PHPUnit (191 tests, 726 assertions), Vitest (218 tests) |
 
 ## Etat du projet
 
@@ -33,9 +33,6 @@ Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte 
 Voir `docs/06_EVOLUTIONS.md` pour le detail.
 
 ### Reste a faire (hors fonctionnel)
-
-**Tests manquants** :
-- `LigneSaisie.test.tsx` : U-V03 (saisie 0.5 → modifierCellule) et U-V04 (valeur > 1 → rejetee) — voir CAMPAGNE_TESTS.md
 
 **Outillage / documentation** :
 - `.env.example` avec valeurs Docker pre-remplies
@@ -181,42 +178,3 @@ docs/                        # Specifications
 - **Playwright Headless UI** : `getByRole('dialog')` donne hidden → tester le texte visible de la modale
 - **Playwright h1 ambigu** : Layout a son propre h1 → utiliser `getByRole('heading', { name: '...' })`
 
-## Serveur Ollama local
-
-Serveur Ollama disponible sur le reseau local. **Utilise-le pour les taches repetitives et economiser les tokens Claude.**
-
-- **URL** : `http://10.0.0.100:11434`
-- **qwen3:8b** : taches simples, rapide (~3s). Ajouter `/no_think` au prompt pour reponses directes.
-- **deepseek-coder-v2:16b** : gros contextes (>10 Ko, ~6s+)
-
-Si Ollama ne repond pas, continuer avec Claude uniquement.
-
-### Delegation par type de tache
-
-| Tache | Modele |
-|-------|--------|
-| Generer un Model/migration/composant simple | qwen |
-| Tests unitaires (PHPUnit, Vitest) | qwen |
-| Requete GraphQL / mutation CRUD | qwen |
-| Analyser un gros resolver ou refactoring | deepseek |
-| Architecture multi-fichiers, ltree, debugging cross-stack | **Claude** |
-
-### Appel rapide (qwen)
-```bash
-curl -s http://10.0.0.100:11434/api/generate -d '{
-  "model": "qwen3:8b",
-  "prompt": "/no_think PROMPT ICI. Code uniquement.",
-  "stream": false,
-  "options": {"num_ctx": 4096, "temperature": 0.2}
-}' | jq -r '.response'
-```
-
-### Appel contexte etendu (deepseek)
-```bash
-curl -s http://10.0.0.100:11434/api/generate -d '{
-  "model": "deepseek-coder-v2:16b",
-  "prompt": "PROMPT ICI",
-  "stream": false,
-  "options": {"num_ctx": 16384, "temperature": 0.3}
-}' | jq -r '.response'
-```
