@@ -12,12 +12,17 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   projects: [
-    // Setup global : authentification (s'exécute en premier)
+    // ── Setups d'authentification (s'exécutent en premier) ──
     {
       name: 'setup',
-      testMatch: /auth\.setup\.ts/,
+      testMatch: /auth\.setup\.ts$/,
     },
-    // Tests Chromium avec session authentifiée
+    {
+      name: 'setup-moderateur',
+      testMatch: /auth\.setup\.moderateur\.ts/,
+    },
+
+    // ── Tests Chromium par rôle ──
     {
       name: 'chromium',
       use: {
@@ -25,6 +30,16 @@ export default defineConfig({
         storageState: 'e2e/.auth/utilisateur.json',
       },
       dependencies: ['setup'],
+      testIgnore: ['**/supervision.spec.ts', '**/saisie-moderateur.spec.ts'],
+    },
+    {
+      name: 'chromium-moderateur',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'e2e/.auth/moderateur.json',
+      },
+      dependencies: ['setup-moderateur'],
+      testMatch: ['**/supervision.spec.ts', '**/saisie-moderateur.spec.ts'],
     },
   ],
 });
