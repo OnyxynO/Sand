@@ -1,354 +1,401 @@
-# SAND - API GraphQL
+# API GraphQL — SAND
 
-> Schéma complet de l'API GraphQL (Lighthouse)
+> Généré depuis le schéma Lighthouse réel (`php artisan lighthouse:print-schema`).
+> Dernière mise à jour : 2026-02-19.
+
+**Endpoint** : `POST http://localhost:8080/graphql`
+**Playground** : `http://localhost:8080/graphiql`
 
 ---
 
-## 1. Types principaux
+## Authentification
 
-### 1.1 User
+L'API utilise **Sanctum SPA avec cookies HttpOnly** (pas de Bearer token).
+
+Avant tout appel, récupérer le cookie CSRF :
+
+```
+GET http://localhost:8080/sanctum/csrf-cookie
+```
+
+Puis inclure le header `X-XSRF-TOKEN` à chaque mutation, et envoyer les requêtes avec `credentials: 'include'`.
+
+---
+
+## Règles métier communes
+
+| Règle | Détail |
+|-------|--------|
+| **ETP** | Durée en équivalent temps plein — décimal entre `0.01` et `1.00`, max 2 décimales |
+| **Unicité** | Une seule saisie par `(utilisateur, date, projet, activité)` |
+| **Activités saisissables** | Uniquement les feuilles (`estFeuille: true`) |
+| **Activité Absence** | Protégée (`estSysteme: true`) — gérée par le système, non saisissable manuellement |
+| **Soft delete** | Users, Projects, Activities, TimeEntries — restaurables |
+
+---
+
+## Rôles et droits d'accès
+
+| Rôle | Accès |
+|------|-------|
+| `UTILISATEUR` | Ses propres saisies, lecture de ses projets/activités/absences |
+| `MODERATEUR` | Saisies de son équipe, gestion des projets assignés |
+| `ADMIN` | Configuration complète (utilisateurs, projets, activités, paramètres, RGPD) |
+
+---
+
+## Scalaires
+
+| Scalaire | Format | Exemple |
+|----------|--------|---------|
+| `Date` | `YYYY-MM-DD` | `"2026-02-19"` |
+| `DateTime` | `YYYY-MM-DD HH:MM:SS` | `"2026-02-19 14:30:00"` |
+| `JSON` | Objet/tableau JSON libre | `{"key": "value"}` |
+
+---
+
+## Types principaux
+
+### User
 
 ```graphql
 type User {
   id: ID!
+  matricule: String        # Matricule RH (optionnel)
+  nom: String!
+  prenom: String!
+  nomComplet: String!      # prenom + nom (calculé)
   email: String!
-  name: String!
   role: UserRole!
-  team: Team
+  estActif: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
 
-  # Relations
-  timeEntries(
-    startDate: Date
-    endDate: Date
-    projectId: ID
-  ): [TimeEntry!]!
-
-  notifications(unreadOnly: Boolean): [Notification!]!
-  moderatedProjects: [Project!]!
+  equipe: Team
+  projets: [Project!]!
+  projetsModeres: [Project!]!
+  saisies(dateDebut: Date, dateFin: Date, projectId: ID): [TimeEntry!]!
+  absences(dateDebut: Date, dateFin: Date): [Absence!]!
+  notifications(nonLuSeulement: Boolean): [Notification!]!
 }
 
 enum UserRole {
-  USER
-  MODERATOR
-  ADMIN
+  UTILISATEUR   # Saisie personnelle uniquement
+  MODERATEUR    # Gestion équipe et projets assignés
+  ADMIN         # Configuration globale
 }
 ```
 
-### 1.2 Team
+### Team
 
 ```graphql
 type Team {
   id: ID!
-  name: String!
+  nom: String!
+  code: String!
+  description: String
+  estActif: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
 
-  # Relations
-  users: [User!]!
+  membres: [User!]!
 }
 ```
 
-### 1.3 Project
+### Project
 
 ```graphql
 type Project {
   id: ID!
-  name: String!
+  nom: String!
+  code: String!
   description: String
-  isActive: Boolean!
+  dateDebut: Date
+  dateFin: Date
+  estActif: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
 
-  # Relations
-  moderators: [User!]!
-  enabledActivities: [Activity!]!
-
-  # Stats
-  totalTime(startDate: Date!, endDate: Date!): Float!
+  utilisateurs: [User!]!
+  moderateurs: [User!]!
+  activitesActives: [Activity!]!   # Activités explicitement activées
+  saisies(dateDebut: Date, dateFin: Date): [TimeEntry!]!
+  tempsTotal(dateDebut: Date!, dateFin: Date!): Float!
 }
 ```
 
-### 1.4 Activity
+### Activity
 
 ```graphql
 type Activity {
   id: ID!
-  name: String!
-  path: String!           # Chemin matérialisé "1.2.3"
-  sortOrder: Int!
-  isActive: Boolean!
-  isSystem: Boolean!      # true pour "Absence"
+  nom: String!
+  code: String
+  description: String
+  chemin: String!        # Chemin ltree PostgreSQL (ex: "1.2.3")
+  niveau: Int!           # Profondeur dans l'arbre (0 = racine)
+  ordre: Int!            # Ordre parmi les frères
+  estFeuille: Boolean!   # true = saisissable
+  estSysteme: Boolean!   # true = protégé (ex: "Absence")
+  estActif: Boolean!
+  cheminComplet: String! # Noms complets (ex: "Dev > Backend > API")
   createdAt: DateTime!
   updatedAt: DateTime!
 
-  # Relations
   parent: Activity
-  children: [Activity!]!
-
-  # Computed
-  depth: Int!             # Niveau de profondeur (0 = racine)
-  isLeaf: Boolean!        # true si pas d'enfants
-  fullPath: [Activity!]!  # Chemin complet depuis la racine
+  enfants: [Activity!]!
+  projets: [Project!]!
 }
 ```
 
-### 1.5 TimeEntry
+### TimeEntry
 
 ```graphql
 type TimeEntry {
   id: ID!
   date: Date!
-  duration: Float!        # DECIMAL(3,2) - max 2 décimales
-  comment: String
+  duree: Float!          # ETP — 0.01 à 1.00
+  commentaire: String
   createdAt: DateTime!
   updatedAt: DateTime!
 
-  # Relations
-  user: User!
-  project: Project!
-  activity: Activity!
-  logs: [TimeEntryLog!]!
+  utilisateur: User!
+  projet: Project!
+  activite: Activity!
+  historique: [TimeEntryLog!]!
 }
 
 type TimeEntryLog {
   id: ID!
-  action: LogAction!
-  oldValue: JSON
-  newValue: JSON
+  action: LogAction!         # CREATION | MODIFICATION | SUPPRESSION
+  ancienneDuree: Float
+  nouvelleDuree: Float
+  ancienCommentaire: String
+  nouveauCommentaire: String
   createdAt: DateTime!
 
-  # Relations
-  user: User!             # Qui a fait la modification
-  timeEntry: TimeEntry!
-}
-
-enum LogAction {
-  CREATE
-  UPDATE
-  DELETE
+  auteur: User!
+  saisie: TimeEntry!
 }
 ```
 
-### 1.6 Absence
+### Absence
 
 ```graphql
 type Absence {
   id: ID!
-  date: Date!
-  duration: Float!        # 0.5 ou 1.0
-  source: AbsenceSource!
-  externalId: String      # Référence système RH
+  type: String!              # Code type (ex: "CP", "RTT", "MALADIE")
+  typeLibelle: String!       # Libellé lisible
+  dateDebut: Date!
+  dateFin: Date!
+  dureeJournaliere: Float!   # 0.5 (demi-journée) ou 1.0 (journée entière)
+  statut: String!
+  referenceExterne: String   # Référence système RH
+  importeLe: DateTime
+  nombreJours: Int!          # Calculé
+  totalEtp: Float!           # Calculé : nombreJours × dureeJournaliere
   createdAt: DateTime!
   updatedAt: DateTime!
 
-  # Relations
-  user: User!
-}
-
-enum AbsenceSource {
-  EXTERNAL
-  MANUAL
+  utilisateur: User!
 }
 ```
 
-### 1.7 Notification
+### Notification
 
 ```graphql
 type Notification {
   id: ID!
-  type: NotificationType!
-  data: JSON!
-  isRead: Boolean!
+  type: String!
+  titre: String!
+  message: String!
+  donnees: JSON              # Données contextuelles (ex: IDs des saisies en conflit)
+  estLu: Boolean!
+  luLe: DateTime
   createdAt: DateTime!
 
-  # Relations
-  user: User!
+  utilisateur: User!
 }
 
 enum NotificationType {
-  INCOMPLETE_DAY       # Total ≠ 1.0
-  ABSENCE_CONFLICT     # Conflit absence/saisie
-  WEEK_EMPTY          # Semaine sans saisie
-  EXPORT_READY        # Export CSV prêt
+  SAISIE_INCOMPLETE    # Total jour ≠ 1.0 ETP
+  ABSENCE_IMPORTEE     # Nouvelle absence depuis l'API RH
+  CONFLIT_ABSENCE      # Conflit entre absence et saisies existantes
+  EXPORT_PRET          # Export CSV disponible
+  SYSTEME              # Notification générale
 }
 ```
 
-### 1.8 Setting
+### Setting
 
 ```graphql
 type Setting {
-  key: String!
-  value: JSON!
+  id: ID!
+  cle: String!
+  valeur: JSON!
+  description: String
+  createdAt: DateTime!
   updatedAt: DateTime!
 }
 ```
 
 ---
 
-## 2. Types pour les statistiques
+## Queries
+
+### Authentification
 
 ```graphql
+# Utilisateur connecté (null si non authentifié)
+me: User
+```
+
+### Utilisateurs
+
+```graphql
+# Liste paginée (Admin)
+users(
+  equipeId: ID
+  role: UserRole
+  search: String            # Recherche partielle sur le nom
+  actifSeulement: Boolean
+  first: Int = 20           # Taille de page
+  page: Int
+): UserPaginator!
+
+# Un utilisateur par ID
+user(id: ID!): User
+
+# Utilisateurs dont le modérateur peut gérer les saisies
+utilisateursModerables: [User!]!
+```
+
+**Pagination** :
+
+```graphql
+type UserPaginator {
+  paginatorInfo: PaginatorInfo!  # total, lastPage, currentPage...
+  data: [User!]!
+}
+```
+
+### Équipes
+
+```graphql
+equipes(actifSeulement: Boolean): [Team!]!
+equipe(id: ID!): Team
+```
+
+### Projets
+
+```graphql
+projets(actif: Boolean, moderateurId: ID): [Project!]!
+projet(id: ID!): Project
+```
+
+### Activités
+
+```graphql
+# Arborescence complète (Admin — tous les niveaux)
+arbreActivites: [Activity!]!
+
+# Activités disponibles pour l'utilisateur courant sur un projet
+activitesDisponibles(projetId: ID!): [Activity!]!
+
+activite(id: ID!): Activity
+```
+
+### Saisies
+
+```graphql
+# Liste filtrée (droits vérifiés côté serveur)
+saisies(
+  userId: ID
+  projetId: ID
+  activiteId: ID
+  dateDebut: Date!
+  dateFin: Date!
+): [TimeEntry!]!
+
+# Saisies de la semaine (format ISO : "2026-W08")
+mesSaisiesSemaine(semaine: String!, userId: ID): [TimeEntry!]!
+```
+
+### Absences
+
+```graphql
+# Resolver custom — détecte les chevauchements de période
+absences(userId: ID, dateDebut: Date!, dateFin: Date!): [Absence!]!
+```
+
+### Notifications
+
+```graphql
+mesNotifications(nonLuSeulement: Boolean, limite: Int): [Notification!]!
+nombreNotificationsNonLues: Int!
+```
+
+### Statistiques
+
+```graphql
+statistiques(
+  projetId: ID
+  equipeId: ID
+  userId: ID
+  dateDebut: Date!
+  dateFin: Date!
+): Statistics!
+
 type Statistics {
-  totalTime: Float!
-  byProject: [ProjectStat!]!
-  byActivity: [ActivityStat!]!
-  byUser: [UserStat!]!
-  byDay: [DayStat!]!
+  tempsTotal: Float!
+  parProjet:      [ProjectStat!]!
+  parActivite:    [ActivityStat!]!
+  parUtilisateur: [UserStat!]!    # Modérateurs/Admins uniquement
+  parJour:        [DayStat!]!
 }
+```
 
-type ProjectStat {
-  project: Project!
-  totalTime: Float!
-  percentage: Float!
-}
+### Supervision
 
-type ActivityStat {
-  activity: Activity!
-  totalTime: Float!
-  percentage: Float!
-}
-
-type UserStat {
-  user: User!
-  totalTime: Float!
-  completionRate: Float!  # % de jours complets
-}
-
-type DayStat {
-  date: Date!
-  totalTime: Float!
-  isComplete: Boolean!    # total == 1.0
-}
-
-type Anomaly {
-  id: ID!
-  type: AnomalyType!
-  user: User!
-  date: Date
-  week: String            # "2025-W04"
-  detail: String!
-  project: Project
-}
+```graphql
+anomalies(
+  projetId: ID
+  equipeId: ID
+  userId: ID
+  dateDebut: Date!
+  dateFin: Date!
+  types: [AnomalyType!]
+): [Anomaly!]!
 
 enum AnomalyType {
-  INCOMPLETE_DAY
-  OVERFLOW_DAY
-  EMPTY_WEEK
-  ABSENCE_CONFLICT
+  JOUR_INCOMPLET       # Total ETP < 1.0
+  JOUR_DEPASSE         # Total ETP > 1.0
+  SEMAINE_VIDE         # Aucune saisie sur la semaine
+  CONFLIT_ABSENCE      # Conflit absence/saisie
+  JOUR_MANQUANT        # Jour ouvré sans saisie
+  SAISIE_SUR_ABSENCE   # Saisie sur un jour d'absence
 }
+```
+
+### Paramètres
+
+```graphql
+parametres: [Setting!]!
+parametre(cle: String!): Setting
+
+# Visibilité par utilisateur sur un projet
+restrictionsVisibilite(projetId: ID!): [ActivityVisibility!]!
 ```
 
 ---
 
-## 3. Queries
+## Mutations
+
+### Authentification
 
 ```graphql
-type Query {
-  # ─── Auth ───────────────────────────────────────
-  me: User
-
-  # ─── Users ──────────────────────────────────────
-  users(
-    teamId: ID
-    role: UserRole
-    search: String
-  ): [User!]! @paginate
-
-  user(id: ID!): User
-
-  # ─── Teams ──────────────────────────────────────
-  teams: [Team!]!
-  team(id: ID!): Team
-
-  # ─── Projects ───────────────────────────────────
-  projects(
-    active: Boolean
-    moderatorId: ID
-  ): [Project!]!
-
-  project(id: ID!): Project
-
-  # ─── Activities ─────────────────────────────────
-  # Arborescence complète (admin)
-  activityTree: [Activity!]!
-
-  # Activités disponibles pour l'utilisateur courant sur un projet
-  availableActivities(projectId: ID!): [Activity!]!
-
-  activity(id: ID!): Activity
-
-  # ─── Time Entries ───────────────────────────────
-  timeEntries(
-    userId: ID
-    projectId: ID
-    activityId: ID
-    startDate: Date!
-    endDate: Date!
-  ): [TimeEntry!]!
-
-  # Saisies de la semaine (pour soi-meme ou un utilisateur modere)
-  myWeekEntries(week: String!, userId: ID): [TimeEntry!]!
-
-  # Utilisateurs dont le moderateur peut gerer les saisies
-  moderatableUsers: [User!]!
-
-  # ─── Absences ───────────────────────────────────
-  # Resolver custom pour detecter les chevauchements (scope periode)
-  absences(
-    userId: ID
-    startDate: Date!
-    endDate: Date!
-  ): [Absence!]!
-
-  # ─── Notifications ──────────────────────────────
-  myNotifications(
-    unreadOnly: Boolean
-    limit: Int
-  ): [Notification!]!
-
-  unreadNotificationCount: Int!
-
-  # ─── Statistics ─────────────────────────────────
-  statistics(
-    projectId: ID
-    teamId: ID
-    userId: ID
-    startDate: Date!
-    endDate: Date!
-  ): Statistics!
-
-  # ─── Supervision ────────────────────────────────
-  anomalies(
-    projectId: ID
-    teamId: ID
-    userId: ID
-    startDate: Date!
-    endDate: Date!
-    types: [AnomalyType!]
-  ): [Anomaly!]!
-
-  # ─── Settings ───────────────────────────────────
-  settings: [Setting!]!
-  setting(key: String!): Setting
-}
-```
-
----
-
-## 4. Mutations
-
-### 4.1 Authentification
-
-```graphql
-type Mutation {
-  # ─── Auth ───────────────────────────────────────
-  login(input: LoginInput!): AuthPayload!
-  logout: Boolean!
-
-  # Pour Sanctum SPA, le login utilise les cookies
-}
+login(input: LoginInput!): AuthPayload!
+logout: Boolean!
 
 input LoginInput {
   email: String!
@@ -357,382 +404,421 @@ input LoginInput {
 
 type AuthPayload {
   user: User!
+  # Pas de token — auth via cookies Sanctum HttpOnly
 }
 ```
 
-### 4.2 Users (Admin)
+### Saisies de temps
 
 ```graphql
-type Mutation {
-  createUser(input: CreateUserInput!): User!
-  updateUser(id: ID!, input: UpdateUserInput!): User!
-  deleteUser(id: ID!): Boolean!
-  restoreUser(id: ID!): User!
-}
+createTimeEntry(input: TimeEntryInput!): TimeEntry!
+updateTimeEntry(id: ID!, input: TimeEntryInput!): TimeEntry!
+deleteTimeEntry(id: ID!): Boolean!
 
-input CreateUserInput {
-  email: String!
-  password: String!
-  name: String!
-  role: UserRole!
-  teamId: ID
-}
-
-input UpdateUserInput {
-  email: String
-  password: String
-  name: String
-  role: UserRole
-  teamId: ID
-}
-```
-
-### 4.3 Teams (Admin)
-
-```graphql
-type Mutation {
-  createTeam(input: TeamInput!): Team!
-  updateTeam(id: ID!, input: TeamInput!): Team!
-  deleteTeam(id: ID!): Boolean!
-}
-
-input TeamInput {
-  name: String!
-}
-```
-
-### 4.4 Projects (Admin)
-
-```graphql
-type Mutation {
-  createProject(input: CreateProjectInput!): Project!
-  updateProject(id: ID!, input: UpdateProjectInput!): Project!
-  deleteProject(id: ID!): Boolean!
-  restoreProject(id: ID!): Project!
-
-  # Gestion des modérateurs
-  addProjectModerator(projectId: ID!, userId: ID!): Project!
-  removeProjectModerator(projectId: ID!, userId: ID!): Project!
-
-  # Activation des activités (tri-state)
-  setProjectActivities(
-    projectId: ID!
-    activityIds: [ID!]!
-    enabled: Boolean!
-  ): Project!
-
-  # Visibilité par utilisateur
-  setActivityVisibility(
-    projectId: ID!
-    activityId: ID!
-    userId: ID!
-    visible: Boolean!
-  ): Boolean!
-}
-
-input CreateProjectInput {
-  name: String!
-  description: String
-  isActive: Boolean
-  moderatorIds: [ID!]
-  enabledActivityIds: [ID!]
-}
-
-input UpdateProjectInput {
-  name: String
-  description: String
-  isActive: Boolean
-}
-```
-
-### 4.5 Activities (Admin)
-
-```graphql
-type Mutation {
-  createActivity(input: CreateActivityInput!): Activity!
-  updateActivity(id: ID!, input: UpdateActivityInput!): Activity!
-  deleteActivity(id: ID!): Boolean!
-  restoreActivity(id: ID!): Activity!
-
-  # Réorganisation de l'arborescence
-  moveActivity(id: ID!, parentId: ID, sortOrder: Int!): Activity!
-  reorderActivities(ids: [ID!]!): [Activity!]!
-}
-
-input CreateActivityInput {
-  name: String!
-  parentId: ID
-  sortOrder: Int
-  isActive: Boolean
-}
-
-input UpdateActivityInput {
-  name: String
-  parentId: ID
-  sortOrder: Int
-  isActive: Boolean
-}
-```
-
-### 4.6 Time Entries
-
-```graphql
-type Mutation {
-  createTimeEntry(input: TimeEntryInput!): TimeEntry!
-  updateTimeEntry(id: ID!, input: TimeEntryInput!): TimeEntry!
-  deleteTimeEntry(id: ID!): Boolean!
-
-  # Saisie rapide (plusieurs entrées d'un coup)
-  bulkCreateTimeEntries(inputs: [TimeEntryInput!]!): [TimeEntry!]!
-  bulkUpdateTimeEntries(entries: [BulkUpdateEntry!]!): [TimeEntry!]!
-}
+# Saisie en lot (sauvegarde d'une semaine entière)
+bulkCreateTimeEntries(inputs: [TimeEntryInput!]!): [TimeEntry!]!
+bulkUpdateTimeEntries(entries: [BulkUpdateEntry!]!): [TimeEntry!]!
 
 input TimeEntryInput {
-  projectId: ID!
-  activityId: ID!
+  projetId: ID!
+  activiteId: ID!
   date: Date!
-  duration: Float!    # Validation: 0.01 ≤ x ≤ 1.00, max 2 décimales
-  comment: String
-  userId: ID          # Optionnel : utilisateur cible (moderateurs/admins uniquement)
+  duree: Float!           # 0.01 ≤ x ≤ 1.00, 2 décimales max
+  commentaire: String     # 1000 caractères max
+  userId: ID              # Modérateurs/Admins uniquement
 }
 
 input BulkUpdateEntry {
   id: ID!
-  duration: Float!
-  comment: String
+  duree: Float!
+  commentaire: String
 }
 ```
 
-### 4.7 Absences
+### Absences
 
 ```graphql
-type Mutation {
-  # Import depuis API RH
-  syncAbsences(
-    userId: ID
-    startDate: Date!
-    endDate: Date!
-  ): SyncResult!
+# Import depuis l'API RH
+syncAbsences(userId: ID, dateDebut: Date!, dateFin: Date!): SyncResult!
 
-  # Saisie manuelle
-  createAbsence(input: AbsenceInput!): Absence!
-  deleteAbsence(id: ID!): Boolean!
+# Saisie manuelle
+createAbsence(input: AbsenceInput!): Absence!
+deleteAbsence(id: ID!): Boolean!
 
-  # Résolution de conflit
-  resolveAbsenceConflict(
-    absenceId: ID!
-    resolution: ConflictResolution!
-  ): Boolean!
-}
+# Résolution de conflit (après import)
+resolveAbsenceConflict(
+  absenceId: ID!
+  resolution: ConflictResolution!
+): Boolean!
 
 input AbsenceInput {
   userId: ID!
-  date: Date!
-  duration: Float!    # 0.5 ou 1.0
+  type: String!
+  dateDebut: Date!
+  dateFin: Date!
+  dureeJournaliere: Float  # 0.5 ou 1.0 (défaut: 1.0)
 }
 
 enum ConflictResolution {
-  OVERWRITE   # Écraser les saisies existantes
-  IGNORE      # Ignorer l'absence
-  ADJUST      # Garder les deux (dépassement accepté)
+  ECRASER   # Supprime les saisies en conflit
+  IGNORER   # Conserve les saisies, ignore l'absence
+  AJUSTER   # Ajuste la durée de l'absence
 }
 
 type SyncResult {
-  imported: Int!
-  conflicts: Int!
-  errors: [String!]!
+  importes: Int!
+  conflits: Int!
+  erreurs: [String!]!
 }
 ```
 
-### 4.8 Notifications
+### Utilisateurs (Admin)
 
 ```graphql
-type Mutation {
-  markNotificationRead(id: ID!): Notification!
-  markAllNotificationsRead: Boolean!
-  deleteNotification(id: ID!): Boolean!
+createUser(input: CreateUserInput!): User!
+updateUser(id: ID!, input: UpdateUserInput!): User!
+deleteUser(id: ID!): Boolean!    # Soft delete
+restoreUser(id: ID!): User!
+
+input CreateUserInput {
+  matricule: String
+  nom: String!
+  prenom: String!
+  email: String!
+  password: String!    # 8 caractères minimum
+  role: UserRole!
+  equipeId: ID
+}
+
+input UpdateUserInput {
+  matricule: String
+  nom: String
+  prenom: String
+  email: String
+  password: String
+  role: UserRole
+  equipeId: ID
+  estActif: Boolean
 }
 ```
 
-### 4.9 Settings (Admin)
+### Équipes (Admin)
 
 ```graphql
-type Mutation {
-  updateSetting(key: String!, value: JSON!): Setting!
-  updateSettings(settings: [SettingInput!]!): [Setting!]!
-}
+createTeam(input: TeamInput!): Team!
+updateTeam(id: ID!, input: TeamInput!): Team!
+deleteTeam(id: ID!): Boolean!
 
-input SettingInput {
-  key: String!
-  value: JSON!
+input TeamInput {
+  nom: String!
+  code: String!
+  description: String
+  estActif: Boolean
 }
 ```
 
-### 4.10 Export
+### Projets (Admin)
 
 ```graphql
-type Mutation {
-  # Lance un export asynchrone
-  requestExport(input: ExportInput!): ExportJob!
+createProject(input: CreateProjectInput!): Project!
+updateProject(id: ID!, input: UpdateProjectInput!): Project!
+deleteProject(id: ID!): Boolean!
+restoreProject(id: ID!): Project!
+
+# Modérateurs
+addProjectModerator(projetId: ID!, userId: ID!): Project!
+removeProjectModerator(projetId: ID!, userId: ID!): Project!
+
+# Affectation des utilisateurs
+addProjectUser(projetId: ID!, userId: ID!): Project!
+removeProjectUser(projetId: ID!, userId: ID!): Project!
+
+# Activités actives sur le projet (système tri-state)
+setProjectActivities(projetId: ID!, activiteIds: [ID!]!): Project!
+
+# Visibilité par utilisateur
+hideActivityForUser(projetId: ID!, activiteId: ID!, userId: ID!): Boolean!
+showActivityForUser(projetId: ID!, activiteId: ID!, userId: ID!): Boolean!
+
+input CreateProjectInput {
+  nom: String!
+  code: String!
+  description: String
+  dateDebut: Date
+  dateFin: Date
+  estActif: Boolean
+  moderateurIds: [ID!]
+  activiteIds: [ID!]
 }
+
+input UpdateProjectInput {
+  nom: String
+  code: String
+  description: String
+  dateDebut: Date
+  dateFin: Date
+  estActif: Boolean
+}
+```
+
+### Activités (Admin)
+
+```graphql
+createActivity(input: CreateActivityInput!): Activity!
+updateActivity(id: ID!, input: UpdateActivityInput!): Activity!
+deleteActivity(id: ID!): Boolean!
+restoreActivity(id: ID!): Activity!
+
+# Déplacement dans l'arborescence (drag & drop)
+moveActivity(id: ID!, parentId: ID, ordre: Int!): Activity!
+reorderActivities(ids: [ID!]!): [Activity!]!
+
+input CreateActivityInput {
+  nom: String!
+  code: String
+  description: String
+  parentId: ID     # null = racine
+  ordre: Int
+  estActif: Boolean
+}
+
+input UpdateActivityInput {
+  nom: String
+  code: String
+  description: String
+  parentId: ID
+  ordre: Int
+  estActif: Boolean
+}
+```
+
+### Notifications
+
+```graphql
+markNotificationRead(id: ID!): Notification!
+markAllNotificationsRead: Boolean!
+deleteNotification(id: ID!): Boolean!
+```
+
+### Export CSV (asynchrone)
+
+```graphql
+requestExport(input: ExportInput!): ExportJob!
 
 input ExportInput {
-  format: ExportFormat!
-  startDate: Date!
-  endDate: Date!
-  projectId: ID
-  teamId: ID
+  format: ExportFormat!   # CSV uniquement
+  dateDebut: Date!
+  dateFin: Date!
+  projetId: ID
+  equipeId: ID
   userId: ID
-}
-
-enum ExportFormat {
-  CSV
 }
 
 type ExportJob {
   id: ID!
-  status: ExportStatus!
-  downloadUrl: String      # Disponible quand COMPLETED
-  expiresAt: DateTime      # URL expire après X heures
+  statut: ExportStatus!
+  urlTelechargement: String   # Disponible quand statut = TERMINE
+  expireLe: DateTime
 }
 
 enum ExportStatus {
-  PENDING
-  PROCESSING
-  COMPLETED
-  FAILED
+  EN_ATTENTE   # Dans la queue Redis
+  EN_COURS     # En cours de génération
+  TERMINE      # Prêt à télécharger
+  ECHEC        # Erreur de génération
+}
+```
+
+> Le fichier CSV est accessible via `GET /exports/{id}/download` (route web authentifiée).
+
+### Paramètres (Admin)
+
+```graphql
+updateSetting(cle: String!, valeur: JSON!): Setting!
+updateSettings(settings: [SettingInput!]!): [Setting!]!
+resetSettings: [Setting!]!    # Remet les valeurs par défaut
+
+input SettingInput {
+  cle: String!
+  valeur: JSON!
+}
+```
+
+### RGPD (Admin)
+
+```graphql
+# Droit à l'oubli — supprime les données d'un utilisateur
+supprimerDonneesUtilisateur(
+  userId: ID!
+  confirmationNom: String!    # Nom complet de l'utilisateur (protection contre les erreurs)
+): ResultatSuppressionRgpd!
+
+# Purge totale de toutes les données transactionnelles
+purgerToutesDonnees(
+  confirmationPhrase: String! # "PURGER TOUTES LES DONNEES"
+): ResultatPurge!
+
+type ResultatSuppressionRgpd {
+  saisiesSupprimees: Int!
+  absencesSupprimees: Int!
+  notificationsSupprimees: Int!
+  exportsSupprimees: Int!
+  logsAnonymises: Int!
+}
+
+type ResultatPurge {
+  saisiesSupprimees: Int!
+  logsSupprimees: Int!
+  absencesSupprimees: Int!
+  notificationsSupprimees: Int!
+  exportsSupprimees: Int!
 }
 ```
 
 ---
 
-## 5. Subscriptions (optionnel, pas en v1)
+## Exemples
+
+### Connexion
 
 ```graphql
-# Non implémenté en v1 (notifications au chargement uniquement)
-# Prévu pour évolution future
-
-type Subscription {
-  notificationReceived: Notification!
-  timeEntryUpdated(userId: ID!): TimeEntry!
+mutation {
+  login(input: { email: "admin@sand.local", password: "password" }) {
+    user {
+      id
+      nomComplet
+      role
+    }
+  }
 }
 ```
 
----
-
-## 6. Scalaires personnalisés
+### Saisies de la semaine courante
 
 ```graphql
-scalar Date        # Format: "2025-01-27"
-scalar DateTime    # Format: "2025-01-27T14:30:00Z"
-scalar JSON        # Objet JSON flexible
-```
-
----
-
-## 7. Directives Lighthouse
-
-```graphql
-# Pagination
-type Query {
-  users: [User!]! @paginate(defaultCount: 20)
-}
-
-# Autorisation
-type Mutation {
-  createProject: Project! @can(ability: "create", model: "Project")
-  updateProject: Project! @can(ability: "update", find: "id")
-}
-
-# Validation
-input TimeEntryInput {
-  duration: Float! @rules(apply: ["numeric", "min:0.01", "max:1", "decimal:0,2"])
-}
-
-# Soft deletes
-type Query {
-  users: [User!]! @softDeletes
-}
-```
-
----
-
-## 8. Exemples de requêtes
-
-### 8.1 Récupérer la semaine courante
-
-```graphql
-query MyWeek($week: String!) {
-  myWeekEntries(week: $week) {
+query {
+  mesSaisiesSemaine(semaine: "2026-W08") {
     id
     date
-    duration
-    comment
-    project {
+    duree
+    commentaire
+    projet { nom code }
+    activite { nom cheminComplet }
+  }
+}
+```
+
+### Sauvegarder plusieurs saisies
+
+```graphql
+mutation SauvegarderSemaine($inputs: [TimeEntryInput!]!) {
+  bulkCreateTimeEntries(inputs: $inputs) {
+    id
+    date
+    duree
+  }
+}
+```
+
+Variables :
+
+```json
+{
+  "inputs": [
+    { "projetId": "1", "activiteId": "5", "date": "2026-02-17", "duree": 0.5 },
+    { "projetId": "1", "activiteId": "5", "date": "2026-02-18", "duree": 1.0 }
+  ]
+}
+```
+
+### Arborescence des activités
+
+```graphql
+query {
+  arbreActivites {
+    id
+    nom
+    chemin
+    niveau
+    estFeuille
+    estSysteme
+    estActif
+    enfants {
       id
-      name
-    }
-    activity {
-      id
-      name
-      fullPath {
-        name
+      nom
+      estFeuille
+      enfants {
+        id
+        nom
+        estFeuille
       }
     }
   }
 }
 ```
 
-### 8.2 Sauvegarder une saisie
+### Statistiques par projet
 
 ```graphql
-mutation SaveEntry($input: TimeEntryInput!) {
-  createTimeEntry(input: $input) {
-    id
+query Stats($debut: Date!, $fin: Date!) {
+  statistiques(dateDebut: $debut, dateFin: $fin) {
+    tempsTotal
+    parProjet {
+      projet { nom code }
+      tempsTotal
+      pourcentage
+    }
+    parActivite {
+      activite { nom cheminComplet }
+      tempsTotal
+      pourcentage
+    }
+  }
+}
+```
+
+### Supervision — anomalies de la semaine
+
+```graphql
+query {
+  anomalies(
+    dateDebut: "2026-02-16"
+    dateFin: "2026-02-22"
+    types: [JOUR_INCOMPLET, SEMAINE_VIDE]
+  ) {
+    type
     date
-    duration
-    project { name }
-    activity { name }
+    detail
+    utilisateur { nomComplet equipe { nom } }
+    projet { nom }
   }
 }
 ```
 
-### 8.3 Récupérer l'arborescence pour un projet
+### Import d'absences et résolution de conflit
 
 ```graphql
-query ProjectActivities($projectId: ID!) {
-  availableActivities(projectId: $projectId) {
-    id
-    name
-    path
-    depth
-    isLeaf
-    parent { id }
-    children { id name }
+# 1. Import
+mutation {
+  syncAbsences(userId: "3", dateDebut: "2026-02-01", dateFin: "2026-02-28") {
+    importes
+    conflits
+    erreurs
   }
 }
-```
 
-### 8.4 Statistiques d'un projet
-
-```graphql
-query ProjectStats($projectId: ID!, $start: Date!, $end: Date!) {
-  statistics(projectId: $projectId, startDate: $start, endDate: $end) {
-    totalTime
-    byActivity {
-      activity { name }
-      totalTime
-      percentage
-    }
-    byUser {
-      user { name }
-      totalTime
-      completionRate
-    }
-  }
+# 2. Résolution si conflits détectés (notif CONFLIT_ABSENCE reçue)
+mutation {
+  resolveAbsenceConflict(absenceId: "12", resolution: ECRASER)
 }
 ```
 
 ---
 
-*Document v1.0 - Janvier 2025*
+## Schéma complet
+
+Pour exporter le schéma SDL à jour :
+
+```bash
+docker-compose exec app php artisan lighthouse:print-schema > docs/schema.graphql
+```
