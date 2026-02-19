@@ -719,7 +719,7 @@ export default function ActivitesPage() {
       {/* Onglets */}
       <div className="flex gap-1 border-b">
         <button
-          onClick={() => setVueActive('arbre')}
+          onClick={() => { setVueActive('arbre'); refetch(); }}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
             vueActive === 'arbre'
               ? 'border-blue-600 text-blue-600'
@@ -729,7 +729,7 @@ export default function ActivitesPage() {
           Vue arbre
         </button>
         <button
-          onClick={() => setVueActive('texte')}
+          onClick={() => { setVueActive('texte'); refetch(); }}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
             vueActive === 'texte'
               ? 'border-blue-600 text-blue-600'

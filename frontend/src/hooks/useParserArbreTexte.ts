@@ -324,8 +324,10 @@ export function calculerDiff(arbreExistant: ActiviteArbre[], nouvelArbre: NoeudA
     }
   }
 
-  // Modifications : meme chemin mais code different
+  // Modifications : meme chemin mais code different (les activites systeme sont ignorees
+  // car leur code n'est pas affiché dans le texte — seul "(systeme)" est affiché)
   for (const [chemin, ancien] of anciensParChemin) {
+    if (ancien.estSysteme) continue;
     const nouveau = nouveauxParChemin.get(chemin);
     if (nouveau && (ancien.code || '') !== (nouveau.code || '')) {
       changements.push({
