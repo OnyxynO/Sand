@@ -93,7 +93,6 @@ describe('LoginPage', () => {
         data: {
           login: {
             user: { id: '1', nom: 'Test', prenom: 'User', email: 'test@test.com', role: 'UTILISATEUR', equipe: null },
-            token: 'fake-token',
           },
         },
       },

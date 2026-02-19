@@ -59,7 +59,6 @@ export interface LoginInput {
 
 export interface AuthPayload {
   user: Utilisateur;
-  token: string;
 }
 
 // Types pour la saisie hebdomadaire

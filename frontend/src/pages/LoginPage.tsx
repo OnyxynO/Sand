@@ -18,7 +18,7 @@ export default function LoginPage() {
     { input: LoginInput }
   >(LOGIN_MUTATION, {
     onCompleted: (data) => {
-      connecter(data.login.user, data.login.token);
+      connecter(data.login.user);
       navigate('/');
     },
     onError: (error) => {
