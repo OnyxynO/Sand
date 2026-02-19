@@ -7,6 +7,7 @@ export default defineConfig({
     environment: 'happy-dom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
+    exclude: ['**/node_modules/**', '**/e2e/**'],
     deps: {
       // Apollo Client 4 : le package separe core et react en sous-modules.
       // Vite dev pre-bundle tout avec esbuild, mais vitest SSR utilise CJS
