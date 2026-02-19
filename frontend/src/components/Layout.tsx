@@ -45,13 +45,21 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Skip link */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-blue-700 focus:rounded focus:shadow"
+      >
+        Aller au contenu principal
+      </a>
+
       {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <div className="flex items-center">
-              <h1 className="text-xl font-bold text-blue-600">SAND</h1>
+              <span className="text-xl font-bold text-blue-600">SAND</span>
             </div>
 
             {/* Navigation desktop */}
@@ -88,8 +96,8 @@ export default function Layout() {
               {/* Bouton deconnexion */}
               <button
                 onClick={handleLogout}
-                className="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                title="Se deconnecter"
+                className="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+                aria-label="Se déconnecter"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -110,7 +118,9 @@ export default function Layout() {
               {/* Bouton menu mobile */}
               <button
                 onClick={() => setMenuOuvert(!menuOuvert)}
-                className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+                className="md:hidden p-2 rounded-lg hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-blue-500"
+                aria-label={menuOuvert ? 'Fermer le menu' : 'Ouvrir le menu'}
+                aria-expanded={menuOuvert}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -166,7 +176,7 @@ export default function Layout() {
       </header>
 
       {/* Contenu principal */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Outlet />
       </main>
 

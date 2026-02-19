@@ -71,13 +71,13 @@ export default function LoginPage() {
               </label>
               <input
                 id="email"
-                type="text"
-                inputMode="email"
+                type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value.replace(/\s/g, ''))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500 transition-colors"
                 placeholder="nom@entreprise.com"
                 autoComplete="email"
+                spellCheck={false}
                 disabled={loading}
               />
             </div>
@@ -95,30 +95,33 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                placeholder="********"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500 transition-colors"
+                placeholder="••••••••"
                 autoComplete="current-password"
                 disabled={loading}
               />
             </div>
 
             {/* Message d'erreur */}
-            {erreur && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                {erreur}
-              </div>
-            )}
+            <div aria-live="polite" aria-atomic="true">
+              {erreur && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm" role="alert">
+                  {erreur}
+                </div>
+              )}
+            </div>
 
             {/* Bouton de connexion */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus-visible:ring-4 focus-visible:ring-blue-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="flex items-center justify-center">
                   <svg
-                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    className="animate-spin motion-reduce:animate-none -ml-1 mr-3 h-5 w-5 text-white"
+                    aria-hidden="true"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -137,7 +140,7 @@ export default function LoginPage() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  Connexion en cours...
+                  Connexion en cours…
                 </span>
               ) : (
                 'Se connecter'

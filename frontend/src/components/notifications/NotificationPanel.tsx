@@ -124,15 +124,16 @@ export default function NotificationPanel() {
                           )}
                           <button
                             onClick={fermerPanneau}
-                            className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+                            className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+                            aria-label="Fermer le panneau de notifications"
                           >
-                            <XMarkIcon className="h-5 w-5" />
+                            <XMarkIcon className="h-5 w-5" aria-hidden="true" />
                           </button>
                         </div>
                       </div>
 
                       {/* Liste des notifications */}
-                      <div className="flex-1 overflow-y-auto">
+                      <div className="flex-1 overflow-y-auto overscroll-contain">
                         {loading ? (
                           <div className="flex items-center justify-center h-32">
                             <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent" />

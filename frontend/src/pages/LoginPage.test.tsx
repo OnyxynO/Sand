@@ -76,12 +76,11 @@ describe('LoginPage', () => {
     });
   });
 
-  it('champ email a type="text" et inputMode="email"', () => {
+  it('champ email a type="email"', () => {
     renderAvecApollo(<LoginPage />);
 
     const emailInput = screen.getByLabelText('Adresse email');
-    expect(emailInput).toHaveAttribute('type', 'text');
-    expect(emailInput).toHaveAttribute('inputMode', 'email');
+    expect(emailInput).toHaveAttribute('type', 'email');
   });
 
   it('desactive les champs pendant le chargement', async () => {
@@ -111,7 +110,7 @@ describe('LoginPage', () => {
     fireEvent.click(screen.getByText('Se connecter'));
 
     await waitFor(() => {
-      expect(screen.getByText('Connexion en cours...')).toBeInTheDocument();
+      expect(screen.getByText('Connexion en cours…')).toBeInTheDocument();
     });
   });
 });

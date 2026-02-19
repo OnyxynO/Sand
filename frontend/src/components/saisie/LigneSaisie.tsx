@@ -64,10 +64,10 @@ export default function LigneSaisie({ ligne, jours, indexLigne, onNavigate, onHi
           {!aSaisiesExistantes && (
             <button
               onClick={() => supprimerLigne(ligne.id)}
-              className="p-1 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-opacity"
-              title="Supprimer cette ligne"
+              className="p-1 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-opacity focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:opacity-100 rounded"
+              aria-label={`Supprimer la ligne ${ligne.activiteNom}`}
             >
-              <TrashIcon className="w-4 h-4" />
+              <TrashIcon className="w-4 h-4" aria-hidden="true" />
             </button>
           )}
         </div>

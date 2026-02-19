@@ -101,8 +101,8 @@ export default function GrilleSemaine({ absencesParJour }: GrilleSemaineProps) {
     return (
       <div className="bg-white rounded-xl shadow-sm p-8">
         <div className="flex items-center justify-center gap-3 text-gray-500">
-          <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-          <span>Chargement des saisies...</span>
+          <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin motion-reduce:animate-none" aria-hidden="true" />
+          <span>Chargement des saisies…</span>
         </div>
       </div>
     );
@@ -145,7 +145,7 @@ export default function GrilleSemaine({ absencesParJour }: GrilleSemaineProps) {
                 <tr className="bg-indigo-50/60">
                   <td className="px-3 py-2">
                     <div className="flex items-center gap-2">
-                      <CalendarDaysIcon className="w-4 h-4 text-indigo-500 flex-shrink-0" />
+                      <CalendarDaysIcon className="w-4 h-4 text-indigo-500 flex-shrink-0" aria-hidden="true" />
                       <span className="text-sm font-medium text-indigo-700">Absence</span>
                     </div>
                   </td>
