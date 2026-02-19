@@ -1,6 +1,17 @@
-import { describe, it, expect } from 'vitest';
-import { transformerAbsences } from '../useSaisieHebdo';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { renderHook, waitFor } from '@testing-library/react';
+import React from 'react';
+import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { ApolloProvider } from '@apollo/client/react';
+import { MockLink } from '@apollo/client/testing';
+import { transformerAbsences, useSaisieHebdo } from '../useSaisieHebdo';
+import { MES_SAISIES_SEMAINE, ABSENCES_SEMAINE, SYNC_ABSENCES } from '../../graphql/operations/saisie';
 import type { AbsenceAPI } from '../../types';
+
+// Mock du store Zustand pour isoler les tests du hook
+vi.mock('../../stores/saisieStore', () => ({
+  useSaisieStore: vi.fn(),
+}));
 
 describe('transformerAbsences', () => {
   const semaine = '2026-W03'; // Lundi 12 jan - Dimanche 18 jan 2026
@@ -156,5 +167,105 @@ describe('transformerAbsences', () => {
 
     expect(resultat['2026-01-14'].dureeJournaliere).toBe(0.5);
     expect(resultat['2026-01-14'].typeLibelle).toBe('Conge (matin)');
+  });
+});
+
+// ─── U-V08 : useSaisieHebdo hook ──────────────────────────────────────────────
+
+import { useSaisieStore } from '../../stores/saisieStore';
+
+describe('useSaisieHebdo', () => {
+  // Semaine 2026-W07 : lundi 9 fev – dimanche 15 fev 2026
+  const SEMAINE = '2026-W07';
+  const DATE_DEBUT = '2026-02-09';
+  const DATE_FIN = '2026-02-15';
+
+  const mockChargerSaisies = vi.fn();
+  const mockSetChargement = vi.fn();
+  const mockSetErreur = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(useSaisieStore).mockReturnValue({
+      semaineISO: SEMAINE,
+      lignes: [],
+      jours: [],
+      chargement: false,
+      sauvegarde: false,
+      erreur: null,
+      chargerSaisies: mockChargerSaisies,
+      reinitialiserModifications: vi.fn(),
+      setChargement: mockSetChargement,
+      setSauvegarde: vi.fn(),
+      setErreur: mockSetErreur,
+      aDifficultes: vi.fn().mockReturnValue(false),
+      getModifications: vi.fn().mockReturnValue({ nouvelles: [], modifiees: [], supprimees: [] }),
+      ajouterLigne: vi.fn(),
+      supprimerLigne: vi.fn(),
+      modifierCellule: vi.fn(),
+      getTotalJour: vi.fn().mockReturnValue(0),
+      getTotalLigne: vi.fn().mockReturnValue(0),
+      setSemaine: vi.fn(),
+      allerSemainePrecedente: vi.fn(),
+      allerSemaineSuivante: vi.fn(),
+      allerSemaineActuelle: vi.fn(),
+    } as never);
+  });
+
+  // U-V08 : charge les saisies de la semaine au montage
+  it('charge les saisies de la semaine au montage', async () => {
+    // __typename requis pour la normalisation InMemoryCache (Apollo Client)
+    const saisiesMock = [
+      {
+        __typename: 'TimeEntry',
+        id: '1',
+        date: '2026-02-10',
+        duree: 0.5,
+        commentaire: null,
+        projet: { __typename: 'Project', id: 'p1', nom: 'Projet Alpha', code: 'PA' },
+        activite: { __typename: 'Activity', id: 'a1', nom: 'Developpement', chemin: '1.2', cheminComplet: 'Backend > Dev' },
+      },
+    ];
+
+    const mocks = [
+      {
+        request: { query: MES_SAISIES_SEMAINE, variables: { semaine: SEMAINE } },
+        result: { data: { mesSaisiesSemaine: saisiesMock } },
+        delay: 0,
+        maxUsageCount: Infinity,
+      },
+      {
+        request: { query: SYNC_ABSENCES, variables: { dateDebut: DATE_DEBUT, dateFin: DATE_FIN } },
+        result: { data: { syncAbsences: { __typename: 'SyncAbsencesResult', importes: 0, conflits: 0, erreurs: 0 } } },
+        delay: 0,
+        maxUsageCount: Infinity,
+      },
+      {
+        request: { query: ABSENCES_SEMAINE, variables: { dateDebut: DATE_DEBUT, dateFin: DATE_FIN } },
+        result: { data: { absences: [] } },
+        delay: 0,
+        maxUsageCount: Infinity,
+      },
+    ];
+
+    const mockLink = new MockLink(mocks as never[]);
+    const client = new ApolloClient({ link: mockLink, cache: new InMemoryCache() });
+
+    const wrapper = ({ children }: { children: React.ReactNode }) =>
+      React.createElement(ApolloProvider, { client }, children);
+
+    renderHook(() => useSaisieHebdo(), { wrapper });
+
+    await waitFor(() => {
+      expect(mockChargerSaisies).toHaveBeenCalledTimes(1);
+    });
+
+    // Verifie que les donnees Apollo sont passees a chargerSaisies
+    const appelArg = mockChargerSaisies.mock.calls[0][0];
+    expect(appelArg).toHaveLength(1);
+    expect(appelArg[0].id).toBe('1');
+    expect(appelArg[0].duree).toBe(0.5);
+    expect(appelArg[0].projet.id).toBe('p1');
+    expect(appelArg[0].activite.nom).toBe('Developpement');
   });
 });
