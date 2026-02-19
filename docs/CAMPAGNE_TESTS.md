@@ -253,6 +253,67 @@ Drag and drop, cas limites.
 
 ---
 
+## État d'avancement (2026-02-19)
+
+### ✅ Implémentés
+
+| Couche | Fichier | IDs couverts |
+|--------|---------|-------------|
+| 🎭 E2E | `login.spec.ts` | AUTH-01 à AUTH-08 |
+| 🎭 E2E | `dashboard.spec.ts` | U-D01 à U-D04 |
+| 🎭 E2E | `saisie.spec.ts` | U-S01 à U-S06, U-S10 |
+| 🎭 E2E | `acces-refuses.spec.ts` | U-A01 à U-A03, M-A01/02 |
+| 🎭 E2E | `supervision.spec.ts` | M-SU01 à M-SU04 |
+| 🎭 E2E | `saisie-moderateur.spec.ts` | M-S01 à M-S03 |
+| 🎭 E2E | `admin-activites.spec.ts` | A-AC01 à A-AC06 |
+| 🎭 E2E | `admin-utilisateurs.spec.ts` | A-U01 à A-U05 |
+| 🧪 PHPUnit | `Policies/TimeEntryPolicyTest.php` | U-P01 à U-P04, M-P01/02 |
+| 🧪 PHPUnit | `Policies/ProjectPolicyTest.php` | U-P05, M-P03 à M-P05, A-P03 |
+| 🧪 PHPUnit | `Policies/UserPolicyTest.php` | U-P06, A-P01/02 |
+| 🧪 PHPUnit | `Policies/ActivityPolicyTest.php` | U-P07, A-P04 à A-P06 |
+| ⚛️ Vitest | `GrilleSemaine.test.tsx` | U-V01/02 |
+| ⚛️ Vitest | `TotauxJournaliers.test.tsx` | U-V05 |
+| ⚛️ Vitest | `NavigationSemaine.test.tsx` | U-V06 |
+| ⚛️ Vitest | `BoutonSauvegarde.test.tsx` | U-V07 |
+| ⚛️ Vitest | `saisieStore.test.ts` | U-V09 (via `aDifficultes()`) |
+| ⚛️ Vitest | `VueTexteActivites.test.tsx` | A-V01 à A-V04 |
+| ⚛️ Vitest | `useParserArbreTexte.test.ts` | A-V05/06 |
+
+### ⏳ Optionnels — non implémentés
+
+Ces tests apporteraient de la valeur mais ont été déprioritisés.
+
+#### 🎭 E2E — Saisie P1 (comportements dynamiques, données incertaines)
+
+| ID | Cas | Difficulté |
+|----|-----|-----------|
+| U-S07 | Semaine future → cellules en lecture seule | Requiert que la date courante soit dans la semaine de test |
+| U-S08 | EV-01 : quitter avec saisie non sauvegardée → modale de confirmation | Fragile : nécessite d'interagir avec une cellule sans sauvegarder |
+| U-S09 | EV-07 : ligne d'absence visible dans la grille | Requiert qu'une absence existe en base pour l'utilisateur de test |
+
+#### 🧪 PHPUnit — GraphQL admin (P1)
+
+| ID | Cas | Remarque |
+|----|-----|---------|
+| A-G01 | `exportCsv` : démarre un job queue | Partiellement couvert par `ExportMutatorGraphQLTest` existant |
+| A-G02 | `exportCsv` : UTILISATEUR refusé | Idem |
+| A-G03 | `supervisionAnomalies` : ADMIN voit tout | Partiellement couvert par `TimeEntryModeratorTest` |
+| A-G04 | `supervisionAnomalies` : MODERATEUR voit son équipe | Idem |
+
+#### ⚛️ Vitest — Hook useSaisieHebdo (P0, complexité élevée)
+
+| ID | Cas | Difficulté |
+|----|-----|-----------|
+| U-V08 | `useSaisieHebdo` : charge les saisies au montage | Nécessite de mocker simultanément 3 requêtes Apollo (MES_SAISIES_SEMAINE, ABSENCES_SEMAINE, SYNC_ABSENCES) + le store Zustand via `renderHook` |
+
+#### 🎭 E2E — Drag and drop (P2)
+
+| ID | Cas | Difficulté |
+|----|-----|-----------|
+| A-AC07 | Déplacer une activité → ordre mis à jour | Playwright drag-and-drop + vérification en base |
+
+---
+
 ## Comptes Playwright à provisionner
 
 ```
