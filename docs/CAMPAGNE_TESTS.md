@@ -265,7 +265,7 @@ Drag and drop, cas limites.
 | 🎭 E2E | `acces-refuses.spec.ts` | U-A01 à U-A03, M-A01/02 |
 | 🎭 E2E | `supervision.spec.ts` | M-SU01 à M-SU04 |
 | 🎭 E2E | `saisie-moderateur.spec.ts` | M-S01 à M-S03 |
-| 🎭 E2E | `admin-activites.spec.ts` | A-AC01 à A-AC06 |
+| 🎭 E2E | `admin-activites.spec.ts` | A-AC01 à A-AC07 |
 | 🎭 E2E | `admin-utilisateurs.spec.ts` | A-U01 à A-U05 |
 | 🧪 PHPUnit | `Policies/TimeEntryPolicyTest.php` | U-P01 à U-P04, M-P01/02 |
 | 🧪 PHPUnit | `Policies/ProjectPolicyTest.php` | U-P05, M-P03 à M-P05, A-P03 |
@@ -285,12 +285,6 @@ Drag and drop, cas limites.
 ### ⏳ Optionnels — non implémentés
 
 Ces tests apporteraient de la valeur mais ont été déprioritisés.
-
-#### 🎭 E2E — Drag and drop (P2)
-
-| ID | Cas | Difficulté |
-|----|-----|-----------|
-| A-AC07 | Déplacer une activité → ordre mis à jour | Playwright drag-and-drop + vérification en base |
 
 ---
 
