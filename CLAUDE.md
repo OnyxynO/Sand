@@ -111,7 +111,8 @@ Pieges Playwright specifiques a ce projet :
 - `__dirname` invalide en ESM → utiliser `fileURLToPath(import.meta.url)`
 - `getByRole('dialog')` retourne hidden avec Headless UI Transition → tester le titre `getByText('Choisir un projet')`
 - `locator('h1')` ambigu (Layout + page) → `getByRole('heading', { name: '...' })`
-- Sélecteur `title` des boutons navigation : `button[title="Semaine precedente"]` (sans accent)
+- Sélecteur `aria-label` des boutons navigation : `button[aria-label="Semaine précédente"]` (avec accent, PAS title=)
+- Cellules saisie : `aria-label="Saisir pour lundi"` — minuscule (date-fns `EEEE` locale fr → lowercase)
 
 ## Acces
 

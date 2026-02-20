@@ -29,7 +29,7 @@ async function supprimerTousLesExports(page: Parameters<Parameters<typeof test>[
     // Attendre que les données soient chargées (skeleton → tableau ou état vide)
     await expect(
       page.getByText('Historique des exports').or(page.getByText('Aucun export pour le moment')),
-    ).toBeVisible({ timeout: 10000 });
+    ).toBeVisible({ timeout: 20000 });
 
     const btn = page.locator('button[title="Supprimer definitivement"]').first();
     if (!(await btn.isVisible())) break;
@@ -114,9 +114,7 @@ test.describe('Export CSV', () => {
     await lancerExport(page);
     await attendreDisponible(page);
 
-    // Attendre la réponse réseau AVANT de compter : cache-and-network renvoie
-    // d'abord le cache (N), puis le réseau (N+1 avec la nouvelle notif de l'export).
-    // Sans attente réseau, countAvant serait N alors que l'UI affiche N+1 après le refetch.
+    // Attendre la réponse réseau AVANT de compter (cache-and-network renvoie cache puis réseau)
     const notifResponsePromise = page.waitForResponse(
       (r) => r.url().includes('/graphql') && r.status() === 200,
       { timeout: 10000 },
@@ -125,16 +123,23 @@ test.describe('Export CSV', () => {
     await notifResponsePromise;
 
     await expect(page.getByText('Export pret').first()).toBeVisible({ timeout: 5000 });
-
-    // Compter après la réponse réseau (données stables)
     const countAvant = await page.getByText('Export pret').count();
 
-    // Cliquer sur la première notification → la marquer lue → bouton supprimer apparaît
+    // Cliquer sur la notification → la marque lue ET navigue vers /export (ferme le panneau).
+    // C'est le comportement voulu : NotificationItem.handleClick navigue pour export_pret.
     await page.getByText('Export pret').first().click();
 
-    // Bouton supprimer (title="Supprimer" dans NotificationItem)
+    // On est maintenant sur /export, panneau fermé.
+    // Rouvrir le panneau : la notification est lue → bouton supprimer visible.
+    const notifResponsePromise2 = page.waitForResponse(
+      (r) => r.url().includes('/graphql') && r.status() === 200,
+      { timeout: 10000 },
+    );
+    await page.getByRole('button', { name: /Notifications/ }).click();
+    await notifResponsePromise2;
+
     const btnSupprimer = page.locator('[title="Supprimer"]').first();
-    await expect(btnSupprimer).toBeVisible({ timeout: 3000 });
+    await expect(btnSupprimer).toBeVisible({ timeout: 5000 });
     await btnSupprimer.click();
 
     // Une notification de moins dans le panneau

@@ -98,8 +98,8 @@ test.describe('Authentification — deconnexion', () => {
     await page.click('button[type="submit"]');
     await expect(page).toHaveURL('/', { timeout: 10000 });
 
-    // Cliquer sur déconnexion
-    const boutonDeconnexion = page.locator('button[title="Se deconnecter"]');
+    // Cliquer sur déconnexion (aria-label dans Layout.tsx)
+    const boutonDeconnexion = page.locator('button[aria-label="Se déconnecter"]');
     await expect(boutonDeconnexion).toBeVisible({ timeout: 5000 });
     await boutonDeconnexion.click();
 

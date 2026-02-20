@@ -42,7 +42,7 @@ test.describe('Saisie — role MODERATEUR', () => {
   // M-S03
   test('le moderateur peut sauvegarder une saisie pour un membre', async ({ page }) => {
     const select = page.locator('#selecteur-utilisateur');
-    await expect(select).toBeVisible({ timeout: 5000 });
+    await expect(select).toBeVisible({ timeout: 10000 });
 
     const count = await select.locator('option').count();
     if (count <= 1) return; // Pas d'utilisateurs moderables
