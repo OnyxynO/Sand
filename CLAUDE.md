@@ -44,9 +44,15 @@ Voir `docs/06_EVOLUTIONS.md` pour le detail.
     une option systeme hors arborescence projet (type "projet special")
 
 - **EV-09 : Export CSV — ajustements UX**
-  - Etat vide : meilleur affichage quand aucun export
+  - Etat vide : meilleur affichage quand aucun export ✓
+  - Vraies infos de filtres affichees dans le tableau (popover ℹ️ par ligne) ✓
   - Delai minimum de 3 secondes avant passage a "Disponible" (rendre "En cours" visible)
-  - Vraies infos de filtres (dates, utilisateur) affichees dans le tableau d'historique
+
+- **EV-10 : Notifications — bouton "Supprimer tout"**
+  - Ajouter un bouton "Supprimer tout" dans le panneau de notifications,
+    a cote du bouton "Marquer tout comme lu"
+  - Supprime toutes les notifications en une seule action (evite de cliquer
+    sur la corbeille une par une)
 
 **Outillage / documentation** (fait) :
 - `.env.example` avec valeurs Docker pre-remplies ✓
