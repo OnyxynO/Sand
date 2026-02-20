@@ -6,10 +6,12 @@ import {
   CheckCircleIcon,
   ClockIcon,
   ExclamationTriangleIcon,
+  InformationCircleIcon,
   MinusCircleIcon,
   TrashIcon,
   XCircleIcon,
 } from '@heroicons/react/24/outline';
+import { Popover } from '@headlessui/react';
 import { REQUEST_EXPORT, MES_EXPORTS, DESACTIVER_EXPORT, SUPPRIMER_EXPORT } from '../graphql/operations/export';
 import { PROJETS_ACTIFS } from '../graphql/operations/saisie';
 import { TEAMS_FULL_QUERY } from '../graphql/operations/teams';
@@ -46,6 +48,67 @@ interface Equipe {
   id: string;
   nom: string;
   code: string;
+}
+
+function libStatut(statut: string): string {
+  switch (statut) {
+    case 'EN_ATTENTE': return 'En attente';
+    case 'EN_COURS': return 'En cours';
+    case 'TERMINE': return 'Disponible';
+    case 'ECHEC': return 'Echec';
+    case 'DESACTIVE': return 'Désactivé';
+    default: return statut;
+  }
+}
+
+function InfoPopover({ job, projets, equipes }: { job: ExportJob; projets: Projet[]; equipes: Equipe[] }) {
+  const f = job.filtres ?? {};
+  const projet = f.project_id ? projets.find((p) => p.id === f.project_id) : null;
+  const equipe = f.team_id ? equipes.find((e) => e.id === f.team_id) : null;
+
+  const lignes: { label: string; valeur: string }[] = [
+    { label: 'Identifiant', valeur: job.id.slice(0, 8) },
+    { label: 'Demandé le', valeur: formaterDateHeure(job.creeLe) },
+    { label: 'Expire le', valeur: job.expireLe ? formaterDateHeure(job.expireLe) : '—' },
+    { label: 'Statut', valeur: libStatut(job.statut) },
+    { label: 'Format', valeur: 'CSV' },
+    {
+      label: 'Période',
+      valeur: f.date_debut && f.date_fin
+        ? `${formaterDate(f.date_debut)} → ${formaterDate(f.date_fin)}`
+        : 'Toutes les dates',
+    },
+    { label: 'Projet', valeur: projet ? `${projet.code} - ${projet.nom}` : 'Tous les projets' },
+    { label: 'Équipe', valeur: equipe ? equipe.nom : 'Toutes les équipes' },
+  ];
+
+  return (
+    <Popover className="relative">
+      <Popover.Button
+        className="p-1.5 text-gray-400 hover:text-blue-500 transition-colors rounded-lg hover:bg-blue-50"
+        title="Détails de l'export"
+      >
+        <InformationCircleIcon className="w-4 h-4" />
+      </Popover.Button>
+
+      <Popover.Panel className="absolute right-0 bottom-full mb-1 z-10 w-72 bg-white rounded-lg shadow-lg border border-gray-200 p-4 text-sm">
+        <p className="font-semibold text-gray-800 mb-3">Détails de l'export</p>
+        <dl className="space-y-1.5">
+          {lignes.map(({ label, valeur }) => (
+            <div key={label} className="grid grid-cols-2 gap-2">
+              <dt className="text-gray-500">{label}</dt>
+              <dd
+                className="text-gray-900 font-medium truncate"
+                title={label === 'Identifiant' ? job.id : undefined}
+              >
+                {valeur}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </Popover.Panel>
+    </Popover>
+  );
 }
 
 export default function ExportPage() {
@@ -244,9 +307,6 @@ export default function ExportPage() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Periode
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Demande le
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -260,9 +320,6 @@ export default function ExportPage() {
             <tbody className="bg-white divide-y divide-gray-100">
               {exports.map((exp) => (
                 <tr key={exp.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <FiltresCell filtres={exp.filtres} projets={projets} equipes={equipes} />
-                  </td>
                   <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                     {formaterDateHeure(exp.creeLe)}
                   </td>
@@ -271,6 +328,9 @@ export default function ExportPage() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
+                      {/* Détails */}
+                      <InfoPopover job={exp} projets={projets} equipes={equipes} />
+
                       {/* Telecharger / Regenerer */}
                       {estTelechargeable(exp) ? (
                         <a
@@ -389,42 +449,6 @@ function StatutBadge({ statut, expire, expireLe }: { statut: string; expire: boo
   }
 }
 
-function FiltresCell({ filtres, projets, equipes }: {
-  filtres: Record<string, string> | null;
-  projets: Projet[];
-  equipes: Equipe[];
-}) {
-  const f = filtres ?? {};
-  const projet = f.project_id ? projets.find((p) => p.id === f.project_id) : null;
-  const equipe = f.team_id ? equipes.find((e) => e.id === f.team_id) : null;
-
-  return (
-    <div className="space-y-1.5">
-      {/* Période */}
-      <div className="text-sm font-medium text-gray-900">
-        {f.date_debut && f.date_fin
-          ? `${formaterDate(f.date_debut)} → ${formaterDate(f.date_fin)}`
-          : <span className="text-gray-400 font-normal italic">Toutes les dates</span>
-        }
-      </div>
-      {/* Badges projet / équipe */}
-      {(projet || equipe) && (
-        <div className="flex flex-wrap gap-1">
-          {projet && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-blue-50 text-blue-700 font-medium">
-              {projet.code}
-            </span>
-          )}
-          {equipe && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-violet-50 text-violet-700 font-medium">
-              {equipe.nom}
-            </span>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
 
 function formaterDate(iso: string): string {
   const [a, m, j] = iso.split('-');
