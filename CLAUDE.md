@@ -34,12 +34,20 @@ Voir `docs/06_EVOLUTIONS.md` pour le detail.
 
 ### Reste a faire (hors fonctionnel)
 
-**Outillage / documentation** :
-- `.env.example` avec valeurs Docker pre-remplies
-- `README.md` complet (installation, troubleshooting, premiers pas)
-- Script `scripts/install.sh` automatise (docker-compose up + migrate + seed)
-- `.gitattributes` (forcer LF sur scripts shell)
-- Documentation API (export schema GraphQL lisible)
+**Bugs connus** :
+- **Export CSV non fonctionnel** : trois points a corriger —
+  1. Le declenchement de l'export lui-meme ne fonctionne pas
+  2. Le lien dans la notification ne s'ouvre pas / ne fonctionne pas
+  3. Le lien de telechargement n'est pas affiche correctement sur la page export
+  Piste probable : le Job Redis (async) ou la generation de l'URL de telechargement
+  apres le passage a l'auth cookie (T-01 suppression du Bearer token).
+
+**Outillage / documentation** (fait) :
+- `.env.example` avec valeurs Docker pre-remplies ✓
+- `README.md` complet (installation, troubleshooting, premiers pas) ✓
+- Script `scripts/install.sh` automatise ✓
+- `.gitattributes` (forcer LF sur scripts shell) ✓
+- Documentation API (export schema GraphQL lisible) ✓
 
 ## Commandes essentielles
 
