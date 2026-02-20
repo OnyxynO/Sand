@@ -39,7 +39,22 @@ export default defineConfig({
       name: 'chromium-admin',
       use: { ...devices['Desktop Chrome'], storageState: 'e2e/.auth/admin.json' },
       dependencies: ['setup-admin'],
-      testMatch: ['**/admin-activites.spec.ts', '**/admin-utilisateurs.spec.ts'],
+      testMatch: [
+        '**/admin-activites.spec.ts',
+        '**/admin-utilisateurs.spec.ts',
+        '**/export.spec.ts',
+        '**/navigation.spec.ts',
+        '**/service-overlay.spec.ts',
+      ],
+    },
+
+    // ⚠️  Projet destructif — RGPD et reset BDD
+    // Exécution uniquement via : npm run e2e:rgpd
+    {
+      name: 'chromium-admin-rgpd',
+      use: { ...devices['Desktop Chrome'], storageState: 'e2e/.auth/admin.json' },
+      dependencies: ['setup-admin'],
+      testMatch: ['**/admin-rgpd.spec.ts'],
     },
   ],
 });

@@ -45,11 +45,5 @@ test.describe('Admin — Autres pages', () => {
     });
   });
 
-  // A-U05
-  test('page rgpd affiche le heading', async ({ page }) => {
-    await page.goto('/admin/rgpd');
-    await expect(
-      page.getByRole('heading', { name: 'RGPD - Gestion des donnees' })
-    ).toBeVisible({ timeout: 8000 });
-  });
+  // A-U05 déplacé dans admin-rgpd.spec.ts (campagne destructive séparée)
 });
