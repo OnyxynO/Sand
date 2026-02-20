@@ -8,6 +8,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useNavigate } from 'react-router-dom';
+import { useNotificationStore } from '../../stores/notificationStore';
 import type { Notification, NotificationType } from '../../types';
 
 interface NotificationItemProps {
@@ -61,10 +63,16 @@ export default function NotificationItem({
 }: NotificationItemProps) {
   const config = typeConfig[notification.type] ?? typeConfig.systeme;
   const IconComponent = config.icon;
+  const navigate = useNavigate();
+  const { fermerPanneau } = useNotificationStore();
 
   const handleClick = () => {
     if (!notification.estLu) {
       onMarkRead(notification.id);
+    }
+    if (notification.type === 'export_pret') {
+      fermerPanneau();
+      navigate('/export');
     }
   };
 
@@ -83,7 +91,7 @@ export default function NotificationItem({
     const donnees = notification.donnees as Record<string, unknown> | undefined;
     const exportId = donnees?.export_id;
     if (exportId) {
-      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8080/graphql').replace('/graphql', '');
       window.open(`${baseUrl}/exports/${exportId}/download`, '_blank');
     }
   };
