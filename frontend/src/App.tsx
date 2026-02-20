@@ -21,6 +21,7 @@ const ProjetsPage = lazy(() => import('./pages/ProjetsPage'));
 // Composants (shell app - import statique)
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import ServiceWaitingPage from './components/ServiceWaitingPage';
 
 function LoadingSpinner() {
   return (
@@ -109,5 +110,10 @@ const router = createBrowserRouter([
 ]);
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <ServiceWaitingPage />
+      <RouterProvider router={router} />
+    </>
+  );
 }
