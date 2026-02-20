@@ -34,13 +34,19 @@ Voir `docs/06_EVOLUTIONS.md` pour le detail.
 
 ### Reste a faire (hors fonctionnel)
 
-**Bugs connus** :
-- **Export CSV non fonctionnel** : trois points a corriger —
-  1. Le declenchement de l'export lui-meme ne fonctionne pas
-  2. Le lien dans la notification ne s'ouvre pas / ne fonctionne pas
-  3. Le lien de telechargement n'est pas affiche correctement sur la page export
-  Piste probable : le Job Redis (async) ou la generation de l'URL de telechargement
-  apres le passage a l'auth cookie (T-01 suppression du Bearer token).
+**Evolutions en attente** :
+
+- **EV-08 : Absences — mode manuel vs API externe configurable**
+  - Ajouter une option de configuration Admin : mode `manuel` ou `api`
+  - En mode `api` : champs URL + token + bouton "Tester la connexion"
+  - En mode `api` : masquer/desactiver la saisie d'absence dans la grille
+  - L'activite "Absence" ne doit pas etre liee a un projet ; la proposer comme
+    une option systeme hors arborescence projet (type "projet special")
+
+- **EV-09 : Export CSV — ajustements UX**
+  - Etat vide : meilleur affichage quand aucun export
+  - Delai minimum de 3 secondes avant passage a "Disponible" (rendre "En cours" visible)
+  - Vraies infos de filtres (dates, utilisateur) affichees dans le tableau d'historique
 
 **Outillage / documentation** (fait) :
 - `.env.example` avec valeurs Docker pre-remplies ✓
