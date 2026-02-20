@@ -15,6 +15,7 @@ import GraphiqueRepartitionProjets from '../components/dashboard/GraphiqueRepart
 import GraphiqueActivites from '../components/dashboard/GraphiqueActivites';
 import GraphiqueUtilisateurs from '../components/dashboard/GraphiqueUtilisateurs';
 import GraphiqueEvolution from '../components/dashboard/GraphiqueEvolution';
+import { SqueletteCarte, SqueletteGraphique } from '../components/Squelette';
 
 function dernierJourDuMois(annee: number, mois: number): number {
   return new Date(annee, mois + 1, 0).getDate();
@@ -164,11 +165,19 @@ export default function StatsGlobalesPage() {
         </div>
       )}
 
-      {/* Chargement */}
+      {/* Squelette (premier chargement) */}
       {loading && !stats && (
-        <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <SqueletteCarte /><SqueletteCarte /><SqueletteCarte />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <SqueletteGraphique /><SqueletteGraphique />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <SqueletteGraphique /><SqueletteGraphique />
+          </div>
+        </>
       )}
 
       {/* Contenu */}
