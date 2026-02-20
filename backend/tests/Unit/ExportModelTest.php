@@ -140,6 +140,26 @@ class ExportModelTest extends TestCase
         $this->assertFalse($export->estTermine());
     }
 
+    public function test_marquer_desactive(): void
+    {
+        $export = Export::create([
+            'user_id' => $this->user->id,
+            'statut' => Export::STATUT_TERMINE,
+            'format' => 'CSV',
+            'chemin_fichier' => 'exports/test.csv',
+            'nom_fichier' => 'export_test.csv',
+            'expire_le' => now()->addHours(24),
+        ]);
+
+        $export->marquerDesactive();
+
+        $fresh = $export->fresh();
+        $this->assertEquals(Export::STATUT_DESACTIVE, $fresh->statut);
+        $this->assertNull($fresh->chemin_fichier);
+        $this->assertNull($fresh->nom_fichier);
+        $this->assertNull($fresh->expire_le);
+    }
+
     public function test_statut_graphql_mapping(): void
     {
         $export = Export::create([
@@ -158,6 +178,9 @@ class ExportModelTest extends TestCase
 
         $export->statut = Export::STATUT_ECHEC;
         $this->assertEquals('ECHEC', $export->statutGraphQL());
+
+        $export->statut = Export::STATUT_DESACTIVE;
+        $this->assertEquals('DESACTIVE', $export->statutGraphQL());
     }
 
     public function test_relation_utilisateur(): void

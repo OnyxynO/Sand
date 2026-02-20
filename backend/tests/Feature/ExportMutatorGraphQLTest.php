@@ -9,6 +9,7 @@ use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
 use App\Jobs\ExportTimeEntriesJob;
 use Tests\TestCase;
 use Tests\Traits\GraphQLTestTrait;
@@ -151,5 +152,165 @@ class ExportMutatorGraphQLTest extends TestCase
         ], $this->admin);
 
         $this->assertGraphQLError($response);
+    }
+
+    // ─── mesExports ────────────────────────────────────────────────────────────
+
+    public function test_mes_exports_retourne_les_exports_de_utilisateur(): void
+    {
+        Export::create([
+            'user_id' => $this->admin->id,
+            'statut' => Export::STATUT_TERMINE,
+            'format' => 'CSV',
+            'filtres' => ['date_debut' => '2026-01-01', 'date_fin' => '2026-01-31'],
+        ]);
+
+        Export::create([
+            'user_id' => $this->moderateur->id,
+            'statut' => Export::STATUT_EN_ATTENTE,
+            'format' => 'CSV',
+        ]);
+
+        $query = '
+            query {
+                mesExports {
+                    id
+                    statut
+                    filtres
+                    creeLe
+                }
+            }
+        ';
+
+        $response = $this->graphqlAsUser($query, [], $this->admin);
+
+        $this->assertGraphQLSuccess($response);
+        $data = $this->getGraphQLData($response, 'mesExports');
+
+        // Seul l'export de l'admin est retourne
+        $this->assertCount(1, $data);
+        $this->assertEquals('TERMINE', $data[0]['statut']);
+    }
+
+    public function test_mes_exports_retourne_liste_vide_si_aucun_export(): void
+    {
+        $query = '
+            query {
+                mesExports {
+                    id
+                    statut
+                }
+            }
+        ';
+
+        $response = $this->graphqlAsUser($query, [], $this->admin);
+
+        $this->assertGraphQLSuccess($response);
+        $data = $this->getGraphQLData($response, 'mesExports');
+        $this->assertEmpty($data);
+    }
+
+    // ─── desactiverExport ──────────────────────────────────────────────────────
+
+    public function test_desactiver_export_marque_desactive_et_supprime_fichier(): void
+    {
+        Storage::fake('local');
+        Storage::disk('local')->put('exports/test/fichier.csv', 'contenu');
+
+        $export = Export::create([
+            'user_id' => $this->admin->id,
+            'statut' => Export::STATUT_TERMINE,
+            'format' => 'CSV',
+            'chemin_fichier' => 'exports/test/fichier.csv',
+            'nom_fichier' => 'fichier.csv',
+            'expire_le' => now()->addHours(24),
+        ]);
+
+        $mutationDesactiver = '
+            mutation DesactiverExport($id: ID!) {
+                desactiverExport(id: $id) {
+                    id
+                    statut
+                }
+            }
+        ';
+
+        $response = $this->graphqlAsUser($mutationDesactiver, ['id' => $export->id], $this->admin);
+
+        $this->assertGraphQLSuccess($response);
+        $data = $this->getGraphQLData($response, 'desactiverExport');
+        $this->assertEquals('DESACTIVE', $data['statut']);
+
+        // Verifier en base
+        $fresh = $export->fresh();
+        $this->assertEquals(Export::STATUT_DESACTIVE, $fresh->statut);
+        $this->assertNull($fresh->chemin_fichier);
+
+        // Verifier que le fichier est supprime
+        Storage::disk('local')->assertMissing('exports/test/fichier.csv');
+    }
+
+    public function test_desactiver_export_interdit_pour_autre_utilisateur(): void
+    {
+        $export = Export::create([
+            'user_id' => $this->admin->id,
+            'statut' => Export::STATUT_TERMINE,
+            'format' => 'CSV',
+        ]);
+
+        $mutationDesactiver = '
+            mutation DesactiverExport($id: ID!) {
+                desactiverExport(id: $id) {
+                    id
+                    statut
+                }
+            }
+        ';
+
+        $response = $this->graphqlAsUser($mutationDesactiver, ['id' => $export->id], $this->moderateur);
+
+        $this->assertGraphQLError($response);
+    }
+
+    // ─── supprimerExport ───────────────────────────────────────────────────────
+
+    public function test_supprimer_export_supprime_la_ligne_en_base(): void
+    {
+        $export = Export::create([
+            'user_id' => $this->admin->id,
+            'statut' => Export::STATUT_ECHEC,
+            'format' => 'CSV',
+        ]);
+
+        $mutationSupprimer = '
+            mutation SupprimerExport($id: ID!) {
+                supprimerExport(id: $id)
+            }
+        ';
+
+        $response = $this->graphqlAsUser($mutationSupprimer, ['id' => $export->id], $this->admin);
+
+        $this->assertGraphQLSuccess($response);
+        $this->assertDatabaseMissing('exports', ['id' => $export->id]);
+    }
+
+    public function test_supprimer_export_interdit_pour_autre_utilisateur(): void
+    {
+        $export = Export::create([
+            'user_id' => $this->admin->id,
+            'statut' => Export::STATUT_ECHEC,
+            'format' => 'CSV',
+        ]);
+
+        $mutationSupprimer = '
+            mutation SupprimerExport($id: ID!) {
+                supprimerExport(id: $id)
+            }
+        ';
+
+        $response = $this->graphqlAsUser($mutationSupprimer, ['id' => $export->id], $this->moderateur);
+
+        $this->assertGraphQLError($response);
+        $this->assertDatabaseHas('exports', ['id' => $export->id]);
     }
 }

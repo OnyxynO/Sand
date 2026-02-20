@@ -74,4 +74,6 @@ enum ExportStatus {
     TERMINE
     "Export echoue"
     ECHEC
+    "Export desactive manuellement (fichier supprime)"
+    DESACTIVE
 }

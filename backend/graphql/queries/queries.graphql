@@ -148,6 +148,12 @@ extend type Query {
         @field(resolver: "App\\GraphQL\\Queries\\AnomaliesQuery")
         @guard
 
+    # ─── Exports ─────────────────────────────────────
+    "Mes exports CSV (du plus recent au plus ancien)"
+    mesExports: [ExportJob!]!
+        @field(resolver: "App\\GraphQL\\Queries\\MesExportsQuery")
+        @guard
+
     # ─── Settings ───────────────────────────────────
     "Liste des parametres systeme"
     parametres: [Setting!]! @all(model: "App\\Models\\Setting") @guard
