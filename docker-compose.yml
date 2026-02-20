@@ -18,6 +18,26 @@ services:
       redis:
         condition: service_healthy
 
+  # Worker de file d'attente Laravel (traitement des exports CSV)
+  queue:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: sand-queue
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - sand-network
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: php artisan queue:work --sleep=3 --tries=3 --timeout=90
+
   # Serveur Web Nginx
   nginx:
     build:
@@ -91,7 +111,7 @@ services:
       - "5173:5173"
     volumes:
       - ./frontend:/app
-      - /app/node_modules
+      - frontend-node-modules:/app/node_modules
     networks:
       - sand-network
     command: npm run dev -- --host
@@ -125,3 +145,4 @@ networks:
 volumes:
   sand-db-data:
   sand-redis-data:
+  frontend-node-modules:
