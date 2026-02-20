@@ -7,6 +7,7 @@ namespace App\GraphQL\Mutations;
 use App\Jobs\ExportTimeEntriesJob;
 use App\Models\Export;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ExportMutator
 {
@@ -43,11 +44,70 @@ class ExportMutator
         // Dispatcher le job
         ExportTimeEntriesJob::dispatch($export->id);
 
+        return $this->exportVersTableau($export);
+    }
+
+    /**
+     * Desactiver un export : supprime le fichier, conserve la ligne en base.
+     */
+    public function desactiver($root, array $args): array
+    {
+        $user = Auth::user();
+        if (!$user) {
+            abort(401, 'Non authentifie.');
+        }
+
+        $export = Export::findOrFail($args['id']);
+
+        if ($export->user_id !== $user->id) {
+            abort(403, 'Acces interdit.');
+        }
+
+        // Supprimer le fichier physique si present
+        if ($export->chemin_fichier && Storage::disk('local')->exists($export->chemin_fichier)) {
+            Storage::disk('local')->delete($export->chemin_fichier);
+        }
+
+        $export->marquerDesactive();
+
+        return $this->exportVersTableau($export);
+    }
+
+    /**
+     * Supprimer definitivement un export (ligne en base + fichier).
+     */
+    public function supprimer($root, array $args): bool
+    {
+        $user = Auth::user();
+        if (!$user) {
+            abort(401, 'Non authentifie.');
+        }
+
+        $export = Export::findOrFail($args['id']);
+
+        if ($export->user_id !== $user->id) {
+            abort(403, 'Acces interdit.');
+        }
+
+        // Supprimer le fichier physique si present
+        if ($export->chemin_fichier && Storage::disk('local')->exists($export->chemin_fichier)) {
+            Storage::disk('local')->delete($export->chemin_fichier);
+        }
+
+        $export->delete();
+
+        return true;
+    }
+
+    private function exportVersTableau(Export $export): array
+    {
         return [
             'id' => $export->id,
             'statut' => $export->statutGraphQL(),
+            'filtres' => $export->filtres,
             'urlTelechargement' => null,
-            'expireLe' => null,
+            'expireLe' => $export->expire_le,
+            'creeLe' => $export->created_at,
         ];
     }
 }

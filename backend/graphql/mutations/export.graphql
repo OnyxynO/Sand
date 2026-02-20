@@ -3,4 +3,14 @@ extend type Mutation {
     requestExport(input: ExportInput! @spread): ExportJob!
         @field(resolver: "App\\GraphQL\\Mutations\\ExportMutator@request")
         @guard
+
+    "Desactiver un export (supprime le fichier, conserve la ligne)"
+    desactiverExport(id: ID!): ExportJob!
+        @field(resolver: "App\\GraphQL\\Mutations\\ExportMutator@desactiver")
+        @guard
+
+    "Supprimer definitivement un export (supprime la ligne en base)"
+    supprimerExport(id: ID!): Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\ExportMutator@supprimer")
+        @guard
 }

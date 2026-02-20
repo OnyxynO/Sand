@@ -33,6 +33,7 @@ class Export extends Model
     public const STATUT_EN_COURS = 'en_cours';
     public const STATUT_TERMINE = 'termine';
     public const STATUT_ECHEC = 'echec';
+    public const STATUT_DESACTIVE = 'desactive';
 
     protected static function boot(): void
     {
@@ -87,6 +88,16 @@ class Export extends Model
         ]);
     }
 
+    public function marquerDesactive(): void
+    {
+        $this->update([
+            'statut' => self::STATUT_DESACTIVE,
+            'chemin_fichier' => null,
+            'nom_fichier' => null,
+            'expire_le' => null,
+        ]);
+    }
+
     // Mapping statut -> enum GraphQL
 
     public function statutGraphQL(): string
@@ -96,6 +107,7 @@ class Export extends Model
             self::STATUT_EN_COURS => 'EN_COURS',
             self::STATUT_TERMINE => 'TERMINE',
             self::STATUT_ECHEC => 'ECHEC',
+            self::STATUT_DESACTIVE => 'DESACTIVE',
             default => 'EN_ATTENTE',
         };
     }

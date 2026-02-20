@@ -76,10 +76,14 @@ type ExportJob {
     id: ID!
     "Statut du job"
     statut: ExportStatus!
+    "Filtres utilises pour generer l'export"
+    filtres: JSON
     "URL de telechargement (disponible quand termine)"
     urlTelechargement: String
     "Date d'expiration du fichier"
     expireLe: DateTime
+    "Date de creation de la demande"
+    creeLe: DateTime!
 }
 
 "Payload retourne apres authentification"
