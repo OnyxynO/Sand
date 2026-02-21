@@ -46,13 +46,16 @@ Voir `docs/06_EVOLUTIONS.md` pour le detail.
 - **EV-09 : Export CSV — ajustements UX**
   - Etat vide : meilleur affichage quand aucun export ✓
   - Vraies infos de filtres affichees dans le tableau (popover ℹ️ par ligne) ✓
-  - Delai minimum de 3 secondes avant passage a "Disponible" (rendre "En cours" visible)
+  - Delai minimum de 3 secondes avant passage a "Disponible" (rendre "En cours" visible) ✓
 
-- **EV-10 : Notifications — bouton "Supprimer tout"**
-  - Ajouter un bouton "Supprimer tout" dans le panneau de notifications,
+- **EV-10 : Notifications — bouton "Supprimer tout"** ✓
+- **EV-11 : Notifications — synchronisation reactive sur fin d'export** ⚠️ BUG
+  - Observer pattern implemente (ExportPage, useRef + useEffect + client.refetchQueries)
+  - Tests unitaires passent mais ne fonctionne pas en pratique
+  - A investiguer : le refetchQueries ne semble pas invalider le cache de NotificationBell
+  - Bouton "Supprimer tout" ajoute dans le panneau de notifications,
     a cote du bouton "Marquer tout comme lu"
-  - Supprime toutes les notifications en une seule action (evite de cliquer
-    sur la corbeille une par une)
+  - Mutation deleteAllNotifications (backend + frontend) ✓
 
 **Outillage / documentation** (fait) :
 - `.env.example` avec valeurs Docker pre-remplies ✓

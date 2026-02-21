@@ -13,4 +13,9 @@ extend type Mutation {
     deleteNotification(id: ID!): Boolean!
         @field(resolver: "App\\GraphQL\\Mutations\\NotificationMutator@delete")
         @guard
+
+    "Supprimer toutes les notifications"
+    deleteAllNotifications: Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\NotificationMutator@deleteAll")
+        @guard
 }
