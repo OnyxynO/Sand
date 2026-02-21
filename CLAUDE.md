@@ -29,6 +29,7 @@ Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte 
 - EV-05 : Reset parametres par defaut
 - EV-07 : Absences dans grille de saisie
 - EV-06 : Suppression donnees RGPD (droit a l'oubli + purge totale)
+- EV-08 : Absences mode manuel vs API externe (settings admin + grille interactive)
 
 Voir `docs/06_EVOLUTIONS.md` pour le detail.
 
@@ -36,12 +37,11 @@ Voir `docs/06_EVOLUTIONS.md` pour le detail.
 
 **Evolutions en attente** :
 
-- **EV-08 : Absences — mode manuel vs API externe configurable**
-  - Ajouter une option de configuration Admin : mode `manuel` ou `api`
-  - En mode `api` : champs URL + token + bouton "Tester la connexion"
-  - En mode `api` : masquer/desactiver la saisie d'absence dans la grille
-  - L'activite "Absence" ne doit pas etre liee a un projet ; la proposer comme
-    une option systeme hors arborescence projet (type "projet special")
+- **EV-08 : Absences — mode manuel vs API externe configurable** ✓
+  - Config admin : mode `manuel` (saisie directe grille) ou `api` (import RH)
+  - Mode `api` : champs URL + token + bouton "Tester la connexion"
+  - Mode `manuel` : cellules absence cliquables (cycle vide/1 ETP/0.5 ETP)
+  - Mutations : `declarerAbsence` (tout user) + `testerConnexionRhApi` (modo/admin)
 
 - **EV-09 : Export CSV — ajustements UX**
   - Etat vide : meilleur affichage quand aucun export ✓
