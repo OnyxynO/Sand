@@ -33,7 +33,7 @@ export default function SaisiePage() {
   const isMobile = useIsMobile();
   const [searchParams, setSearchParams] = useSearchParams();
   const [userIdModeration, setUserIdModeration] = useState<string | null>(null);
-  const { erreur, aDesModifications, sauvegarde, sauvegarder, absencesParJour } = useSaisieHebdo(userIdModeration);
+  const { erreur, aDesModifications, sauvegarde, sauvegarder, absencesParJour, modeAbsence, refetcherAbsences } = useSaisieHebdo(userIdModeration);
   const utilisateur = useAuthStore((state) => state.utilisateur);
   const setSemaine = useSaisieStore((state) => state.setSemaine);
 
@@ -92,9 +92,9 @@ export default function SaisiePage() {
 
       {/* Grille selon taille ecran */}
       {isMobile ? (
-        <GrilleSemaineMobile absencesParJour={absencesParJour} />
+        <GrilleSemaineMobile absencesParJour={absencesParJour} modeAbsence={modeAbsence} />
       ) : (
-        <GrilleSemaine absencesParJour={absencesParJour} />
+        <GrilleSemaine absencesParJour={absencesParJour} modeAbsence={modeAbsence} onAbsenceModifiee={refetcherAbsences} />
       )}
 
       {/* Barre de sauvegarde */}

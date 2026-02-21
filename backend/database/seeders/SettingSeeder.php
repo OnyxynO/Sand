@@ -44,5 +44,23 @@ class SettingSeeder extends Seeder
             1,
             'Premier jour de la semaine (1=lundi, 0=dimanche)'
         );
+
+        Setting::set(
+            Setting::CLE_ABSENCE_MODE,
+            'manuel',
+            'Mode de gestion des absences (manuel ou api)'
+        );
+
+        Setting::set(
+            Setting::CLE_ABSENCE_API_URL,
+            '',
+            "URL de l'API RH externe"
+        );
+
+        Setting::set(
+            Setting::CLE_ABSENCE_API_TOKEN,
+            '',
+            "Token d'authentification API RH"
+        );
     }
 }

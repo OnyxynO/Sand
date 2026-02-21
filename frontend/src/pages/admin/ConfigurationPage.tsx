@@ -4,8 +4,10 @@ import {
   Cog6ToothIcon,
   CheckIcon,
   ArrowPathIcon,
+  WifiIcon,
+  CalendarDaysIcon,
 } from '@heroicons/react/24/outline';
-import { PARAMETRES_QUERY, UPDATE_SETTINGS, RESET_SETTINGS } from '../../graphql/operations/settings';
+import { PARAMETRES_QUERY, UPDATE_SETTINGS, RESET_SETTINGS, TESTER_CONNEXION_RH_API } from '../../graphql/operations/settings';
 import NavAdmin from '../../components/admin/NavAdmin';
 
 interface Parametre {
@@ -73,6 +75,7 @@ export default function ConfigurationPage() {
   const [modifie, setModifie] = useState(false);
   const [succes, setSucces] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [testConnexionResultat, setTestConnexionResultat] = useState<{ ok: boolean; message: string } | null>(null);
 
   const { data, loading, error } = useQuery(PARAMETRES_QUERY, {
     fetchPolicy: 'network-only',
@@ -85,6 +88,18 @@ export default function ConfigurationPage() {
       setTimeout(() => setSucces(false), 3000);
     },
     refetchQueries: [{ query: PARAMETRES_QUERY }],
+  });
+
+  const [testerConnexionRhApi, { loading: testing }] = useMutation(TESTER_CONNEXION_RH_API, {
+    onCompleted: (data) => {
+      const erreur = data.testerConnexionRhApi as string | null;
+      setTestConnexionResultat(
+        erreur ? { ok: false, message: erreur } : { ok: true, message: 'Connexion etablie avec succes.' }
+      );
+    },
+    onError: (err) => {
+      setTestConnexionResultat({ ok: false, message: err.message });
+    },
   });
 
   const [resetSettings, { loading: resetting }] = useMutation(RESET_SETTINGS, {
@@ -235,6 +250,97 @@ export default function ConfigurationPage() {
               {saving ? 'Enregistrement...' : 'Enregistrer'}
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Section Gestion des absences */}
+      {!loading && data && (
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
+            <CalendarDaysIcon className="w-5 h-5 text-gray-500" />
+            <h2 className="text-base font-semibold text-gray-900">Gestion des absences</h2>
+          </div>
+
+          {/* Mode */}
+          <div className="p-6 flex items-center justify-between gap-8 border-b border-gray-100">
+            <div className="flex-1">
+              <label className="text-sm font-medium text-gray-900">Mode de saisie</label>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Manuel : les utilisateurs declarent leurs absences directement dans la grille.
+                API : les absences sont importees automatiquement depuis le systeme RH externe.
+              </p>
+            </div>
+            <div className="flex-shrink-0 w-48">
+              <select
+                value={String(valeurs['absence_mode'] ?? 'manuel')}
+                onChange={(e) => handleChange('absence_mode', e.target.value)}
+                className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+              >
+                <option value="manuel">Manuel</option>
+                <option value="api">API externe</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Champs API (conditionnels) */}
+          {valeurs['absence_mode'] === 'api' && (
+            <>
+              <div className="p-6 flex items-center justify-between gap-8 border-b border-gray-100">
+                <div className="flex-1">
+                  <label className="text-sm font-medium text-gray-900">URL de l'API RH</label>
+                  <p className="text-xs text-gray-500 mt-0.5">Adresse de l'API RH externe (ex : http://rh.entreprise.fr/api)</p>
+                </div>
+                <div className="flex-shrink-0 w-72">
+                  <input
+                    type="text"
+                    value={String(valeurs['absence_api_url'] ?? '')}
+                    onChange={(e) => handleChange('absence_api_url', e.target.value)}
+                    placeholder="https://rh.exemple.fr/api"
+                    className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="p-6 flex items-center justify-between gap-8 border-b border-gray-100">
+                <div className="flex-1">
+                  <label className="text-sm font-medium text-gray-900">Token d'authentification</label>
+                  <p className="text-xs text-gray-500 mt-0.5">Token Bearer pour l'API RH (stocke en base de donnees)</p>
+                </div>
+                <div className="flex-shrink-0 w-72">
+                  <input
+                    type="password"
+                    value={String(valeurs['absence_api_token'] ?? '')}
+                    onChange={(e) => handleChange('absence_api_token', e.target.value)}
+                    placeholder="••••••••"
+                    className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="p-6 flex items-center gap-4 bg-gray-50">
+                <button
+                  onClick={() => {
+                    setTestConnexionResultat(null);
+                    testerConnexionRhApi();
+                  }}
+                  disabled={testing || modifie}
+                  title={modifie ? 'Enregistrez d\'abord les modifications avant de tester' : undefined}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+                >
+                  <WifiIcon className="w-4 h-4" />
+                  {testing ? 'Test en cours...' : 'Tester la connexion'}
+                </button>
+                {modifie && (
+                  <span className="text-xs text-gray-500">Enregistrez d'abord avant de tester.</span>
+                )}
+                {testConnexionResultat && !modifie && (
+                  <span className={`text-sm font-medium ${testConnexionResultat.ok ? 'text-green-700' : 'text-red-700'}`}>
+                    {testConnexionResultat.ok ? '✓ ' : '✗ '}{testConnexionResultat.message}
+                  </span>
+                )}
+              </div>
+            </>
+          )}
         </div>
       )}
 

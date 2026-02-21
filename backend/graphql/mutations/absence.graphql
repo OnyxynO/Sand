@@ -25,4 +25,15 @@ extend type Mutation {
     resolveAbsenceConflict(absenceId: ID!, resolution: ConflictResolution!): Boolean!
         @field(resolver: "App\\GraphQL\\Mutations\\AbsenceMutator@resolveConflict")
         @guard
+
+    "Mode manuel : declarer sa propre absence pour une journee (duree null = supprimer)"
+    declarerAbsence(date: Date!, duree: Float): Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\AbsenceMutator@declarerAbsence")
+        @guard
+
+    "Tester la connexion a l'API RH avec les settings actuels (null = OK, sinon message erreur)"
+    testerConnexionRhApi: String
+        @field(resolver: "App\\GraphQL\\Mutations\\AbsenceMutator@testerConnexionRhApi")
+        @guard
+        @can(ability: "sync", model: "App\\Models\\Absence")
 }

@@ -7,6 +7,7 @@ namespace App\GraphQL\Mutations;
 use App\Exceptions\RhApiException;
 use App\Models\Absence;
 use App\Models\Notification;
+use App\Models\Setting;
 use App\Models\TimeEntry;
 use App\Models\User;
 use App\Services\RhApiClient;
@@ -317,6 +318,68 @@ class AbsenceMutator
 
             return true;
         });
+    }
+
+    /**
+     * Declarer manuellement sa propre absence pour une journee.
+     * Uniquement disponible en mode 'manuel'. duree null = supprimer l'absence.
+     */
+    public function declarerAbsence($root, array $args): bool
+    {
+        $mode = Setting::get(Setting::CLE_ABSENCE_MODE, 'manuel');
+        if ($mode !== 'manuel') {
+            abort(403, 'La declaration manuelle est desactivee en mode API.');
+        }
+
+        $user = Auth::user();
+        $date = Carbon::parse($args['date'])->format('Y-m-d');
+        $duree = $args['duree'] ?? null;
+
+        $existante = Absence::where('user_id', $user->id)
+            ->where('date_debut', $date)
+            ->where('date_fin', $date)
+            ->whereNull('reference_externe')
+            ->first();
+
+        if ($duree === null || $duree <= 0) {
+            $existante?->delete();
+        } else {
+            if ($existante) {
+                $existante->update(['duree_journaliere' => $duree]);
+            } else {
+                Absence::create([
+                    'user_id' => $user->id,
+                    'date_debut' => $date,
+                    'date_fin' => $date,
+                    'type' => Absence::TYPE_AUTRE,
+                    'duree_journaliere' => $duree,
+                    'statut' => Absence::STATUT_VALIDE,
+                ]);
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Tester la connexion a l'API RH avec les settings actuels.
+     * Retourne null si OK, ou un message d'erreur si KO.
+     */
+    public function testerConnexionRhApi($root, array $args): ?string
+    {
+        $this->authorize('sync', Absence::class);
+
+        $url = Setting::get(Setting::CLE_ABSENCE_API_URL, '');
+        $token = Setting::get(Setting::CLE_ABSENCE_API_TOKEN, '');
+
+        if (empty($url)) {
+            return "L'URL de l'API RH n'est pas configuree.";
+        }
+
+        $client = RhApiClient::avecConfig($url, $token);
+        $ok = $client->healthCheck();
+
+        return $ok ? null : "Connexion a l'API RH impossible. Verifiez l'URL et le token.";
     }
 
     /**

@@ -180,3 +180,9 @@ export const BULK_UPDATE_TIME_ENTRIES = gql`
     }
   }
 `;
+
+export const DECLARER_ABSENCE = gql`
+  mutation DeclarerAbsence($date: Date!, $duree: Float) {
+    declarerAbsence(date: $date, duree: $duree)
+  }
+`;

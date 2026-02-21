@@ -1,7 +1,7 @@
 // Hook pour la logique de chargement et sauvegarde des saisies hebdomadaires
 
 import { useEffect, useCallback, useMemo } from 'react';
-import { useLazyQuery, useMutation } from '@apollo/client/react';
+import { useLazyQuery, useMutation, useQuery } from '@apollo/client/react';
 import { useSaisieStore } from '../stores/saisieStore';
 import {
   MES_SAISIES_SEMAINE,
@@ -11,6 +11,7 @@ import {
   BULK_UPDATE_TIME_ENTRIES,
   DELETE_TIME_ENTRY,
 } from '../graphql/operations/saisie';
+import { PARAMETRE_ABSENCE_MODE } from '../graphql/operations/settings';
 import { parseSemaineISO } from '../utils/semaineUtils';
 import { endOfWeek, format, eachDayOfInterval, isAfter, isBefore } from 'date-fns';
 import type { SaisieAPI, TimeEntryInput, BulkUpdateEntry, AbsenceJour, AbsenceAPI } from '../types';
@@ -22,10 +23,12 @@ interface UseSaisieHebdoResult {
   erreur: string | null;
   aDesModifications: boolean;
   absencesParJour: Record<string, AbsenceJour>;
+  modeAbsence: string;
 
   // Actions
   charger: () => void;
   sauvegarder: () => Promise<void>;
+  refetcherAbsences: () => void;
 }
 
 /**
@@ -109,6 +112,13 @@ export function useSaisieHebdo(userId?: string | null): UseSaisieHebdoResult {
     fetchPolicy: 'network-only',
   });
 
+  // Mode de gestion des absences (manuel ou api)
+  const { data: modeData } = useQuery<{ parametre: { valeur: string } | null }>(
+    PARAMETRE_ABSENCE_MODE,
+    { fetchPolicy: 'cache-first' }
+  );
+  const modeAbsence = (modeData?.parametre?.valeur as string) ?? 'api';
+
   // Mutation de synchronisation (best effort, ignore les erreurs d'autorisation)
   const [syncAbsences] = useMutation(SYNC_ABSENCES);
 
@@ -152,19 +162,35 @@ export function useSaisieHebdo(userId?: string | null): UseSaisieHebdoResult {
 
     fetchSaisies({ variables });
 
-    // Synchro absences (best effort, ignore les erreurs d'autorisation)
     const absVariables = {
       dateDebut: datesSemaine.dateDebut,
       dateFin: datesSemaine.dateFin,
       ...(userId ? { userId } : {}),
     };
 
-    syncAbsences({ variables: absVariables }).catch(() => {
-      // Ignorer les erreurs (permission refusee pour les utilisateurs simples)
-    }).finally(() => {
+    if (modeAbsence === 'api') {
+      // Synchro depuis l'API RH (best effort, ignore les erreurs d'autorisation)
+      syncAbsences({ variables: absVariables }).catch(() => {
+        // Ignorer les erreurs (permission refusee pour les utilisateurs simples)
+      }).finally(() => {
+        fetchAbsences({ variables: absVariables });
+      });
+    } else {
+      // Mode manuel : charger directement les absences depuis la BDD
       fetchAbsences({ variables: absVariables });
+    }
+  }, [semaineISO, userId, modeAbsence, fetchSaisies, fetchAbsences, syncAbsences, datesSemaine]);
+
+  // Fonction de rechargement des absences
+  const refetcherAbsences = useCallback(() => {
+    fetchAbsences({
+      variables: {
+        dateDebut: datesSemaine.dateDebut,
+        dateFin: datesSemaine.dateFin,
+        ...(userId ? { userId } : {}),
+      },
     });
-  }, [semaineISO, userId, fetchSaisies, fetchAbsences, syncAbsences, datesSemaine]);
+  }, [fetchAbsences, datesSemaine, userId]);
 
   // Fonction de chargement manuel
   const charger = useCallback(() => {
@@ -174,14 +200,8 @@ export function useSaisieHebdo(userId?: string | null): UseSaisieHebdoResult {
         ...(userId ? { userId } : {}),
       },
     });
-    fetchAbsences({
-      variables: {
-        dateDebut: datesSemaine.dateDebut,
-        dateFin: datesSemaine.dateFin,
-        ...(userId ? { userId } : {}),
-      },
-    });
-  }, [fetchSaisies, fetchAbsences, semaineISO, userId, datesSemaine]);
+    refetcherAbsences();
+  }, [fetchSaisies, semaineISO, userId, refetcherAbsences]);
 
   // Fonction de sauvegarde
   const sauvegarder = useCallback(async () => {
@@ -279,7 +299,9 @@ export function useSaisieHebdo(userId?: string | null): UseSaisieHebdoResult {
     erreur,
     aDesModifications: aDifficultes(),
     absencesParJour,
+    modeAbsence,
     charger,
     sauvegarder,
+    refetcherAbsences,
   };
 }
