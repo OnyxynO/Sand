@@ -32,3 +32,17 @@ export const RESET_SETTINGS = gql`
     }
   }
 `;
+
+export const PARAMETRE_ABSENCE_MODE = gql`
+  query ParametreAbsenceMode {
+    parametre(cle: "absence_mode") {
+      valeur
+    }
+  }
+`;
+
+export const TESTER_CONNEXION_RH_API = gql`
+  mutation TesterConnexionRhApi {
+    testerConnexionRhApi
+  }
+`;

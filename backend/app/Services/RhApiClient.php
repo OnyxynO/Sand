@@ -27,6 +27,18 @@ class RhApiClient
     }
 
     /**
+     * Creer une instance avec une URL et un token specifiques (test de connexion).
+     */
+    public static function avecConfig(string $url, string $token): static
+    {
+        $instance = new static();
+        $instance->baseUrl = rtrim($url, '/');
+        $instance->apiKey = $token;
+
+        return $instance;
+    }
+
+    /**
      * Recuperer les absences d'un collaborateur pour une periode donnee.
      *
      * @param  string  $matricule  Matricule du collaborateur

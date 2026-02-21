@@ -9,6 +9,7 @@ import type { JourSemaine, AbsenceJour } from '../../types';
 
 interface GrilleSemaineMobileProps {
   absencesParJour: Record<string, AbsenceJour>;
+  modeAbsence: string;
 }
 
 // Carte pour un jour
@@ -118,7 +119,7 @@ function CarteJour({ jour, absence }: { jour: JourSemaine; absence?: AbsenceJour
   );
 }
 
-export default function GrilleSemaineMobile({ absencesParJour }: GrilleSemaineMobileProps) {
+export default function GrilleSemaineMobile({ absencesParJour }: GrilleSemaineMobileProps) { // modeAbsence ignoré sur mobile (lecture seule)
   const { jours, chargement } = useSaisieStore();
   const [modaleOuverte, setModaleOuverte] = useState(false);
 

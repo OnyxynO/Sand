@@ -6,6 +6,7 @@ import { ApolloProvider } from '@apollo/client/react';
 import { MockLink } from '@apollo/client/testing';
 import { transformerAbsences, useSaisieHebdo } from '../useSaisieHebdo';
 import { MES_SAISIES_SEMAINE, ABSENCES_SEMAINE, SYNC_ABSENCES } from '../../graphql/operations/saisie';
+import { PARAMETRE_ABSENCE_MODE } from '../../graphql/operations/settings';
 import type { AbsenceAPI } from '../../types';
 
 // Mock du store Zustand pour isoler les tests du hook
@@ -228,6 +229,12 @@ describe('useSaisieHebdo', () => {
     ];
 
     const mocks = [
+      {
+        request: { query: PARAMETRE_ABSENCE_MODE, variables: {} },
+        result: { data: { parametre: { __typename: 'Setting', valeur: 'api' } } },
+        delay: 0,
+        maxUsageCount: Infinity,
+      },
       {
         request: { query: MES_SAISIES_SEMAINE, variables: { semaine: SEMAINE } },
         result: { data: { mesSaisiesSemaine: saisiesMock } },

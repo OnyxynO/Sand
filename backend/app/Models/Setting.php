@@ -27,6 +27,9 @@ class Setting extends Model
     public const CLE_DELAI_ANNULATION = 'delai_annulation';
     public const CLE_AFFICHER_WEEKENDS = 'afficher_weekends';
     public const CLE_PREMIER_JOUR_SEMAINE = 'premier_jour_semaine';
+    public const CLE_ABSENCE_MODE = 'absence_mode';
+    public const CLE_ABSENCE_API_URL = 'absence_api_url';
+    public const CLE_ABSENCE_API_TOKEN = 'absence_api_token';
 
     // Valeurs par defaut
     public const VALEURS_PAR_DEFAUT = [
@@ -36,6 +39,9 @@ class Setting extends Model
         self::CLE_DELAI_ANNULATION => ['valeur' => 5, 'description' => 'Delai d\'annulation en secondes'],
         self::CLE_AFFICHER_WEEKENDS => ['valeur' => false, 'description' => 'Afficher les weekends dans la grille'],
         self::CLE_PREMIER_JOUR_SEMAINE => ['valeur' => 1, 'description' => 'Premier jour de la semaine (0=dimanche, 1=lundi)'],
+        self::CLE_ABSENCE_MODE => ['valeur' => 'manuel', 'description' => 'Mode de gestion des absences (manuel ou api)'],
+        self::CLE_ABSENCE_API_URL => ['valeur' => '', 'description' => "URL de l'API RH externe"],
+        self::CLE_ABSENCE_API_TOKEN => ['valeur' => '', 'description' => "Token d'authentification API RH"],
     ];
 
     /**

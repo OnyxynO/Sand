@@ -15,6 +15,7 @@ vi.mock('../../stores/saisieStore', () => ({
 vi.mock('../../utils/semaineUtils', () => ({
   formatJourEnTete: (jour: JourSemaine) => jour.jourNom,
   formatDuree: (duree: number | null | undefined) => (duree ? String(duree) : ''),
+  parseSemaineISO: () => new Date('2026-02-09'),
 }));
 
 // Mock des sous-composants complexes
@@ -95,11 +96,13 @@ describe('GrilleSemaine', () => {
     vi.clearAllMocks();
   });
 
+  const defaultProps = { absencesParJour: {}, modeAbsence: 'api', onAbsenceModifiee: vi.fn() };
+
   // U-V01 : affiche le spinner pendant le chargement
   it('affiche le spinner pendant le chargement', () => {
     mockStore({ chargement: true });
 
-    renderAvecApollo(<GrilleSemaine absencesParJour={{}} />);
+    renderAvecApollo(<GrilleSemaine {...defaultProps} />);
 
     expect(screen.getByText('Chargement des saisies…')).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
@@ -109,7 +112,7 @@ describe('GrilleSemaine', () => {
   it('affiche les lignes de saisie existantes', () => {
     mockStore({ lignes: [ligneTest] });
 
-    renderAvecApollo(<GrilleSemaine absencesParJour={{}} />);
+    renderAvecApollo(<GrilleSemaine {...defaultProps} />);
 
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByTestId('ligne-saisie')).toBeInTheDocument();
@@ -119,7 +122,7 @@ describe('GrilleSemaine', () => {
   it('affiche le tableau vide quand aucune ligne', () => {
     mockStore({ lignes: [] });
 
-    renderAvecApollo(<GrilleSemaine absencesParJour={{}} />);
+    renderAvecApollo(<GrilleSemaine {...defaultProps} />);
 
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.queryByTestId('ligne-saisie')).not.toBeInTheDocument();
