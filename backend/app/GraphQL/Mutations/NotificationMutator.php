@@ -53,4 +53,16 @@ class NotificationMutator
 
         return true;
     }
+
+    /**
+     * Supprimer toutes les notifications
+     */
+    public function deleteAll(): bool
+    {
+        $user = Auth::user();
+
+        Notification::where('user_id', $user->id)->delete();
+
+        return true;
+    }
 }

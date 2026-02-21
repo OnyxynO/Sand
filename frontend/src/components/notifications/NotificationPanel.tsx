@@ -15,6 +15,7 @@ import {
   MARK_NOTIFICATION_READ,
   MARK_ALL_NOTIFICATIONS_READ,
   DELETE_NOTIFICATION,
+  DELETE_ALL_NOTIFICATIONS,
 } from '../../graphql/operations/notifications';
 import NotificationItem from './NotificationItem';
 import ConflitResolutionModal from './ConflitResolutionModal';
@@ -46,6 +47,13 @@ export default function NotificationPanel() {
   });
 
   const [deleteNotification] = useMutation(DELETE_NOTIFICATION, {
+    refetchQueries: [
+      { query: NOMBRE_NOTIFICATIONS_NON_LUES },
+      { query: MES_NOTIFICATIONS, variables: { limite: 50 } },
+    ],
+  });
+
+  const [deleteAllNotifications, { loading: deletingAll }] = useMutation(DELETE_ALL_NOTIFICATIONS, {
     refetchQueries: [
       { query: NOMBRE_NOTIFICATIONS_NON_LUES },
       { query: MES_NOTIFICATIONS, variables: { limite: 50 } },
@@ -113,6 +121,15 @@ export default function NotificationPanel() {
                           Notifications
                         </DialogTitle>
                         <div className="flex items-center gap-2">
+                          {notifications.length > 0 && (
+                            <button
+                              onClick={() => deleteAllNotifications()}
+                              disabled={deletingAll}
+                              className="text-sm text-red-500 hover:text-red-700 font-medium disabled:opacity-50 transition-colors"
+                            >
+                              Supprimer tout
+                            </button>
+                          )}
                           {hasNonLues && (
                             <button
                               onClick={handleMarkAllRead}

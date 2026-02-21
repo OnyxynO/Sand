@@ -54,6 +54,12 @@ export const DELETE_NOTIFICATION = gql`
   }
 `;
 
+export const DELETE_ALL_NOTIFICATIONS = gql`
+  mutation DeleteAllNotifications {
+    deleteAllNotifications
+  }
+`;
+
 export const RESOLVE_ABSENCE_CONFLICT = gql`
   mutation ResolveAbsenceConflict($absenceId: ID!, $resolution: ConflictResolution!) {
     resolveAbsenceConflict(absenceId: $absenceId, resolution: $resolution)

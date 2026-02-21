@@ -1,5 +1,5 @@
-import { useMemo, useState, useCallback } from 'react';
-import { useMutation, useQuery } from '@apollo/client/react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { useMutation, useQuery, useApolloClient } from '@apollo/client/react';
 import {
   ArrowDownTrayIcon,
   ArrowPathIcon,
@@ -15,6 +15,7 @@ import { Popover } from '@headlessui/react';
 import { REQUEST_EXPORT, MES_EXPORTS, DESACTIVER_EXPORT, SUPPRIMER_EXPORT } from '../graphql/operations/export';
 import { PROJETS_ACTIFS } from '../graphql/operations/saisie';
 import { TEAMS_FULL_QUERY } from '../graphql/operations/teams';
+import { MES_NOTIFICATIONS, NOMBRE_NOTIFICATIONS_NON_LUES } from '../graphql/operations/notifications';
 import { SqueletteTableau } from '../components/Squelette';
 
 function dernierJourDuMois(annee: number, mois: number): number {
@@ -134,7 +135,61 @@ export default function ExportPage() {
   // Exports locaux créés dans cette session (affichés immédiatement, avant le refetch)
   const [exportsLocaux, setExportsLocaux] = useState<ExportJob[]>([]);
 
+  // Délai minimum "En cours" : timestamp jusqu'auquel masquer TERMINE pour chaque export ID
+  const [delaiFin, setDelaiFin] = useState<Record<string, number>>({});
+
+  // Re-render automatique à l'expiration du délai
+  useEffect(() => {
+    const timestamps = Object.values(delaiFin);
+    if (timestamps.length === 0) return;
+    const now = Date.now();
+    const prochains = timestamps.filter((t) => t > now);
+    if (prochains.length === 0) return;
+    const delai = Math.min(...prochains) - now;
+    const timer = setTimeout(() => {
+      setDelaiFin((prev) => {
+        const now2 = Date.now();
+        const next: Record<string, number> = {};
+        for (const [id, t] of Object.entries(prev)) {
+          if (t > now2) next[id] = t;
+        }
+        return next;
+      });
+    }, delai);
+    return () => clearTimeout(timer);
+  }, [delaiFin]);
+
+  // Retourne le statut à afficher : masque TERMINE pendant 3 s après création
+  const statutAffiche = useCallback(
+    (exp: ExportJob): string => {
+      if (exp.statut === 'TERMINE' && delaiFin[exp.id] && Date.now() < delaiFin[exp.id]) {
+        return 'EN_COURS';
+      }
+      return exp.statut;
+    },
+    [delaiFin],
+  );
+
   const exportsServeur: ExportJob[] = dataExports?.mesExports ?? [];
+
+  // Observer : détecte les transitions vers TERMINE et invalide immédiatement
+  // les queries de notification (pastille + panneau), sans attendre le poll de 60 s
+  const client = useApolloClient();
+  const statutsPrecedents = useRef<Record<string, string>>({});
+  useEffect(() => {
+    const precedents = statutsPrecedents.current;
+    let nouveauTermine = false;
+    for (const exp of exportsServeur) {
+      const precedent = precedents[exp.id];
+      if (exp.statut === 'TERMINE' && precedent !== undefined && precedent !== 'TERMINE') {
+        nouveauTermine = true;
+      }
+      precedents[exp.id] = exp.statut;
+    }
+    if (nouveauTermine) {
+      client.refetchQueries({ include: [NOMBRE_NOTIFICATIONS_NON_LUES, MES_NOTIFICATIONS] });
+    }
+  }, [exportsServeur, client]);
 
   // Merge : les exports serveur ont la priorité, on ajoute les locaux pas encore en BDD
   const exports = useMemo(() => {
@@ -145,6 +200,9 @@ export default function ExportPage() {
 
   const [requestExport, { loading: exporting }] = useMutation(REQUEST_EXPORT, {
     onCompleted: (data) => {
+      const id: string = data.requestExport.id;
+      // Garantir 3 s minimum en état "En cours" pour que le badge soit visible
+      setDelaiFin((prev) => ({ ...prev, [id]: Date.now() + 3000 }));
       // Apparition immédiate de la ligne avec EN_ATTENTE
       setExportsLocaux((prev) => [data.requestExport, ...prev]);
       // Puis refetch pour synchroniser avec le serveur
@@ -189,9 +247,6 @@ export default function ExportPage() {
     if (!exp.expireLe) return false;
     return new Date(exp.expireLe) < new Date();
   };
-
-  const estTelechargeable = (exp: ExportJob) =>
-    exp.statut === 'TERMINE' && !estExpire(exp);
 
   return (
     <div className="space-y-6">
@@ -318,13 +373,15 @@ export default function ExportPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
-              {exports.map((exp) => (
+              {exports.map((exp) => {
+                const statut = statutAffiche(exp);
+                return (
                 <tr key={exp.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                     {formaterDateHeure(exp.creeLe)}
                   </td>
                   <td className="px-6 py-4">
-                    <StatutBadge statut={exp.statut} expire={estExpire(exp)} expireLe={exp.expireLe} />
+                    <StatutBadge statut={statut} expire={estExpire(exp)} expireLe={exp.expireLe} />
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
@@ -332,7 +389,7 @@ export default function ExportPage() {
                       <InfoPopover job={exp} projets={projets} equipes={equipes} />
 
                       {/* Telecharger / Regenerer */}
-                      {estTelechargeable(exp) ? (
+                      {statut === 'TERMINE' && !estExpire(exp) ? (
                         <a
                           href={`${baseUrl}/exports/${exp.id}/download`}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
@@ -341,7 +398,7 @@ export default function ExportPage() {
                           Telecharger
                         </a>
                       ) : (
-                        ['ECHEC', 'DESACTIVE', 'TERMINE'].includes(exp.statut) && (
+                        ['ECHEC', 'DESACTIVE', 'TERMINE'].includes(statut) && (
                           <button
                             onClick={() => handleRegenerer(exp)}
                             disabled={exporting}
@@ -354,7 +411,7 @@ export default function ExportPage() {
                       )}
 
                       {/* Desactiver (si fichier encore disponible) */}
-                      {exp.statut === 'TERMINE' && (
+                      {statut === 'TERMINE' && (
                         <button
                           onClick={() => desactiverExport({ variables: { id: exp.id } })}
                           title="Supprimer le fichier (conserver la ligne)"
@@ -375,7 +432,8 @@ export default function ExportPage() {
                     </div>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

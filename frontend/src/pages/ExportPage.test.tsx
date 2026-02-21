@@ -1,9 +1,8 @@
-import { screen } from '@testing-library/react';
-import { render } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { screen, render, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import ExportPage from './ExportPage';
-import { MES_EXPORTS } from '../graphql/operations/export';
+import { MES_EXPORTS, REQUEST_EXPORT } from '../graphql/operations/export';
 import { PROJETS_ACTIFS } from '../graphql/operations/saisie';
 import { TEAMS_FULL_QUERY } from '../graphql/operations/teams';
 
@@ -14,6 +13,7 @@ vi.mock('@heroicons/react/24/outline', () => ({
   CheckCircleIcon: () => <span data-testid="icon-check" />,
   ClockIcon: () => <span data-testid="icon-clock" />,
   ExclamationTriangleIcon: () => <span data-testid="icon-warning" />,
+  InformationCircleIcon: () => <span data-testid="icon-info" />,
   MinusCircleIcon: () => <span data-testid="icon-minus" />,
   TrashIcon: () => <span data-testid="icon-trash" />,
   XCircleIcon: () => <span data-testid="icon-x" />,
@@ -21,10 +21,12 @@ vi.mock('@heroicons/react/24/outline', () => ({
 
 const mockUseQuery = vi.fn();
 const mockUseMutation = vi.fn();
+const mockRefetchQueries = vi.fn().mockResolvedValue([]);
 
 vi.mock('@apollo/client/react', () => ({
   useQuery: (...args: unknown[]) => mockUseQuery(...args),
   useMutation: (...args: unknown[]) => mockUseMutation(...args),
+  useApolloClient: () => ({ refetchQueries: mockRefetchQueries }),
 }));
 
 const projets = [
@@ -122,8 +124,9 @@ describe('ExportPage', () => {
     renderPage();
 
     expect(screen.getByText('Historique des exports')).toBeInTheDocument();
-    expect(screen.getByText('01/01/2026 → 31/01/2026')).toBeInTheDocument();
     expect(screen.getByText('Telecharger')).toBeInTheDocument();
+    // Bouton info (popover filtres) présent pour chaque ligne
+    expect(screen.getByTestId('icon-info')).toBeInTheDocument();
   });
 
   it('affiche le bouton Regenerer pour un export desactive', () => {
@@ -172,7 +175,7 @@ describe('ExportPage', () => {
     expect(screen.getByText('Desactive')).toBeInTheDocument();
   });
 
-  it('affiche la periode et le badge projet quand present', () => {
+  it('affiche le bouton info (popover filtres) pour un export avec filtres', () => {
     configurerMocks([
       {
         id: 'uuid-4',
@@ -184,7 +187,133 @@ describe('ExportPage', () => {
     ]);
     renderPage();
 
-    expect(screen.getByText('01/01/2026 → 31/01/2026')).toBeInTheDocument();
-    expect(screen.getByText('ALPHA')).toBeInTheDocument();
+    // Le bouton info ouvre un popover avec les détails des filtres (période, projet, etc.)
+    expect(screen.getByTestId('icon-info')).toBeInTheDocument();
+    expect(screen.getByText('Telecharger')).toBeInTheDocument();
+  });
+});
+
+// ─── EV-09 : délai minimum 3 s avant affichage "Disponible" ──────────────────
+describe('EV-09 — délai minimum En cours', () => {
+  const exportTermine = {
+    id: 'ev09-id',
+    statut: 'TERMINE',
+    filtres: null,
+    expireLe: new Date(Date.now() + 86400000).toISOString(),
+    creeLe: new Date().toISOString(),
+  };
+
+  let capturedOnCompleted: ((data: unknown) => void) | undefined;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    capturedOnCompleted = undefined;
+
+    mockUseQuery.mockImplementation((query: unknown) => {
+      if (query === PROJETS_ACTIFS) return { data: { projets }, loading: false };
+      if (query === TEAMS_FULL_QUERY) return { data: { equipes }, loading: false };
+      if (query === MES_EXPORTS) return { data: { mesExports: [exportTermine] }, loading: false, refetch: vi.fn() };
+      return { data: undefined, loading: false };
+    });
+
+    mockUseMutation.mockImplementation((mutation: unknown, options?: { onCompleted?: (data: unknown) => void }) => {
+      if (mutation === REQUEST_EXPORT) {
+        capturedOnCompleted = options?.onCompleted;
+      }
+      return [vi.fn(), { loading: false }];
+    });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('masque TERMINE et affiche En cours pendant les 3 premières secondes', () => {
+    renderPage();
+    // Initialement : serveur dit TERMINE → Disponible
+    expect(screen.getByText('Disponible')).toBeInTheDocument();
+
+    // Simuler le retour de la mutation (onCompleted définit le délai)
+    act(() => {
+      capturedOnCompleted?.({
+        requestExport: { id: 'ev09-id', statut: 'EN_ATTENTE', filtres: null, expireLe: null, creeLe: new Date().toISOString() },
+      });
+    });
+
+    // delaiFin actif → badge masqué à "En cours" malgré TERMINE côté serveur
+    expect(screen.getByText('En cours')).toBeInTheDocument();
+    expect(screen.queryByText('Disponible')).not.toBeInTheDocument();
+  });
+
+  it('bascule sur Disponible après 3 secondes', () => {
+    renderPage();
+
+    act(() => {
+      capturedOnCompleted?.({
+        requestExport: { id: 'ev09-id', statut: 'EN_ATTENTE', filtres: null, expireLe: null, creeLe: new Date().toISOString() },
+      });
+    });
+
+    expect(screen.getByText('En cours')).toBeInTheDocument();
+
+    // Avancer le temps au-delà du délai
+    act(() => {
+      vi.advanceTimersByTime(3001);
+    });
+
+    expect(screen.getByText('Disponible')).toBeInTheDocument();
+    expect(screen.queryByText('En cours')).not.toBeInTheDocument();
+  });
+});
+
+// ─── EV-11 : Observer — refetch notifications sur transition TERMINE ──────────
+describe('EV-11 — Observer refetch notifications', () => {
+  beforeEach(() => {
+    mockRefetchQueries.mockClear();
+  });
+
+  it('ne déclenche pas de refetch au premier chargement', () => {
+    configurerMocks([
+      { id: '1', statut: 'TERMINE', filtres: null, expireLe: null, creeLe: new Date().toISOString() },
+    ]);
+    renderPage();
+
+    expect(mockRefetchQueries).not.toHaveBeenCalled();
+  });
+
+  it('ne déclenche pas de refetch si le statut TERMINE était déjà connu', () => {
+    // Même statut TERMINE sur deux polls consécutifs → pas de refetch
+    const { rerender } = renderPage();
+    configurerMocks([
+      { id: '1', statut: 'TERMINE', filtres: null, expireLe: null, creeLe: new Date().toISOString() },
+    ]);
+    rerender(
+      <MemoryRouter>
+        <ExportPage />
+      </MemoryRouter>,
+    );
+
+    expect(mockRefetchQueries).not.toHaveBeenCalled();
+  });
+
+  it('déclenche un refetch quand un export passe de EN_COURS à TERMINE', () => {
+    // Premier poll : EN_COURS
+    configurerMocks([
+      { id: '1', statut: 'EN_COURS', filtres: null, expireLe: null, creeLe: new Date().toISOString() },
+    ]);
+    const { rerender } = renderPage();
+    expect(mockRefetchQueries).not.toHaveBeenCalled();
+
+    // Deuxième poll : TERMINE
+    configurerMocks([
+      { id: '1', statut: 'TERMINE', filtres: null, expireLe: null, creeLe: new Date().toISOString() },
+    ]);
+    rerender(
+      <MemoryRouter>
+        <ExportPage />
+      </MemoryRouter>,
+    );
+
+    expect(mockRefetchQueries).toHaveBeenCalledTimes(1);
   });
 });
