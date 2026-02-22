@@ -56,9 +56,12 @@ Voir `docs/06_EVOLUTIONS.md` pour le detail.
     (job très rapide, precedent === undefined mais export dans exportsLocaux)
 
 **Bugs transverses corrigés** :
-- **Auth — connexion utilisateur** : `Auth::login()` sans guard explicite échouait car
-  Lighthouse change le guard par défaut en `sanctum` (RequestGuard stateless).
+- **Auth — connexion** : `Auth::login()` sans guard explicite échouait car Lighthouse
+  change le guard par défaut en `sanctum` (RequestGuard stateless).
   Fix : `Auth::guard('web')->login($user)` pour cibler explicitement le SessionGuard.
+- **Auth — déconnexion** : refresh après logout reconnectait l'utilisateur. Le logout
+  ne détruisait pas la session. Fix : `Auth::guard('web')->logout()` +
+  `session()->invalidate()` + `session()->regenerateToken()`.
 
 **Outillage / documentation** (fait) :
 - `.env.example` avec valeurs Docker pre-remplies ✓
