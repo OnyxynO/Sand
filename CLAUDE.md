@@ -217,6 +217,8 @@ docs/                        # Specifications
 - **Playwright ESM** : `__dirname` inexistant → `fileURLToPath(import.meta.url)` + `path.dirname()`
 - **Playwright Headless UI** : `getByRole('dialog')` donne hidden → tester le texte visible de la modale
 - **Playwright h1 ambigu** : Layout a son propre h1 → utiliser `getByRole('heading', { name: '...' })`
+- **JSON scalar double encodage** : `MLL\GraphQLScalars\JSON::serialize()` faisait `json_encode($value)`, provoquant un double encodage dans la reponse HTTP (graphql-php encode une seconde fois). Apollo recevait `'"manuel"'` au lieu de `'manuel'`. Fix : `app/GraphQL/Scalars/JsonScalar.php` override `serialize()` pour retourner la valeur PHP telle quelle. Le scalar `JSON` dans schema.graphql pointe vers cette classe.
+- **Setting.valeur cast 'array'** : Le modele Setting utilise le cast Eloquent `'array'` (json_encode/decode). Utiliser `Setting::get()` ou l'accesseur Eloquent pour lire les valeurs (pas de raw SQL) pour beneficier du decode automatique.
 
 ## Audit technique et qualite
 
