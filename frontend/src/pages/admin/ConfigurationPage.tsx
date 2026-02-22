@@ -285,7 +285,7 @@ export default function ConfigurationPage() {
                     type="password"
                     value={String(valeurs['absence_api_token'] ?? '')}
                     onChange={(e) => handleChange('absence_api_token', e.target.value)}
-                    placeholder="••••••••"
+                    placeholder="Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                     className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
                   />
                 </div>

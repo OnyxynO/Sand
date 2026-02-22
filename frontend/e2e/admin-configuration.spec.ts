@@ -67,4 +67,37 @@ test.describe('Admin — Configuration', () => {
 
     await expect(btnEnregistrer).toBeEnabled();
   });
+
+  // CFG-05 — EV-12 : bouton "Tester la connexion" renvoie un résultat en mode API
+  test('CFG-05 : tester connexion API RH affiche un resultat', async ({ page }) => {
+    // Passer en mode API
+    await page.getByRole('combobox').filter({ hasText: 'Manuel' }).selectOption('api');
+
+    // Les champs API doivent apparaitre
+    await expect(page.getByPlaceholder('https://rh.exemple.fr/api')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Tester la connexion' })).toBeVisible();
+
+    // Enregistrer pour que modifie = false (le bouton Tester est désactivé si modifie = true)
+    const btnEnregistrer = page.getByRole('button', { name: 'Enregistrer' });
+    await expect(btnEnregistrer).toBeEnabled();
+    await btnEnregistrer.click();
+    await expect(btnEnregistrer).toBeDisabled({ timeout: 5000 });
+
+    // Le bouton Tester la connexion doit être actif maintenant
+    const btnTester = page.getByRole('button', { name: 'Tester la connexion' });
+    await expect(btnTester).toBeEnabled({ timeout: 3000 });
+
+    // Cliquer sur "Tester la connexion"
+    await btnTester.click();
+
+    // Un résultat doit apparaitre (✓ succès ou ✗ erreur — peu importe, le workflow fonctionne)
+    await expect(page.locator('span').filter({ hasText: /^[✓✗]/ })).toBeVisible({ timeout: 10000 });
+
+    // Nettoyage : remettre en mode manuel
+    await page.getByRole('combobox').filter({ hasText: 'API externe' }).selectOption('manuel');
+    const btnEnregistrerRetour = page.getByRole('button', { name: 'Enregistrer' });
+    await expect(btnEnregistrerRetour).toBeEnabled();
+    await btnEnregistrerRetour.click();
+    await expect(btnEnregistrerRetour).toBeDisabled({ timeout: 5000 });
+  });
 });

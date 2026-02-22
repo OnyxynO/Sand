@@ -298,10 +298,10 @@ EV-12 est à **~85% complétée**.
 
 ### P2 — Finaliser EV-12
 
-- [ ] **BACK-03** : Notification dans `declarerAbsence()`
-- [ ] **FRONT-MIN-03** : Tests E2E (déclaration manuelle, notification, test connexion API RH)
-- [ ] **DOC-02** : Documenter `declarerAbsence` dans `docs/04_API_GRAPHQL.md`
-- [ ] Placeholder token API : ajouter exemple `Bearer eyJhbGci...`
+- [x] **BACK-03** : Notification dans `declarerAbsence()` — ✅ 2026-02-22
+- [x] **FRONT-MIN-03** : Tests E2E (déclaration manuelle, notification, test connexion API RH) — ✅ 2026-02-22
+- [x] **DOC-02** : Documenter `declarerAbsence` dans `docs/04_API_GRAPHQL.md` — ✅ 2026-02-22
+- [x] Placeholder token API : `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` — ✅ 2026-02-22
 
 ### P3 — Qualité code
 
@@ -332,7 +332,7 @@ EV-12 est à **~85% complétée**.
 | SEC-02 | bulkUpdate autorisation | P1 | ❌ Ouvert | — |
 | BACK-01 | Activity withTrashed | P3 | ❌ Ouvert | — |
 | BACK-02 | Colonne niveau inutile | P3 | ❌ Ouvert | — |
-| BACK-03 | Notification declarerAbsence | P2 | ❌ Ouvert | — |
+| BACK-03 | Notification declarerAbsence | P2 | ✅ Corrigé | 2026-02-22 |
 | BACK-04 | AbsenceService | P3 | ❌ Ouvert | — |
 | BACK-05 | ValidationException GraphQL | P3 | ❌ Ouvert | — |
 | BACK-06 | Tests PHPUnit manquants | P3 | ❌ Ouvert | — |
@@ -342,8 +342,8 @@ EV-12 est à **~85% complétée**.
 | FRONT-04 | Logique métier dans pages | P4 | ❌ Ouvert | — |
 | FRONT-MIN-01 | Types any dans tests | P4 | ❌ Ouvert | — |
 | FRONT-MIN-02 | historiqueEntries useMemo | P4 | ❌ Ouvert | — |
-| FRONT-MIN-03 | Tests E2E manquants | P2 | ❌ Ouvert | — |
-| DOC-01 | React 18 → 19 | P4 | ❌ Ouvert | — |
-| DOC-02 | declarerAbsence non documentée | P2 | ❌ Ouvert | — |
-| DOC-03 | EV-12 décision dans CLAUDE.md | P4 | ❌ Ouvert | — |
-| DOC-04 | Chiffres tests périmés | P4 | ❌ Ouvert | — |
+| FRONT-MIN-03 | Tests E2E manquants | P2 | ✅ Corrigé | 2026-02-22 |
+| DOC-01 | React 18 → 19 | P4 | ✅ Corrigé | 2026-02-22 |
+| DOC-02 | declarerAbsence non documentée | P2 | ✅ Corrigé | 2026-02-22 |
+| DOC-03 | EV-12 décision dans CLAUDE.md | P4 | ✅ Corrigé | 2026-02-22 |
+| DOC-04 | Chiffres tests périmés | P4 | ✅ Corrigé | 2026-02-22 |
