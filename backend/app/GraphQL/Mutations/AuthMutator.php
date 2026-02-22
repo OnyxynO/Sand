@@ -43,18 +43,18 @@ class AuthMutator
      */
     public function logout(): bool
     {
-        $user = Auth::user();
+        // Déconnexion de la session web (guard 'web' = SessionGuard, stateful).
+        // Même raison que pour login : Lighthouse change le guard par défaut en 'sanctum'.
+        Auth::guard('web')->logout();
 
-        if ($user) {
-            // Revoquer le token courant si auth via token Sanctum
-            $token = $user->currentAccessToken();
-            if ($token && method_exists($token, 'delete')) {
-                $token->delete();
-            }
+        // Invalider la session pour que l'ancien cookie laravel_session soit inutilisable.
+        // Sans ça, un refresh de page après logout reconnecte l'utilisateur.
+        // hasSession() protège le contexte de test (actingAs sanctum, sans session HTTP).
+        $request = request();
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
         }
-
-        // Note: Auth::logout() ne fonctionne pas avec le guard sanctum (stateless)
-        // La revocation du token suffit
 
         return true;
     }
