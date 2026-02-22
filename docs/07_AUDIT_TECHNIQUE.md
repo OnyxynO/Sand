@@ -305,9 +305,10 @@ EV-12 est à **~85% complétée**.
 
 ### P2b — Bugs UX post-refonte absences (corrigés)
 
-- [x] Bug #1 : Sauvegarde impossible URL/token API (ValidationException sur valeurs vides) — ✅ 2026-02-22
+- [x] Bug #1 : Sauvegarde impossible URL/token API (`@rules(required)` rejetait chaînes vides) — ✅ 2026-02-22
 - [x] Bug #2 : BlocAbsences absent sur semaines sans absence (fallback `?? 'api'`) — ✅ 2026-02-22
-- [x] Bug #3 : Activité "Absence" visible dans admin (scope nonSysteme manquant) — ✅ 2026-02-22
+- [x] Bug #3 : Activité "Absence" visible dans admin (scope `nonSysteme` manquant) — ✅ 2026-02-22
+- [x] Bug #4 : Double encodage JSON scalar — `MLL\GraphQLScalars\JSON::serialize()` faisait `json_encode()`, provoquant un second encodage par graphql-php dans la réponse HTTP. Apollo recevait `'"manuel"'` au lieu de `'manuel'`. Fix : `app/GraphQL/Scalars/JsonScalar.php` retourne la valeur PHP telle quelle. — ✅ 2026-02-22
 
 ### P3 — Qualité code
 
@@ -349,6 +350,7 @@ EV-12 est à **~85% complétée**.
 | FRONT-MIN-01 | Types any dans tests | P4 | ❌ Ouvert | — |
 | FRONT-MIN-02 | historiqueEntries useMemo | P4 | ❌ Ouvert | — |
 | FRONT-MIN-03 | Tests E2E manquants | P2 | ✅ Corrigé | 2026-02-22 |
+| INFRA-01 | JSON scalar double encodage | P2 | ✅ Corrigé | 2026-02-22 |
 | DOC-01 | React 18 → 19 | P4 | ✅ Corrigé | 2026-02-22 |
 | DOC-02 | declarerAbsence non documentée | P2 | ✅ Corrigé | 2026-02-22 |
 | DOC-03 | EV-12 décision dans CLAUDE.md | P4 | ✅ Corrigé | 2026-02-22 |
