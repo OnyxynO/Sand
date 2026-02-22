@@ -224,32 +224,6 @@ export default function ConfigurationPage() {
             </div>
           ))}
 
-          {/* Barre d'actions */}
-          <div className="p-6 flex items-center justify-between bg-gray-50 rounded-b-xl">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setConfirmReset(true)}
-                disabled={resetting}
-                className="inline-flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
-              >
-                <ArrowPathIcon className="w-4 h-4" />
-                Reinitialiser
-              </button>
-              {succes && (
-                <span className="inline-flex items-center gap-1 text-sm text-green-700">
-                  <CheckIcon className="w-4 h-4" />
-                  Parametres enregistres
-                </span>
-              )}
-            </div>
-            <button
-              onClick={handleSave}
-              disabled={!modifie || saving}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
-            >
-              {saving ? 'Enregistrement...' : 'Enregistrer'}
-            </button>
-          </div>
         </div>
       )}
 
@@ -341,6 +315,35 @@ export default function ConfigurationPage() {
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {/* Barre d'actions — en bas de toute la configuration */}
+      {!loading && data && (
+        <div className="bg-white rounded-xl shadow-sm p-6 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setConfirmReset(true)}
+              disabled={resetting}
+              className="inline-flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+            >
+              <ArrowPathIcon className="w-4 h-4" />
+              Reinitialiser
+            </button>
+            {succes && (
+              <span className="inline-flex items-center gap-1 text-sm text-green-700">
+                <CheckIcon className="w-4 h-4" />
+                Parametres enregistres
+              </span>
+            )}
+          </div>
+          <button
+            onClick={handleSave}
+            disabled={!modifie || saving}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+          >
+            {saving ? 'Enregistrement...' : 'Enregistrer'}
+          </button>
         </div>
       )}
 

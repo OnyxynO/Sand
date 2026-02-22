@@ -5,6 +5,7 @@ import ExportPage from './ExportPage';
 import { MES_EXPORTS, REQUEST_EXPORT } from '../graphql/operations/export';
 import { PROJETS_ACTIFS } from '../graphql/operations/saisie';
 import { TEAMS_FULL_QUERY } from '../graphql/operations/teams';
+import { useNotificationStore } from '../stores/notificationStore';
 
 // Heroicons crashent dans jsdom (rendu SVG) → on les remplace par des spans
 vi.mock('@heroicons/react/24/outline', () => ({
@@ -21,12 +22,10 @@ vi.mock('@heroicons/react/24/outline', () => ({
 
 const mockUseQuery = vi.fn();
 const mockUseMutation = vi.fn();
-const mockRefetchQueries = vi.fn().mockResolvedValue([]);
 
 vi.mock('@apollo/client/react', () => ({
   useQuery: (...args: unknown[]) => mockUseQuery(...args),
   useMutation: (...args: unknown[]) => mockUseMutation(...args),
-  useApolloClient: () => ({ refetchQueries: mockRefetchQueries }),
 }));
 
 const projets = [
@@ -266,23 +265,24 @@ describe('EV-09 — délai minimum En cours', () => {
   });
 });
 
-// ─── EV-11 : Observer — refetch notifications sur transition TERMINE ──────────
-describe('EV-11 — Observer refetch notifications', () => {
+// ─── EV-11 : Observer — signal Zustand sur transition TERMINE ────────────────
+describe('EV-11 — Observer signal notifications', () => {
   beforeEach(() => {
-    mockRefetchQueries.mockClear();
+    // Réinitialiser le store Zustand entre chaque test
+    useNotificationStore.setState({ refreshCount: 0 });
   });
 
-  it('ne déclenche pas de refetch au premier chargement', () => {
+  it('ne déclenche pas de signal au premier chargement', () => {
     configurerMocks([
       { id: '1', statut: 'TERMINE', filtres: null, expireLe: null, creeLe: new Date().toISOString() },
     ]);
     renderPage();
 
-    expect(mockRefetchQueries).not.toHaveBeenCalled();
+    expect(useNotificationStore.getState().refreshCount).toBe(0);
   });
 
-  it('ne déclenche pas de refetch si le statut TERMINE était déjà connu', () => {
-    // Même statut TERMINE sur deux polls consécutifs → pas de refetch
+  it('ne déclenche pas de signal si le statut TERMINE était déjà connu', () => {
+    // Même statut TERMINE sur deux polls consécutifs → pas de signal
     const { rerender } = renderPage();
     configurerMocks([
       { id: '1', statut: 'TERMINE', filtres: null, expireLe: null, creeLe: new Date().toISOString() },
@@ -293,16 +293,16 @@ describe('EV-11 — Observer refetch notifications', () => {
       </MemoryRouter>,
     );
 
-    expect(mockRefetchQueries).not.toHaveBeenCalled();
+    expect(useNotificationStore.getState().refreshCount).toBe(0);
   });
 
-  it('déclenche un refetch quand un export passe de EN_COURS à TERMINE', () => {
+  it('envoie le signal quand un export passe de EN_COURS à TERMINE', () => {
     // Premier poll : EN_COURS
     configurerMocks([
       { id: '1', statut: 'EN_COURS', filtres: null, expireLe: null, creeLe: new Date().toISOString() },
     ]);
     const { rerender } = renderPage();
-    expect(mockRefetchQueries).not.toHaveBeenCalled();
+    expect(useNotificationStore.getState().refreshCount).toBe(0);
 
     // Deuxième poll : TERMINE
     configurerMocks([
@@ -314,6 +314,7 @@ describe('EV-11 — Observer refetch notifications', () => {
       </MemoryRouter>,
     );
 
-    expect(mockRefetchQueries).toHaveBeenCalledTimes(1);
+    // Le signal Zustand doit avoir été incrémenté → NotificationBell appellera refetch()
+    expect(useNotificationStore.getState().refreshCount).toBe(1);
   });
 });

@@ -42,6 +42,7 @@ export default defineConfig({
       testMatch: [
         '**/admin-activites.spec.ts',
         '**/admin-utilisateurs.spec.ts',
+        '**/admin-configuration.spec.ts',
         '**/export.spec.ts',
         '**/navigation.spec.ts',
         '**/service-overlay.spec.ts',

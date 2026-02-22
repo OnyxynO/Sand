@@ -94,8 +94,38 @@ test.describe('Export CSV', () => {
     expect(response.status()).toBeLessThan(400);
   });
 
-  // EX-05
-  test('EX-05 : notification Export pret apparait dans le panneau', async ({ page }) => {
+  // EX-05 — EV-11 : la pastille se met à jour sans attendre le poll de 60 s
+  // Vérifie que cache.evict déclenche un refetch dès la transition TERMINE → nouvelle notif visible
+  test('EX-05 : pastille notification mise a jour apres export sans attendre 60 s', async ({
+    page,
+  }) => {
+    const btnNotif = page.getByRole('button', { name: /Notifications/ });
+
+    // Lire le compte initial
+    const compteAvant = await btnNotif.getAttribute('aria-label').then((label) => {
+      const match = label?.match(/\((\d+) non lues\)/);
+      return match ? parseInt(match[1]) : 0;
+    });
+
+    await lancerExport(page);
+    await attendreDisponible(page);
+
+    // Courte attente pour laisser le job queue créer la notification côté serveur
+    // (le job tourne après que le statut passe à TERMINE)
+    await page.waitForTimeout(2000);
+
+    // La pastille doit se mettre à jour en moins de 15 s (bien avant le poll de 60 s)
+    // grâce à cache.evict qui invalide le cache dès la détection de la transition
+    await expect(async () => {
+      const label = await btnNotif.getAttribute('aria-label');
+      const match = label?.match(/\((\d+) non lues\)/);
+      const compteApres = match ? parseInt(match[1]) : 0;
+      expect(compteApres).toBeGreaterThan(compteAvant);
+    }).toPass({ timeout: 15000 });
+  });
+
+  // EX-07
+  test('EX-07 : notification Export pret apparait dans le panneau', async ({ page }) => {
     await lancerExport(page);
     await attendreDisponible(page);
 
@@ -109,8 +139,8 @@ test.describe('Export CSV', () => {
     await expect(page.getByText(/Votre export CSV est pret/).first()).toBeVisible();
   });
 
-  // EX-06
-  test('EX-06 : supprimer une notification dans le panneau', async ({ page }) => {
+  // EX-08
+  test('EX-08 : supprimer une notification dans le panneau', async ({ page }) => {
     await lancerExport(page);
     await attendreDisponible(page);
 
@@ -146,9 +176,9 @@ test.describe('Export CSV', () => {
     await expect(page.getByText('Export pret')).toHaveCount(countAvant - 1, { timeout: 5000 });
   });
 
-  // EX-07 — timeout étendu : supprimerTousLesExports navigue une fois par export
+  // EX-09 — timeout étendu : supprimerTousLesExports navigue une fois par export
   // (~1,5 s × N exports accumulés sur plusieurs runs)
-  test('EX-07 : supprimer le dernier export affiche l etat vide', async ({ page }) => {
+  test('EX-09 : supprimer le dernier export affiche l etat vide', async ({ page }) => {
     test.setTimeout(180000);
     // Partir d'un état propre : supprimer tous les exports existants
     await supprimerTousLesExports(page);

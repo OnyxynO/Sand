@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
-import { useMutation, useQuery, useApolloClient } from '@apollo/client/react';
+import { useMutation, useQuery } from '@apollo/client/react';
 import {
   ArrowDownTrayIcon,
   ArrowPathIcon,
@@ -15,7 +15,7 @@ import { Popover } from '@headlessui/react';
 import { REQUEST_EXPORT, MES_EXPORTS, DESACTIVER_EXPORT, SUPPRIMER_EXPORT } from '../graphql/operations/export';
 import { PROJETS_ACTIFS } from '../graphql/operations/saisie';
 import { TEAMS_FULL_QUERY } from '../graphql/operations/teams';
-import { MES_NOTIFICATIONS, NOMBRE_NOTIFICATIONS_NON_LUES } from '../graphql/operations/notifications';
+import { useNotificationStore } from '../stores/notificationStore';
 import { SqueletteTableau } from '../components/Squelette';
 
 function dernierJourDuMois(annee: number, mois: number): number {
@@ -172,24 +172,33 @@ export default function ExportPage() {
 
   const exportsServeur: ExportJob[] = dataExports?.mesExports ?? [];
 
-  // Observer : détecte les transitions vers TERMINE et invalide immédiatement
-  // les queries de notification (pastille + panneau), sans attendre le poll de 60 s
-  const client = useApolloClient();
+  // Observer : détecte les transitions vers TERMINE et signale à NotificationBell
+  // de refetch immédiatement, sans attendre le poll de 60 s.
+  const signalRefreshCount = useNotificationStore((s) => s.signalRefreshCount);
   const statutsPrecedents = useRef<Record<string, string>>({});
   useEffect(() => {
     const precedents = statutsPrecedents.current;
     let nouveauTermine = false;
     for (const exp of exportsServeur) {
       const precedent = precedents[exp.id];
-      if (exp.statut === 'TERMINE' && precedent !== undefined && precedent !== 'TERMINE') {
+      // Signal si TERMINE et :
+      // - transition depuis un statut connu (precedent !== undefined) : cas normal
+      // - OU export créé dans cette session (dans exportsLocaux) : cas job très rapide
+      //   (TERMINE direct au premier poll, precedent === undefined car jamais vu EN_ATTENTE)
+      const estDeSession = exportsLocaux.some((e) => e.id === exp.id);
+      if (
+        exp.statut === 'TERMINE' &&
+        precedent !== 'TERMINE' &&
+        (precedent !== undefined || estDeSession)
+      ) {
         nouveauTermine = true;
       }
       precedents[exp.id] = exp.statut;
     }
     if (nouveauTermine) {
-      client.refetchQueries({ include: [NOMBRE_NOTIFICATIONS_NON_LUES, MES_NOTIFICATIONS] });
+      signalRefreshCount();
     }
-  }, [exportsServeur, client]);
+  }, [exportsServeur, exportsLocaux, signalRefreshCount]);
 
   // Merge : les exports serveur ont la priorité, on ajoute les locaux pas encore en BDD
   const exports = useMemo(() => {

@@ -36,6 +36,7 @@ export const RESET_SETTINGS = gql`
 export const PARAMETRE_ABSENCE_MODE = gql`
   query ParametreAbsenceMode {
     parametre(cle: "absence_mode") {
+      id
       valeur
     }
   }

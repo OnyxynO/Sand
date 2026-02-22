@@ -113,7 +113,7 @@ export function useSaisieHebdo(userId?: string | null): UseSaisieHebdoResult {
   });
 
   // Mode de gestion des absences (manuel ou api)
-  const { data: modeData } = useQuery<{ parametre: { valeur: string } | null }>(
+  const { data: modeData } = useQuery<{ parametre: { id: string; valeur: string } | null }>(
     PARAMETRE_ABSENCE_MODE,
     { fetchPolicy: 'cache-first' }
   );
