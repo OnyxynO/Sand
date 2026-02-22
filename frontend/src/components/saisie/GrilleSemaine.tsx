@@ -1,11 +1,11 @@
 // Grille de saisie hebdomadaire (version desktop)
 
 import { useState, useRef, useCallback } from 'react';
-import { useQuery, useMutation } from '@apollo/client/react';
-import { PlusIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
+import { useQuery } from '@apollo/client/react';
+import { PlusIcon } from '@heroicons/react/24/outline';
 import { useSaisieStore } from '../../stores/saisieStore';
-import { formatJourEnTete, formatDuree } from '../../utils/semaineUtils';
-import { HISTORIQUE_SAISIE, DECLARER_ABSENCE } from '../../graphql/operations/saisie';
+import { formatJourEnTete } from '../../utils/semaineUtils';
+import { HISTORIQUE_SAISIE } from '../../graphql/operations/saisie';
 import LigneSaisie from './LigneSaisie';
 import TotauxJournaliers from './TotauxJournaliers';
 import SelecteurProjetActivite from './SelecteurProjetActivite';
@@ -14,8 +14,6 @@ import type { AbsenceJour } from '../../types';
 
 interface GrilleSemaineProps {
   absencesParJour: Record<string, AbsenceJour>;
-  modeAbsence: string;
-  onAbsenceModifiee: () => void;
 }
 
 interface HistoriqueState {
@@ -24,7 +22,7 @@ interface HistoriqueState {
   dateStr: string;
 }
 
-export default function GrilleSemaine({ absencesParJour, modeAbsence, onAbsenceModifiee }: GrilleSemaineProps) {
+export default function GrilleSemaine({ absencesParJour }: GrilleSemaineProps) {
   const { lignes, jours, chargement, semaineISO } = useSaisieStore();
   const [modaleOuverte, setModaleOuverte] = useState(false);
   const [historique, setHistorique] = useState<HistoriqueState>({
@@ -33,26 +31,6 @@ export default function GrilleSemaine({ absencesParJour, modeAbsence, onAbsenceM
     dateStr: '',
   });
   const tableRef = useRef<HTMLTableElement>(null);
-
-  const [declarerAbsence] = useMutation(DECLARER_ABSENCE, {
-    onCompleted: () => onAbsenceModifiee(),
-  });
-
-  // Afficher la ligne d'absence : toujours en mode manuel, sinon seulement si absences presente
-  const aDesAbsences = modeAbsence === 'manuel' || Object.keys(absencesParJour).length > 0;
-
-  // Cycle de duree pour les absences manuelles : vide → 1 → 0.5 → vide
-  const handleCycleAbsence = useCallback((dateStr: string, dureeActuelle: number | undefined) => {
-    let nouvelleDuree: number | null;
-    if (!dureeActuelle) {
-      nouvelleDuree = 1;
-    } else if (dureeActuelle === 1) {
-      nouvelleDuree = 0.5;
-    } else {
-      nouvelleDuree = null;
-    }
-    declarerAbsence({ variables: { date: dateStr, duree: nouvelleDuree } });
-  }, [declarerAbsence]);
 
   // Charger l'historique des saisies de la semaine
   const { data: historiqueData } = useQuery(HISTORIQUE_SAISIE, {
@@ -97,9 +75,7 @@ export default function GrilleSemaine({ absencesParJour, modeAbsence, onAbsenceM
       if (!table) return;
 
       const rows = table.querySelectorAll('tbody tr');
-      // +1 pour sauter la ligne d'absence si elle existe
-      const offset = aDesAbsences ? 1 : 0;
-      const targetRow = rows[ligneIndex + offset];
+      const targetRow = rows[ligneIndex];
       if (!targetRow) return;
 
       // +1 pour la colonne projet/activite
@@ -113,7 +89,7 @@ export default function GrilleSemaine({ absencesParJour, modeAbsence, onAbsenceM
         focusable.click();
       }
     },
-    [aDesAbsences]
+    []
   );
 
   if (chargement) {
@@ -159,61 +135,6 @@ export default function GrilleSemaine({ absencesParJour, modeAbsence, onAbsenceM
             </thead>
 
             <tbody className="divide-y divide-gray-100">
-              {/* Ligne d'absences */}
-              {aDesAbsences && (
-                <tr className="bg-indigo-50/60">
-                  <td className="px-3 py-2">
-                    <div className="flex items-center gap-2">
-                      <CalendarDaysIcon className="w-4 h-4 text-indigo-500 flex-shrink-0" aria-hidden="true" />
-                      <span className="text-sm font-medium text-indigo-700">Absence</span>
-                      {modeAbsence === 'manuel' && (
-                        <span className="text-xs text-indigo-400">(cliquer pour saisir)</span>
-                      )}
-                    </div>
-                  </td>
-                  {jours.map((jour) => {
-                    const absence = absencesParJour[jour.dateStr];
-                    if (modeAbsence === 'manuel') {
-                      return (
-                        <td
-                          key={jour.dateStr}
-                          className="px-1 py-2 text-center cursor-pointer hover:bg-indigo-100/60 transition-colors"
-                          title={absence ? `Absence : ${formatDuree(absence.dureeJournaliere)} ETP — cliquer pour changer` : 'Cliquer pour declarer une absence'}
-                          onClick={() => handleCycleAbsence(jour.dateStr, absence?.dureeJournaliere)}
-                        >
-                          {absence ? (
-                            <div className="text-xs">
-                              <div className="font-medium text-indigo-700">{absence.typeLibelle}</div>
-                              <div className="text-indigo-500">{formatDuree(absence.dureeJournaliere)}</div>
-                            </div>
-                          ) : (
-                            <span className="text-xs text-indigo-300">—</span>
-                          )}
-                        </td>
-                      );
-                    }
-                    return (
-                      <td key={jour.dateStr} className="px-1 py-2 text-center">
-                        {absence ? (
-                          <div className="text-xs">
-                            <div className="font-medium text-indigo-700">{absence.typeLibelle}</div>
-                            <div className="text-indigo-500">{formatDuree(absence.dureeJournaliere)}</div>
-                          </div>
-                        ) : null}
-                      </td>
-                    );
-                  })}
-                  {/* Total absences semaine */}
-                  <td className="px-3 py-2 text-center">
-                    <span className="text-xs font-medium text-indigo-700">
-                      {formatDuree(
-                        jours.reduce((sum, j) => sum + (absencesParJour[j.dateStr]?.dureeJournaliere || 0), 0)
-                      )}
-                    </span>
-                  </td>
-                </tr>
-              )}
-
               {/* Lignes de saisie */}
               {lignes.map((ligne, index) => (
                 <LigneSaisie
