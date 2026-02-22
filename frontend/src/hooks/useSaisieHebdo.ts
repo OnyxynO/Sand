@@ -117,7 +117,7 @@ export function useSaisieHebdo(userId?: string | null): UseSaisieHebdoResult {
     PARAMETRE_ABSENCE_MODE,
     { fetchPolicy: 'cache-first' }
   );
-  const modeAbsence = (modeData?.parametre?.valeur as string) ?? 'api';
+  const modeAbsence = (modeData?.parametre?.valeur as string) ?? 'manuel';
 
   // Mutation de synchronisation (best effort, ignore les erreurs d'autorisation)
   const [syncAbsences] = useMutation(SYNC_ABSENCES);

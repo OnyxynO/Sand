@@ -42,9 +42,9 @@ extend type Query {
     projet("Identifiant du projet" id: ID! @eq): Project @find(model: "App\\Models\\Project") @guard
 
     # ─── Activities ─────────────────────────────────
-    "Arborescence complete des activites"
+    "Arborescence complete des activites (hors activites systeme)"
     arbreActivites: [Activity!]!
-        @all(model: "App\\Models\\Activity", scopes: ["racine", "trierParOrdre"])
+        @all(model: "App\\Models\\Activity", scopes: ["racine", "nonSysteme", "trierParOrdre"])
         @cache(maxAge: 300)
         @guard
 

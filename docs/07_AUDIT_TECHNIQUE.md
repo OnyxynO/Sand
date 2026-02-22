@@ -303,6 +303,12 @@ EV-12 est à **~85% complétée**.
 - [x] **DOC-02** : Documenter `declarerAbsence` dans `docs/04_API_GRAPHQL.md` — ✅ 2026-02-22
 - [x] Placeholder token API : `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` — ✅ 2026-02-22
 
+### P2b — Bugs UX post-refonte absences (corrigés)
+
+- [x] Bug #1 : Sauvegarde impossible URL/token API (ValidationException sur valeurs vides) — ✅ 2026-02-22
+- [x] Bug #2 : BlocAbsences absent sur semaines sans absence (fallback `?? 'api'`) — ✅ 2026-02-22
+- [x] Bug #3 : Activité "Absence" visible dans admin (scope nonSysteme manquant) — ✅ 2026-02-22
+
 ### P3 — Qualité code
 
 - [ ] **BACK-01** : `Activity::deleted()` event — ajouter `->withTrashed()`

@@ -81,7 +81,7 @@ export default function ConfigurationPage() {
     fetchPolicy: 'network-only',
   });
 
-  const [updateSettings, { loading: saving }] = useMutation(UPDATE_SETTINGS, {
+  const [updateSettings, { loading: saving, error: saveError }] = useMutation(UPDATE_SETTINGS, {
     onCompleted: () => {
       setModifie(false);
       setSucces(true);
@@ -338,6 +338,13 @@ export default function ConfigurationPage() {
               )}
             </>
           )}
+        </div>
+      )}
+
+      {/* Erreur de sauvegarde */}
+      {saveError && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">
+          Erreur lors de l'enregistrement : {saveError.message}
         </div>
       )}
 
