@@ -356,6 +356,15 @@ class AbsenceMutator
                     'statut' => Absence::STATUT_VALIDE,
                 ]);
             }
+
+            $dateFormatee = Carbon::parse($date)->format('d/m/Y');
+            $dureeLibelle = $duree >= 1.0 ? 'journee complete' : 'demi-journee';
+            Notification::creer(
+                $user,
+                Notification::TYPE_ABSENCE_IMPORTEE,
+                'Absence declaree',
+                "Absence du {$dateFormatee} ({$dureeLibelle}) enregistree."
+            );
         }
 
         return true;

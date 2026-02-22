@@ -26,6 +26,7 @@ export default defineConfig({
         '**/login.spec.ts',
         '**/dashboard.spec.ts',
         '**/saisie.spec.ts',
+        '**/absences-ev12.spec.ts',
         '**/acces-refuses.spec.ts',
       ],
     },

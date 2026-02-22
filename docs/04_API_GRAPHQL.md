@@ -445,6 +445,14 @@ syncAbsences(userId: ID, dateDebut: Date!, dateFin: Date!): SyncResult!
 createAbsence(input: AbsenceInput!): Absence!
 deleteAbsence(id: ID!): Boolean!
 
+# Déclaration manuelle par l'utilisateur lui-même (mode manuel uniquement)
+# duree: null ou <= 0 = supprimer l'absence du jour
+# Accessible à tous les rôles (utilisateur, modérateur, admin) si mode = 'manuel'
+declarerAbsence(date: Date!, duree: Float): Boolean!
+
+# Test de connexion à l'API RH (modérateur/admin, mode api uniquement)
+testerConnexionRhApi: String  # null = OK, message d'erreur si KO
+
 # Résolution de conflit (après import)
 resolveAbsenceConflict(
   absenceId: ID!
