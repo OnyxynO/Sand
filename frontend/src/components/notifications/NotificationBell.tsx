@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { BellIcon } from '@heroicons/react/24/outline';
 import { useQuery } from '@apollo/client/react';
 import { useNotificationStore } from '../../stores/notificationStore';
@@ -8,12 +9,23 @@ interface NombreNotificationsData {
 }
 
 export default function NotificationBell() {
-  const { togglePanneau } = useNotificationStore();
+  const { togglePanneau, refreshCount } = useNotificationStore();
 
-  const { data } = useQuery<NombreNotificationsData>(NOMBRE_NOTIFICATIONS_NON_LUES, {
+  const { data, refetch } = useQuery<NombreNotificationsData>(NOMBRE_NOTIFICATIONS_NON_LUES, {
     pollInterval: 60000, // Rafraichir toutes les 60 secondes
     fetchPolicy: 'cache-and-network',
   });
+
+  // Refetch immédiat quand un export se termine (signal depuis ExportPage via Zustand).
+  // refetch() est garanti de déclencher un appel réseau sur l'ObservableQuery actif,
+  // contrairement à cache.evict() ou client.query() qui ne sont pas fiables avec pollInterval.
+  const seenRefreshCount = useRef(refreshCount);
+  useEffect(() => {
+    if (refreshCount > seenRefreshCount.current) {
+      seenRefreshCount.current = refreshCount;
+      refetch();
+    }
+  }, [refreshCount, refetch]);
 
   const nombreNonLues = data?.nombreNotificationsNonLues ?? 0;
 

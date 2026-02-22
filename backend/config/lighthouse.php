@@ -230,7 +230,8 @@ return [
 
     'security' => [
         // Complexite max : evite les requetes qui surchargent le serveur (DoS applicatif)
-        'max_query_complexity' => 200,
+        // Note : la query users paginee (20 items + relations equipe) atteint ~481 de complexite
+        'max_query_complexity' => 500,
         // Profondeur max : 7 niveaux suffisent largement pour ce schema
         'max_query_depth' => 7,
         // Introspection : desactivee en production via variable d'environnement

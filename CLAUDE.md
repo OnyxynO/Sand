@@ -15,7 +15,7 @@ Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte 
 | Base de donnees | PostgreSQL 16 (extension ltree) |
 | Cache/Queue | Redis |
 | Conteneurisation | Docker, Docker Compose |
-| Tests | PHPUnit (191 tests, 726 assertions), Vitest (218 tests) |
+| Tests | PHPUnit (191 tests, 726 assertions), Vitest (235 tests) |
 
 ## Etat du projet
 
@@ -42,20 +42,18 @@ Voir `docs/06_EVOLUTIONS.md` pour le detail.
   - Mode `api` : champs URL + token + bouton "Tester la connexion"
   - Mode `manuel` : cellules absence cliquables (cycle vide/1 ETP/0.5 ETP)
   - Mutations : `declarerAbsence` (tout user) + `testerConnexionRhApi` (modo/admin)
+  - **Bugs corrigés** :
+    - Page Utilisateurs liste vide : Lighthouse `max_query_complexity` trop basse (200),
+      la query `users` paginée atteint ~481 → augmentée à 500
+    - ConfigurationPage bouton "Enregistrer" : déplacé hors de la section absences,
+      maintenant en bas de toute la page ✓
 
-- **EV-09 : Export CSV — ajustements UX**
-  - Etat vide : meilleur affichage quand aucun export ✓
-  - Vraies infos de filtres affichees dans le tableau (popover ℹ️ par ligne) ✓
-  - Delai minimum de 3 secondes avant passage a "Disponible" (rendre "En cours" visible) ✓
-
+- **EV-09 : Export CSV — ajustements UX** ✓
 - **EV-10 : Notifications — bouton "Supprimer tout"** ✓
-- **EV-11 : Notifications — synchronisation reactive sur fin d'export** ⚠️ BUG
-  - Observer pattern implemente (ExportPage, useRef + useEffect + client.refetchQueries)
-  - Tests unitaires passent mais ne fonctionne pas en pratique
-  - A investiguer : le refetchQueries ne semble pas invalider le cache de NotificationBell
-  - Bouton "Supprimer tout" ajoute dans le panneau de notifications,
-    a cote du bouton "Marquer tout comme lu"
-  - Mutation deleteAllNotifications (backend + frontend) ✓
+- **EV-11 : Notifications — synchronisation reactive sur fin d'export** ✓
+  - Signal Zustand (refreshCount) + refetch() dans NotificationBell
+  - Fix : observer déclenche aussi quand l'export est TERMINE dès le premier poll
+    (job très rapide, precedent === undefined mais export dans exportsLocaux)
 
 **Outillage / documentation** (fait) :
 - `.env.example` avec valeurs Docker pre-remplies ✓
