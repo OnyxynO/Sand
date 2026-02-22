@@ -17,7 +17,7 @@ input ExportInput {
 "Parametre systeme"
 input SettingInput {
     "Cle du parametre"
-    cle: String! @rules(apply: ["required"])
+    cle: String!
     "Nouvelle valeur (JSON)"
-    valeur: JSON! @rules(apply: ["required"])
+    valeur: JSON!
 }

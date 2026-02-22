@@ -179,6 +179,11 @@ class Activity extends Model
         return $query->where('est_systeme', true);
     }
 
+    public function scopeNonSysteme(Builder $query): Builder
+    {
+        return $query->where('est_systeme', false);
+    }
+
     public function scopeOrdreHierarchique(Builder $query): Builder
     {
         return $query->orderBy('chemin');
