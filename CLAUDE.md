@@ -11,11 +11,11 @@ Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte 
 | Couche | Technologies |
 |--------|--------------|
 | Backend | Laravel 12, PHP 8.4, Lighthouse 6 (GraphQL), Sanctum |
-| Frontend | React 18, TypeScript, Apollo Client 4, Tailwind CSS, Zustand |
+| Frontend | React 19, TypeScript, Apollo Client 4, Tailwind CSS, Zustand |
 | Base de donnees | PostgreSQL 16 (extension ltree) |
 | Cache/Queue | Redis |
 | Conteneurisation | Docker, Docker Compose |
-| Tests | PHPUnit (191 tests, 726 assertions), Vitest (235 tests) |
+| Tests | PHPUnit + Vitest (chiffres exacts variables — voir CI) |
 
 ## Etat du projet
 
@@ -37,28 +37,15 @@ Voir `docs/06_EVOLUTIONS.md` pour le detail.
 
 **Evolutions en attente** :
 
-- **EV-12 : Absences — refonte mécanique** ⏳ À FAIRE
-  - **Dissociation projet** : les absences ne doivent PAS être liées à un projet.
-    Actuellement elles utilisent l'activité système "Absence" dans la grille de saisie
-    (qui est forcément rattachée à un projet). À revoir : stocker les absences séparément
-    de la table `time_entries`, ou au moins sans contrainte de projet.
-  - **Tous les rôles** : vérifier que utilisateur, modérateur ET admin peuvent tous
-    déclarer des absences (la mutation `declarerAbsence` doit être accessible à tous,
-    pas seulement aux admins/modérateurs).
-  - **Notification à l'utilisateur concerné** : quand une absence est déclarée
-    (que ce soit en mode manuel ou via import API), l'utilisateur concerné doit recevoir
-    une notification dans son panneau de notifications.
-  - **Exemples dans la config API** : dans la page ConfigurationPage, la section
-    "Gestion des absences" mode `api` doit afficher des valeurs placeholder/exemple
-    dans les champs URL et token (ex: `https://rh.exemple.com/api/absences`,
-    `Bearer eyJhbGci...`) pour guider l'administrateur.
-  - **Tests** : couvrir tout ce qui précède — tests unitaires backend (PHPUnit)
-    et tests E2E Playwright pour les scénarios utilisateur/modo/admin.
-  - **Point de conception à trancher avant d'implémenter** : faut-il une table
-    dédiée `absences` (propre, sans contrainte projet, mais migration + modèle à créer)
-    ou rendre `projet_id` nullable dans `time_entries` (moins de changements mais
-    mélange saisies normales et absences dans la même table) ?
-    Recommandation : table dédiée `absences` pour une séparation nette des concepts.
+- **EV-12 : Absences — refonte mécanique** ⏳ 85% terminé
+  - ✅ **Dissociation projet** : table `absences` dédiée, séparée de `time_entries`, sans contrainte projet
+  - ✅ **Tous les rôles** : `declarerAbsence` accessible à tout utilisateur authentifié (pas de policy check)
+  - ✅ **Mode manuel vs API** : configurable via settings, UI admin implémentée
+  - ✅ **Affichage dans la grille** : ligne indigo avec icone et durée
+  - ✅ **Tests backend PHPUnit** : complets
+  - ❌ **Notification à l'utilisateur concerné** : manquante dans `declarerAbsence()` (voir BACK-03)
+  - ⚠️ **Placeholder token API** : URL ok, token exemple `Bearer eyJhbGci...` à compléter
+  - ❌ **Tests E2E** : manquants pour déclaration manuelle, notification, test connexion API RH
 
 - **EV-08 : Absences — mode manuel vs API externe configurable** ✓
   - Config admin : mode `manuel` (saisie directe grille) ou `api` (import RH)
@@ -178,7 +165,7 @@ backend/                     # Laravel 12
     ├── migrations/
     └── seeders/             # DatabaseSeeder, DemoSeeder
 
-frontend/                    # React 18 + TypeScript
+frontend/                    # React 19 + TypeScript
 └── src/
     ├── components/          # Composants reutilisables
     ├── pages/               # Pages (SaisiePage, SupervisionPage, StatsPage...)
@@ -203,7 +190,7 @@ docs/                        # Specifications
 
 - **Auth** : Sanctum SPA avec cookies HttpOnly + CSRF (pas de JWT)
 - **ltree** : Extension PostgreSQL native. Operateurs `<@` (descendants), `@>` (ancetres), index GiST. Niveau = `nlevel(chemin) - 1`
-- **Soft delete** : Sur users, projects, activities, time_entries
+- **Soft delete** : Sur users, projects, activities, time_entries (Absence : à ajouter — BACK-MIN-01)
 - **Model events** : `est_feuille` recalcule automatiquement via evenements `deleted`/`restored`
 - **Export CSV** : Job queue Redis asynchrone, notification quand pret
 - **Tests** : PostgreSQL obligatoire (ltree incompatible SQLite), base `sand_test`
@@ -230,4 +217,50 @@ docs/                        # Specifications
 - **Playwright ESM** : `__dirname` inexistant → `fileURLToPath(import.meta.url)` + `path.dirname()`
 - **Playwright Headless UI** : `getByRole('dialog')` donne hidden → tester le texte visible de la modale
 - **Playwright h1 ambigu** : Layout a son propre h1 → utiliser `getByRole('heading', { name: '...' })`
+
+## Audit technique et qualite
+
+### Agent auditeur
+
+Un agent auditeur est disponible : **`auditeur-sand`** (`.claude/agents/auditeur-sand.md`).
+
+**Obligation** : interroger cet agent en **debut ET fin de chaque implementation** (correction, evolution, refactoring).
+
+- **Avant** : l'agent verifie la coherence de la tache avec le plan d'action, identifie les risques et definit les criteres de succes
+- **Apres** : l'agent verifie que la correction est conforme, met a jour le tableau de suivi dans `docs/07_AUDIT_TECHNIQUE.md`
+
+```
+# Exemple d'invocation
+"Avant de corriger SEC-01, consulte l'agent auditeur-sand"
+"La correction de SEC-01 est terminee, fais le post-check avec auditeur-sand"
+```
+
+### Rapport d'audit
+
+Rapport complet : **`docs/07_AUDIT_TECHNIQUE.md`** (audit du 2026-02-22)
+
+### Plan d'action
+
+Les items sont identifies par ID dans le rapport. Priorites :
+
+**P1 — Securite (urgent)**
+- `SEC-01` : `TeamMutator::delete()` sans autorisation — faille critique
+- `SEC-02` : `TimeEntryMutator::bulkUpdate()` sans autorisation par entree — faille critique
+
+**P2 — Finaliser EV-12**
+- `BACK-03` : Notification manquante dans `declarerAbsence()`
+- `FRONT-MIN-03` : Tests E2E (declaration manuelle, notification, test connexion API RH)
+- `DOC-02` : Documenter `declarerAbsence` dans `docs/04_API_GRAPHQL.md`
+
+**P3 — Qualite code**
+- `BACK-01` : `Activity::deleted()` event — ajouter `->withTrashed()`
+- `BACK-02` : Supprimer colonne `niveau` inutile dans `activities`
+- `FRONT-01` : Remplacer `console.error` silencieux par etats d'erreur UI
+- `BACK-04` : Creer `AbsenceService`
+- `BACK-06` : Tests PHPUnit manquants (TeamMutator, declarerAbsence user, bulkUpdate)
+
+**P4 — Refactoring**
+- `FRONT-02` : Decouper `ProjetsPage.tsx` (971 lignes)
+- `FRONT-04` : Extraire `useIsMobile`, `usePeriode` en hooks partages
+- `BACK-MIN-01` : Ajouter `SoftDeletes` au modele `Absence`
 
