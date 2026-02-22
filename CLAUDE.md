@@ -37,6 +37,24 @@ Voir `docs/06_EVOLUTIONS.md` pour le detail.
 
 **Evolutions en attente** :
 
+- **EV-12 : Absences — refonte mécanique** ⏳ À FAIRE
+  - **Dissociation projet** : les absences ne doivent PAS être liées à un projet.
+    Actuellement elles utilisent l'activité système "Absence" dans la grille de saisie
+    (qui est forcément rattachée à un projet). À revoir : stocker les absences séparément
+    de la table `time_entries`, ou au moins sans contrainte de projet.
+  - **Tous les rôles** : vérifier que utilisateur, modérateur ET admin peuvent tous
+    déclarer des absences (la mutation `declarerAbsence` doit être accessible à tous,
+    pas seulement aux admins/modérateurs).
+  - **Notification à l'utilisateur concerné** : quand une absence est déclarée
+    (que ce soit en mode manuel ou via import API), l'utilisateur concerné doit recevoir
+    une notification dans son panneau de notifications.
+  - **Exemples dans la config API** : dans la page ConfigurationPage, la section
+    "Gestion des absences" mode `api` doit afficher des valeurs placeholder/exemple
+    dans les champs URL et token (ex: `https://rh.exemple.com/api/absences`,
+    `Bearer eyJhbGci...`) pour guider l'administrateur.
+  - **Tests** : couvrir tout ce qui précède — tests unitaires backend (PHPUnit)
+    et tests E2E Playwright pour les scénarios utilisateur/modo/admin.
+
 - **EV-08 : Absences — mode manuel vs API externe configurable** ✓
   - Config admin : mode `manuel` (saisie directe grille) ou `api` (import RH)
   - Mode `api` : champs URL + token + bouton "Tester la connexion"
