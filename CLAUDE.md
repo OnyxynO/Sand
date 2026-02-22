@@ -55,6 +55,11 @@ Voir `docs/06_EVOLUTIONS.md` pour le detail.
   - Fix : observer déclenche aussi quand l'export est TERMINE dès le premier poll
     (job très rapide, precedent === undefined mais export dans exportsLocaux)
 
+**Bugs transverses corrigés** :
+- **Auth — connexion utilisateur** : `Auth::login()` sans guard explicite échouait car
+  Lighthouse change le guard par défaut en `sanctum` (RequestGuard stateless).
+  Fix : `Auth::guard('web')->login($user)` pour cibler explicitement le SessionGuard.
+
 **Outillage / documentation** (fait) :
 - `.env.example` avec valeurs Docker pre-remplies ✓
 - `README.md` complet (installation, troubleshooting, premiers pas) ✓
