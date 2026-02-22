@@ -54,6 +54,11 @@ Voir `docs/06_EVOLUTIONS.md` pour le detail.
     `Bearer eyJhbGci...`) pour guider l'administrateur.
   - **Tests** : couvrir tout ce qui précède — tests unitaires backend (PHPUnit)
     et tests E2E Playwright pour les scénarios utilisateur/modo/admin.
+  - **Point de conception à trancher avant d'implémenter** : faut-il une table
+    dédiée `absences` (propre, sans contrainte projet, mais migration + modèle à créer)
+    ou rendre `projet_id` nullable dans `time_entries` (moins de changements mais
+    mélange saisies normales et absences dans la même table) ?
+    Recommandation : table dédiée `absences` pour une séparation nette des concepts.
 
 - **EV-08 : Absences — mode manuel vs API externe configurable** ✓
   - Config admin : mode `manuel` (saisie directe grille) ou `api` (import RH)
