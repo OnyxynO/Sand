@@ -313,6 +313,29 @@ export default function ConfigurationPage() {
                   </span>
                 )}
               </div>
+
+              {/* Config de test — mock RH dev uniquement */}
+              {import.meta.env.DEV && (
+                <div className="px-6 pb-6">
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <p className="text-sm font-medium text-amber-800 mb-2">
+                      Config de test (mock RH local) :
+                    </p>
+                    <ul className="text-xs text-amber-700 space-y-1">
+                      <li>
+                        URL :{' '}
+                        <code className="bg-amber-100 px-1 rounded">http://mock-rh:3001/api</code>
+                        <span className="ml-1 text-amber-500">(hostname Docker interne)</span>
+                      </li>
+                      <li>
+                        Token :{' '}
+                        <code className="bg-amber-100 px-1 rounded">mock-token-dev</code>
+                        <span className="ml-1 text-amber-500">(non vérifié par le mock)</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>

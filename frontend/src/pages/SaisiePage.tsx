@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useBlocker } from 'react-router';
 import NavigationSemaine from '../components/saisie/NavigationSemaine';
+import BlocAbsences from '../components/saisie/BlocAbsences';
 import GrilleSemaine from '../components/saisie/GrilleSemaine';
 import GrilleSemaineMobile from '../components/saisie/GrilleSemaineMobile';
 import BoutonSauvegarde from '../components/saisie/BoutonSauvegarde';
@@ -90,11 +91,20 @@ export default function SaisiePage() {
       {/* Navigation semaine */}
       <NavigationSemaine />
 
-      {/* Grille selon taille ecran */}
+      {/* Bloc absences — indépendant des projets */}
+      {!isMobile && (
+        <BlocAbsences
+          absencesParJour={absencesParJour}
+          modeAbsence={modeAbsence}
+          onAbsenceModifiee={refetcherAbsences}
+        />
+      )}
+
+      {/* Grille de saisie (projets + activités) */}
       {isMobile ? (
         <GrilleSemaineMobile absencesParJour={absencesParJour} modeAbsence={modeAbsence} />
       ) : (
-        <GrilleSemaine absencesParJour={absencesParJour} modeAbsence={modeAbsence} onAbsenceModifiee={refetcherAbsences} />
+        <GrilleSemaine absencesParJour={absencesParJour} />
       )}
 
       {/* Barre de sauvegarde */}
