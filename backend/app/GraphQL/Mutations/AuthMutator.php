@@ -29,7 +29,9 @@ class AuthMutator
         }
 
         // Connexion session Sanctum (cookie HttpOnly)
-        Auth::login($user);
+        // Auth::login() utilise le guard par défaut, mais Lighthouse le change en 'sanctum' (RequestGuard
+        // stateless, sans méthode login). On cible explicitement 'web' (SessionGuard, stateful).
+        Auth::guard('web')->login($user);
 
         return [
             'user' => $user,
