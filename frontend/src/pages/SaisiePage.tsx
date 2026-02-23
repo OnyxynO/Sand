@@ -11,24 +11,7 @@ import SelecteurUtilisateur from '../components/saisie/SelecteurUtilisateur';
 import { useSaisieHebdo } from '../hooks/useSaisieHebdo';
 import { useAuthStore } from '../stores/authStore';
 import { useSaisieStore } from '../stores/saisieStore';
-
-// Hook pour detecter la taille d'ecran
-function useIsMobile(breakpoint = 768) {
-  const [isMobile, setIsMobile] = useState(
-    typeof window !== 'undefined' ? window.innerWidth < breakpoint : false
-  );
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < breakpoint);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [breakpoint]);
-
-  return isMobile;
-}
+import { useIsMobile } from '../hooks/useIsMobile';
 
 export default function SaisiePage() {
   const isMobile = useIsMobile();

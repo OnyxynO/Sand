@@ -5,6 +5,7 @@ import type { KeyboardEvent, FocusEvent, MouseEvent } from 'react';
 import { ClockIcon } from '@heroicons/react/24/outline';
 import { useSaisieStore } from '../../stores/saisieStore';
 import { formatDuree, parseDuree } from '../../utils/semaineUtils';
+import { useGrilleSaisie } from './GrilleSaisieContext';
 import type { CelluleSaisieData, JourSemaine } from '../../types';
 
 interface CelluleSaisieProps {
@@ -12,11 +13,11 @@ interface CelluleSaisieProps {
   jour: JourSemaine;
   cellule: CelluleSaisieData;
   onNavigate?: (direction: 'up' | 'down' | 'left' | 'right') => void;
-  onHistorique?: () => void;
 }
 
-export default function CelluleSaisie({ ligneId, jour, cellule, onNavigate, onHistorique }: CelluleSaisieProps) {
+export default function CelluleSaisie({ ligneId, jour, cellule, onNavigate }: CelluleSaisieProps) {
   const { modifierCellule } = useSaisieStore();
+  const { ouvrirHistorique } = useGrilleSaisie();
   const [enEdition, setEnEdition] = useState(false);
   const [valeurTemp, setValeurTemp] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -138,7 +139,7 @@ export default function CelluleSaisie({ ligneId, jour, cellule, onNavigate, onHi
   const handleHistorique = (e: MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    onHistorique?.();
+    ouvrirHistorique(ligneId, jour.dateStr);
   };
 
   // Mode affichage
@@ -154,7 +155,7 @@ export default function CelluleSaisie({ ligneId, jour, cellule, onNavigate, onHi
           {aValeur ? formatDuree(cellule.duree) : ''}
         </span>
         {/* Icone historique sur les saisies existantes */}
-        {cellule.id && onHistorique && (
+        {cellule.id && (
           <button
             onClick={handleHistorique}
             onMouseDown={(e) => e.stopPropagation()}

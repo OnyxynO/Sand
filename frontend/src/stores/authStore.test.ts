@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useAuthStore } from './authStore';
+import type { UserRole } from '../types';
 
 describe('authStore', () => {
   beforeEach(() => {
@@ -20,8 +21,8 @@ describe('authStore', () => {
 
   describe('connecter', () => {
     it('met a jour utilisateur et estConnecte', () => {
-      const user = { id: '1', nom: 'Dupont', prenom: 'Jean', email: 'jean@test.com' };
-      useAuthStore.getState().connecter(user as any);
+      const user = { id: '1', nom: 'Dupont', prenom: 'Jean', email: 'jean@test.com', role: 'UTILISATEUR' as UserRole };
+      useAuthStore.getState().connecter(user);
 
       const state = useAuthStore.getState();
       expect(state.utilisateur).toEqual(user);
@@ -32,8 +33,8 @@ describe('authStore', () => {
 
   describe('deconnecter', () => {
     it('remet a zero utilisateur et estConnecte', () => {
-      const user = { id: '1', nom: 'Dupont', prenom: 'Jean', email: 'jean@test.com' };
-      useAuthStore.getState().connecter(user as any);
+      const user = { id: '1', nom: 'Dupont', prenom: 'Jean', email: 'jean@test.com', role: 'UTILISATEUR' as UserRole };
+      useAuthStore.getState().connecter(user);
       useAuthStore.getState().deconnecter();
 
       const state = useAuthStore.getState();
@@ -55,8 +56,8 @@ describe('authStore', () => {
 
   describe('setUtilisateur', () => {
     it('met a jour utilisateur et estConnecte si user present', () => {
-      const user = { id: '1', nom: 'Test', prenom: 'User', email: 'test@test.com' };
-      useAuthStore.getState().setUtilisateur(user as any);
+      const user = { id: '1', nom: 'Test', prenom: 'User', email: 'test@test.com', role: 'UTILISATEUR' as UserRole };
+      useAuthStore.getState().setUtilisateur(user);
 
       const state = useAuthStore.getState();
       expect(state.utilisateur).toEqual(user);
