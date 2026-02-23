@@ -46,10 +46,7 @@ Voir `docs/06_EVOLUTIONS.md` pour le detail.
 
 ### Reste a faire
 
-**Refactoring P4** (non urgent, qualite code) :
-- `FRONT-02` : Decouper `ProjetsPage.tsx` (~1200 lignes, 4 composants embarques)
-- `FRONT-03/04` : Reduire props drilling saisie, extraire `useIsMobile`, `usePeriode`
-- `FRONT-MIN-01/02` : Types `any` dans tests Vitest, `historiqueEntries` useMemo
+Rien. Toutes les evolutions et l'integralite de l'audit technique (P1 a P4) sont termines.
 
 ## Commandes essentielles
 
@@ -216,10 +213,5 @@ Rapport complet : **`docs/07_AUDIT_TECHNIQUE.md`** (audit du 2026-02-22)
 
 ### Plan d'action
 
-**P1/P2/P3 : 100% termines** (voir `docs/07_AUDIT_TECHNIQUE.md` pour le detail).
-
-**P4 — Refactoring (en attente)**
-- `FRONT-02` : Decouper `ProjetsPage.tsx` (~1200 lignes)
-- `FRONT-03/04` : Extraire `useIsMobile`, `usePeriode` en hooks partages
-- `FRONT-MIN-01/02` : Types `any` dans tests, `historiqueEntries` useMemo
+**P1/P2/P3/P4 : 100% termines** (voir `docs/07_AUDIT_TECHNIQUE.md` pour le detail).
 

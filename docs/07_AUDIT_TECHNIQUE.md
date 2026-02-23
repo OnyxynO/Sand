@@ -309,9 +309,10 @@ EV-12 est à **100% complétée**.
 - [x] **FRONT-03** : Réduire props drilling grille de saisie — ✅ 2026-02-23
 - [x] **FRONT-04** : Extraire `useIsMobile`, `usePeriode`, etc. — ✅ 2026-02-23
 - [x] **BACK-MIN-01** : Ajouter `SoftDeletes` au modèle `Absence` — ✅ 2026-02-22
-- [ ] **DOC-01** : Corriger React 18 → 19 dans CLAUDE.md
-- [ ] **DOC-03** : Mettre à jour statut EV-12 dans CLAUDE.md
-- [ ] **DOC-04** : Retirer chiffres de tests manuels
+- [x] **BACK-MIN-02** : `Setting::invaliderToutLeCache()` — remplacé la boucle SQL+forget par `Cache::tags('settings')->flush()` ; toutes les méthodes cache utilisent désormais le tag `settings` — ✅ 2026-02-23
+- [x] **DOC-01** : Corriger React 18 → 19 dans CLAUDE.md — ✅ 2026-02-22
+- [x] **DOC-03** : Mettre à jour statut EV-12 dans CLAUDE.md — ✅ 2026-02-22
+- [x] **DOC-04** : Retirer chiffres de tests manuels — ✅ 2026-02-22
 
 ---
 
@@ -340,6 +341,7 @@ EV-12 est à **100% complétée**.
 | DOC-03 | EV-12 décision dans CLAUDE.md | P4 | ✅ Corrigé | 2026-02-22 |
 | DOC-04 | Chiffres tests périmés | P4 | ✅ Corrigé | 2026-02-22 |
 | BACK-MIN-01 | Absence SoftDeletes | P4 | ✅ Corrigé | 2026-02-22 |
+| BACK-MIN-02 | Setting cache tags flush | P4 | ✅ Corrigé | 2026-02-23 |
 | BUG-CONFIG-01 | declarerAbsence userId admin/modo | P2 | ✅ Corrigé | 2026-02-22 |
 | BUG-CONFIG-02/03 | handleSave null JSON! + reset API (à diagnostiquer E2E) | P2 | ✅ Corrigé | 2026-02-23 |
 | EV-12-MOTIF | Motif absence absent dans declarerAbsence manuel | P3 | ✅ Corrigé | 2026-02-23 |
