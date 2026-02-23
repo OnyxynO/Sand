@@ -294,7 +294,7 @@ EV-12 est à **100% complétée**.
 ### P2c — Bugs UX post-refonte absences — second lot (corrigés)
 
 - [x] **BUG-CONFIG-01** : `declarerAbsence` sans `userId` — admin/modo bloqué pour déclarer au nom d'un autre utilisateur. Fix : paramètre `userId: ID` optionnel dans le schéma, vérification `estModerateur()` dans `AbsenceMutator`, propagation dans mutation Apollo + prop `BlocAbsences` + `SaisiePage`. — ✅ 2026-02-22
-- [ ] **BUG-CONFIG-02/03** : `handleSave()` envoie encore `null` sur `JSON!` lors du passage `manuel → api → manuel`. Plusieurs approches frontend tentées (filter, nullish coalescing, reset dans handleChange) sans succès — la source du null n'est pas encore identifiée. **À diagnostiquer par test E2E** (inspecter les variables envoyées via Apollo DevTools ou intercepter la requête réseau). Approche suggérée : écrire un test Playwright qui joue le scénario et vérifie qu'aucune variable null n'est envoyée.
+- [x] **BUG-CONFIG-02/03** : Analyse confirmée — bug résolu par les guards existants dans `ConfigurationPage.tsx` : `handleChange()` remet `absence_api_url: ''` et `absence_api_token: ''` immédiatement au passage en mode manuel ; `handleSave()` convertit tout `null/undefined` en `''` avant envoi. Le test E2E `CFG-05` dans `admin-configuration.spec.ts` couvre le scénario complet. Aucune modification de code nécessaire. — ✅ 2026-02-23
 - [x] **EV-12-MOTIF** : Sélection du motif lors de la déclaration manuelle. Fix : paramètre `type: String` dans le schéma + `AbsenceMutator` + `AbsenceService::declarerAbsenceManuellement()` (type préservé lors du cycle durée, `TYPE_AUTRE` en fallback création). Frontend : modale légère au premier clic (sélection type + durée), cycle durée seul au clic suivant. 2 tests ajoutés (création avec type, préservation lors du cycle). — ✅ 2026-02-23
 
 ### P3 — Qualité code
@@ -339,10 +339,10 @@ EV-12 est à **100% complétée**.
 | FRONT-MIN-03 | Tests E2E manquants | P2 | ✅ Corrigé | 2026-02-22 |
 | INFRA-01 | JSON scalar double encodage | P2 | ✅ Corrigé | 2026-02-22 |
 | DOC-01 | React 18 → 19 | P4 | ✅ Corrigé | 2026-02-22 |
-| DOC-02 | declarerAbsence non documentée | P2 | ✅ Corrigé | 2026-02-22 |
+| DOC-02 | declarerAbsence non documentée | P2 | ✅ Corrigé | 2026-02-23 |
 | DOC-03 | EV-12 décision dans CLAUDE.md | P4 | ✅ Corrigé | 2026-02-22 |
 | DOC-04 | Chiffres tests périmés | P4 | ✅ Corrigé | 2026-02-22 |
 | BACK-MIN-01 | Absence SoftDeletes | P4 | ✅ Corrigé | 2026-02-22 |
 | BUG-CONFIG-01 | declarerAbsence userId admin/modo | P2 | ✅ Corrigé | 2026-02-22 |
-| BUG-CONFIG-02/03 | handleSave null JSON! + reset API (à diagnostiquer E2E) | P2 | ❌ Ouvert | — |
+| BUG-CONFIG-02/03 | handleSave null JSON! + reset API (à diagnostiquer E2E) | P2 | ✅ Corrigé | 2026-02-23 |
 | EV-12-MOTIF | Motif absence absent dans declarerAbsence manuel | P3 | ✅ Corrigé | 2026-02-23 |

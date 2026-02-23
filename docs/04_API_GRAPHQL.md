@@ -447,8 +447,12 @@ deleteAbsence(id: ID!): Boolean!
 
 # Déclaration manuelle par l'utilisateur lui-même (mode manuel uniquement)
 # duree: null ou <= 0 = supprimer l'absence du jour
-# Accessible à tous les rôles (utilisateur, modérateur, admin) si mode = 'manuel'
-declarerAbsence(date: Date!, duree: Float): Boolean!
+# type: code du motif (conges_payes | rtt | maladie | formation | autre) — TYPE_AUTRE par défaut
+#   - Premier clic sur cellule vide : modale de sélection type + durée
+#   - Clic suivant sur absence existante : cycle durée uniquement (type préservé)
+# userId: optionnel — réservé aux modérateurs et admins pour déclarer au nom d'un autre utilisateur
+# Accessible à tous les rôles authentifiés si mode = 'manuel'
+declarerAbsence(date: Date!, duree: Float, type: String, userId: ID): Boolean!
 
 # Test de connexion à l'API RH (modérateur/admin, mode api uniquement)
 testerConnexionRhApi: String  # null = OK, message d'erreur si KO
