@@ -59,7 +59,7 @@ class Setting extends Model
      */
     public static function get(string $cle, mixed $defaut = null): mixed
     {
-        return Cache::remember("setting.{$cle}", 3600, function () use ($cle, $defaut) {
+        return Cache::tags('settings')->remember("setting.{$cle}", 3600, function () use ($cle, $defaut) {
             $setting = static::where('cle', $cle)->first();
 
             return $setting?->valeur ?? $defaut;
@@ -79,7 +79,7 @@ class Setting extends Model
             ]
         );
 
-        Cache::forget("setting.{$cle}");
+        Cache::tags('settings')->forget("setting.{$cle}");
     }
 
     /**
@@ -87,7 +87,7 @@ class Setting extends Model
      */
     public static function invaliderCache(string $cle): void
     {
-        Cache::forget("setting.{$cle}");
+        Cache::tags('settings')->forget("setting.{$cle}");
     }
 
     /**
@@ -95,10 +95,6 @@ class Setting extends Model
      */
     public static function invaliderToutLeCache(): void
     {
-        $settings = static::all();
-
-        foreach ($settings as $setting) {
-            Cache::forget("setting.{$setting->cle}");
-        }
+        Cache::tags('settings')->flush();
     }
 }
