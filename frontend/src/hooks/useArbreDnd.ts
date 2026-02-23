@@ -297,8 +297,8 @@ export default function useArbreDnd(
 
       try {
         await onMoveActivity(draggedId, infoDrop.parentId, infoDrop.ordre);
-      } catch (err) {
-        console.error('Erreur deplacement DnD:', err);
+      } catch {
+        // Le deplacement est annule : le DnD revient visuellement a sa position initiale
       }
 
       setInfoDrop(null);

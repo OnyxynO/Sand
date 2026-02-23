@@ -108,6 +108,21 @@ class TeamMutatorGraphQLTest extends TestCase
         $this->assertGraphQLSuccess($response);
     }
 
+    public function test_utilisateur_non_admin_ne_peut_pas_supprimer(): void
+    {
+        $user = User::factory()->create();
+        $team = Team::factory()->create();
+
+        $response = $this->graphqlAsUser('
+            mutation DeleteTeam($id: ID!) {
+                deleteTeam(id: $id)
+            }
+        ', ['id' => (string) $team->id], $user);
+
+        $this->assertGraphQLError($response);
+        $this->assertDatabaseHas('teams', ['id' => $team->id]);
+    }
+
     public function test_non_authentifie_ne_peut_pas_creer(): void
     {
         $response = $this->graphql('

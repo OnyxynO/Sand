@@ -214,6 +214,30 @@ class TimeEntryGraphQLTest extends TestCase
         $this->assertGraphQLError($response);
     }
 
+    public function test_bulk_update_refuse_saisie_autre_utilisateur(): void
+    {
+        $autreUser = User::factory()->create();
+        $saisie = TimeEntry::factory()->create([
+            'user_id' => $autreUser->id,
+            'project_id' => $this->project->id,
+            'activity_id' => $this->activity->id,
+            'duree' => 0.5,
+        ]);
+
+        $response = $this->graphqlAsUser('
+            mutation BulkUpdate($entries: [BulkUpdateEntry!]!) {
+                bulkUpdateTimeEntries(entries: $entries) { id }
+            }
+        ', [
+            'entries' => [
+                ['id' => (string) $saisie->id, 'duree' => 0.75],
+            ],
+        ], $this->user);
+
+        $this->assertGraphQLError($response);
+        $this->assertDatabaseHas('time_entries', ['id' => $saisie->id, 'duree' => 0.5]);
+    }
+
     public function test_creer_saisies_en_lot(): void
     {
         $activity2 = Activity::factory()->create(['est_feuille' => true]);
