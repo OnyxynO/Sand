@@ -10,7 +10,8 @@ import {
   FunnelIcon,
   EyeIcon,
 } from '@heroicons/react/24/outline';
-import { format, startOfWeek, endOfWeek, subWeeks, addWeeks, getISOWeek, getISOWeekYear } from 'date-fns';
+import { format, startOfWeek, endOfWeek, subWeeks, addWeeks } from 'date-fns';
+import { dateVersSemaineISO } from '../utils/semaineUtils';
 import { fr } from 'date-fns/locale';
 import { ANOMALIES_QUERY } from '../graphql/operations/supervision';
 import { PROJETS_QUERY } from '../graphql/operations/projects';
@@ -84,15 +85,6 @@ const typeConfig: Record<string, { label: string; couleur: string; icone: typeof
   },
 };
 
-/**
- * Calcule la semaine ISO (YYYY-WNN) depuis une date string.
- */
-function dateVersSemaineISO(dateStr: string): string {
-  const date = new Date(dateStr);
-  const annee = getISOWeekYear(date);
-  const semaine = getISOWeek(date);
-  return `${annee}-W${semaine.toString().padStart(2, '0')}`;
-}
 
 export default function SupervisionPage() {
   const { utilisateur } = useAuthStore();
@@ -181,7 +173,7 @@ export default function SupervisionPage() {
 
   // Navigation vers la page de saisie d'un utilisateur
   const voirSaisie = (userId: string, dateStr?: string) => {
-    const semaine = dateVersSemaineISO(dateStr || dateDebut);
+    const semaine = dateVersSemaineISO(new Date(dateStr || dateDebut));
     navigate(`/saisie?userId=${userId}&semaine=${semaine}`);
   };
 
