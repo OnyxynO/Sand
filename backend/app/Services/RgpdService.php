@@ -46,8 +46,8 @@ class RgpdService
             // Hard delete des saisies
             TimeEntry::where('user_id', $id)->forceDelete();
 
-            // Supprimer les autres donnees
-            Absence::where('user_id', $id)->delete();
+            // Supprimer les autres donnees (forceDelete pour absences — droit a l'oubli RGPD)
+            Absence::where('user_id', $id)->forceDelete();
             Notification::where('user_id', $id)->delete();
             Export::where('user_id', $id)->delete();
             ActivityUserVisibility::where('user_id', $id)->delete();
@@ -81,7 +81,7 @@ class RgpdService
             // Supprimer dans l'ordre des FK
             TimeEntryLog::query()->delete();
             TimeEntry::withTrashed()->forceDelete();
-            Absence::query()->delete();
+            Absence::withTrashed()->forceDelete();
             Notification::query()->delete();
             Export::query()->delete();
             ActivityUserVisibility::query()->delete();

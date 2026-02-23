@@ -68,6 +68,7 @@ export default function UtilisateursPage() {
 
   // Confirmation suppression
   const [confirmationSuppression, setConfirmationSuppression] = useState<Utilisateur | null>(null);
+  const [erreurSuppression, setErreurSuppression] = useState('');
 
   // Reset page sur changement de filtre
   const changerRecherche = useCallback((valeur: string) => {
@@ -136,9 +137,10 @@ export default function UtilisateursPage() {
     try {
       await deleteUser({ variables: { id: confirmationSuppression.id } });
       setConfirmationSuppression(null);
+      setErreurSuppression('');
       refetch();
     } catch (err) {
-      console.error('Erreur suppression:', err);
+      setErreurSuppression(err instanceof Error ? err.message : 'Erreur lors de la suppression.');
     }
   };
 
@@ -384,9 +386,12 @@ export default function UtilisateursPage() {
               Voulez-vous vraiment supprimer l'utilisateur{' '}
               <strong>{confirmationSuppression.nomComplet}</strong> ?
             </p>
+            {erreurSuppression && (
+              <p className="text-sm text-red-600 mb-3">{erreurSuppression}</p>
+            )}
             <div className="flex justify-end gap-3">
               <button
-                onClick={() => setConfirmationSuppression(null)}
+                onClick={() => { setConfirmationSuppression(null); setErreurSuppression(''); }}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-lg hover:bg-gray-50"
                 disabled={suppressionEnCours}
               >

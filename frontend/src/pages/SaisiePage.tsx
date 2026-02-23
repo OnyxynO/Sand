@@ -97,6 +97,7 @@ export default function SaisiePage() {
           absencesParJour={absencesParJour}
           modeAbsence={modeAbsence}
           onAbsenceModifiee={refetcherAbsences}
+          userId={userIdModeration}
         />
       )}
 

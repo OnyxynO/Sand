@@ -499,6 +499,8 @@ export default function ActivitesPage() {
   const [activiteEditee, setActiviteEditee] = useState<Activite | null>(null);
   const [parentIdPourCreation, setParentIdPourCreation] = useState<string | null>(null);
   const [confirmationSuppression, setConfirmationSuppression] = useState<Activite | null>(null);
+  const [erreurSuppression, setErreurSuppression] = useState('');
+  const [erreurDeplacement, setErreurDeplacement] = useState('');
   const [activiteADeplacer, setActiviteADeplacer] = useState<Activite | null>(null);
 
   const { data, loading, refetch } = useQuery<{ arbreActivites: Activite[] }>(ARBRE_ACTIVITES, {
@@ -581,9 +583,10 @@ export default function ActivitesPage() {
     try {
       await deleteActivity({ variables: { id: confirmationSuppression.id } });
       setConfirmationSuppression(null);
+      setErreurSuppression('');
       refetch();
     } catch (err) {
-      console.error('Erreur suppression:', err);
+      setErreurSuppression(err instanceof Error ? err.message : 'Erreur lors de la suppression.');
     }
   };
 
@@ -636,7 +639,7 @@ export default function ActivitesPage() {
       });
       refetch();
     } catch (err) {
-      console.error('Erreur deplacement:', err);
+      setErreurDeplacement(err instanceof Error ? err.message : 'Erreur lors du déplacement.');
     }
   };
 
@@ -657,7 +660,7 @@ export default function ActivitesPage() {
       });
       refetch();
     } catch (err) {
-      console.error('Erreur deplacement:', err);
+      setErreurDeplacement(err instanceof Error ? err.message : 'Erreur lors du déplacement.');
     }
   };
 
@@ -674,7 +677,7 @@ export default function ActivitesPage() {
       setActiviteADeplacer(null);
       refetch();
     } catch (err) {
-      console.error('Erreur deplacement:', err);
+      setErreurDeplacement(err instanceof Error ? err.message : 'Erreur lors du déplacement.');
     }
   };
 
@@ -743,6 +746,14 @@ export default function ActivitesPage() {
       {/* Vue texte */}
       {vueActive === 'texte' && (
         <VueTexteActivites activites={activites} onAppliquer={() => refetch()} />
+      )}
+
+      {/* Erreur deplacement */}
+      {erreurDeplacement && (
+        <div className="flex items-center justify-between bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+          <span>{erreurDeplacement}</span>
+          <button onClick={() => setErreurDeplacement('')} className="ml-4 text-red-500 hover:text-red-700">✕</button>
+        </div>
       )}
 
       {/* Arborescence avec DnD */}
@@ -841,9 +852,12 @@ export default function ActivitesPage() {
                 </span>
               )}
             </p>
+            {erreurSuppression && (
+              <p className="text-sm text-red-600 mb-3">{erreurSuppression}</p>
+            )}
             <div className="flex justify-end gap-3">
               <button
-                onClick={() => setConfirmationSuppression(null)}
+                onClick={() => { setConfirmationSuppression(null); setErreurSuppression(''); }}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-lg hover:bg-gray-50"
                 disabled={suppressionEnCours}
               >

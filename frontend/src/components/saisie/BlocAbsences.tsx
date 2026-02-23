@@ -12,9 +12,10 @@ interface BlocAbsencesProps {
   absencesParJour: Record<string, AbsenceJour>;
   modeAbsence: string;
   onAbsenceModifiee: () => void;
+  userId?: string | null;
 }
 
-export default function BlocAbsences({ absencesParJour, modeAbsence, onAbsenceModifiee }: BlocAbsencesProps) {
+export default function BlocAbsences({ absencesParJour, modeAbsence, onAbsenceModifiee, userId }: BlocAbsencesProps) {
   const { jours } = useSaisieStore();
 
   const [declarerAbsence] = useMutation(DECLARER_ABSENCE, {
@@ -32,9 +33,9 @@ export default function BlocAbsences({ absencesParJour, modeAbsence, onAbsenceMo
       } else {
         nouvelleDuree = null;
       }
-      declarerAbsence({ variables: { date: dateStr, duree: nouvelleDuree } });
+      declarerAbsence({ variables: { date: dateStr, duree: nouvelleDuree, userId: userId ?? undefined } });
     },
-    [declarerAbsence]
+    [declarerAbsence, userId]
   );
 
   // En mode API : n'afficher que s'il y a des absences

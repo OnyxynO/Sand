@@ -23,6 +23,7 @@ export default function ConflitResolutionModal({
   onFermer,
 }: ConflitResolutionModalProps) {
   const [confirmationAction, setConfirmationAction] = useState<ConflictResolution | null>(null);
+  const [erreur, setErreur] = useState('');
 
   const [resolveConflict, { loading }] = useMutation(RESOLVE_ABSENCE_CONFLICT, {
     refetchQueries: [
@@ -31,10 +32,11 @@ export default function ConflitResolutionModal({
     ],
     onCompleted: () => {
       setConfirmationAction(null);
+      setErreur('');
       onFermer();
     },
     onError: (error) => {
-      console.error('Erreur resolution conflit:', error);
+      setErreur(error.message);
       setConfirmationAction(null);
     },
   });
@@ -123,6 +125,13 @@ export default function ConflitResolutionModal({
                       sont en conflit avec cette absence.
                     </p>
                   </div>
+
+                  {/* Erreur */}
+                  {erreur && (
+                    <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+                      {erreur}
+                    </div>
+                  )}
 
                   {/* Zone confirmation si action destructive */}
                   {confirmationAction === 'ECRASER' && (

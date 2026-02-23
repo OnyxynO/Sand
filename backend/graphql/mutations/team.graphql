@@ -15,5 +15,5 @@ extend type Mutation {
     deleteTeam(id: ID!): Boolean!
         @field(resolver: "App\\GraphQL\\Mutations\\TeamMutator@delete")
         @guard
-        @can(ability: "delete", model: "App\\Models\\Team")
+        @can(ability: "delete", find: "id", model: "App\\Models\\Team")
 }

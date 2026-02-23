@@ -300,6 +300,83 @@ class AbsenceMutatorGraphQLTest extends TestCase
         $this->assertTrue($notification->est_lu);
     }
 
+    public function test_utilisateur_peut_declarer_sa_propre_absence(): void
+    {
+        // Le mode 'manuel' est la valeur par defaut quand aucun setting n'existe
+        $response = $this->graphqlAsUser('
+            mutation DeclarerAbsence($date: Date!, $duree: Float) {
+                declarerAbsence(date: $date, duree: $duree)
+            }
+        ', [
+            'date' => '2026-03-10',
+            'duree' => 1.0,
+        ], $this->utilisateur);
+
+        $this->assertGraphQLSuccess($response);
+        $this->assertTrue($this->getGraphQLData($response, 'declarerAbsence'));
+
+        $this->assertDatabaseHas('absences', [
+            'user_id' => $this->utilisateur->id,
+            'date_debut' => '2026-03-10',
+            'date_fin' => '2026-03-10',
+            'duree_journaliere' => 1.0,
+        ]);
+    }
+
+    public function test_declarer_absence_envoie_notification(): void
+    {
+        $this->graphqlAsUser('
+            mutation DeclarerAbsence($date: Date!, $duree: Float) {
+                declarerAbsence(date: $date, duree: $duree)
+            }
+        ', [
+            'date' => '2026-03-11',
+            'duree' => 0.5,
+        ], $this->utilisateur);
+
+        $this->assertDatabaseHas('notifications', [
+            'user_id' => $this->utilisateur->id,
+            'type' => Notification::TYPE_ABSENCE_IMPORTEE,
+        ]);
+    }
+
+    public function test_utilisateur_ne_peut_pas_declarer_absence_pour_autre(): void
+    {
+        $autreUser = User::factory()->create(['equipe_id' => $this->team->id]);
+
+        $response = $this->graphqlAsUser('
+            mutation DeclarerAbsence($date: Date!, $duree: Float, $userId: ID) {
+                declarerAbsence(date: $date, duree: $duree, userId: $userId)
+            }
+        ', [
+            'date' => '2026-03-12',
+            'duree' => 1.0,
+            'userId' => (string) $autreUser->id,
+        ], $this->utilisateur);
+
+        $this->assertGraphQLError($response);
+        $this->assertDatabaseMissing('absences', ['user_id' => $autreUser->id]);
+    }
+
+    public function test_moderateur_peut_declarer_absence_pour_autre(): void
+    {
+        $response = $this->graphqlAsUser('
+            mutation DeclarerAbsence($date: Date!, $duree: Float, $userId: ID) {
+                declarerAbsence(date: $date, duree: $duree, userId: $userId)
+            }
+        ', [
+            'date' => '2026-03-13',
+            'duree' => 1.0,
+            'userId' => (string) $this->utilisateur->id,
+        ], $this->moderateur);
+
+        $this->assertGraphQLSuccess($response);
+        $this->assertDatabaseHas('absences', [
+            'user_id' => $this->utilisateur->id,
+            'date_debut' => '2026-03-13',
+        ]);
+    }
+
     public function test_creer_absence_duree_invalide_echoue(): void
     {
         // Tenter de creer une absence avec dureeJournaliere hors limites (> 1)
@@ -320,5 +397,69 @@ class AbsenceMutatorGraphQLTest extends TestCase
         ], $this->admin);
 
         $this->assertGraphQLError($response);
+    }
+
+    public function test_declarer_absence_suppression_ne_cree_pas_notification(): void
+    {
+        // Creer une absence existante a supprimer
+        Absence::create([
+            'user_id' => $this->utilisateur->id,
+            'date_debut' => '2026-04-20',
+            'date_fin' => '2026-04-20',
+            'type' => Absence::TYPE_AUTRE,
+            'duree_journaliere' => 1.0,
+            'statut' => Absence::STATUT_VALIDE,
+        ]);
+
+        // Appeler declarerAbsence sans duree (= suppression)
+        $response = $this->graphqlAsUser('
+            mutation DeclarerAbsence($date: Date!, $duree: Float) {
+                declarerAbsence(date: $date, duree: $duree)
+            }
+        ', [
+            'date' => '2026-04-20',
+            'duree' => null,
+        ], $this->utilisateur);
+
+        $this->assertGraphQLSuccess($response);
+
+        // L'absence doit etre supprimee (soft delete)
+        $this->assertDatabaseMissing('absences', [
+            'user_id' => $this->utilisateur->id,
+            'date_debut' => '2026-04-20',
+            'deleted_at' => null,
+        ]);
+
+        // Aucune notification ne doit avoir ete creee
+        $this->assertDatabaseMissing('notifications', [
+            'user_id' => $this->utilisateur->id,
+            'type' => Notification::TYPE_ABSENCE_IMPORTEE,
+        ]);
+    }
+
+    public function test_moderateur_declarant_pour_autre_notifie_utilisateur_cible(): void
+    {
+        // Le moderateur declare une absence pour $utilisateur
+        $response = $this->graphqlAsUser('
+            mutation DeclarerAbsence($date: Date!, $duree: Float, $userId: ID) {
+                declarerAbsence(date: $date, duree: $duree, userId: $userId)
+            }
+        ', [
+            'date' => '2026-04-25',
+            'duree' => 0.5,
+            'userId' => (string) $this->utilisateur->id,
+        ], $this->moderateur);
+
+        $this->assertGraphQLSuccess($response);
+
+        // La notification doit etre destinee a l'utilisateur cible, pas au moderateur
+        $this->assertDatabaseHas('notifications', [
+            'user_id' => $this->utilisateur->id,
+            'type' => Notification::TYPE_ABSENCE_IMPORTEE,
+        ]);
+        $this->assertDatabaseMissing('notifications', [
+            'user_id' => $this->moderateur->id,
+            'type' => Notification::TYPE_ABSENCE_IMPORTEE,
+        ]);
     }
 }

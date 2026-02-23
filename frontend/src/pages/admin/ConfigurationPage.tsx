@@ -124,16 +124,32 @@ export default function ConfigurationPage() {
   }, [data]);
 
   const handleChange = (cle: string, valeur: unknown) => {
-    setValeurs((prev) => ({ ...prev, [cle]: valeur }));
+    if (cle === 'absence_mode' && valeur === 'manuel') {
+      // Effacer les champs API lors du passage en mode manuel
+      setValeurs((prev) => ({ ...prev, [cle]: valeur, absence_api_url: '', absence_api_token: '' }));
+    } else {
+      setValeurs((prev) => ({ ...prev, [cle]: valeur }));
+    }
     setModifie(true);
     setSucces(false);
   };
 
   const handleSave = () => {
-    const settings = Object.entries(valeurs).map(([cle, valeur]) => ({
-      cle,
-      valeur,
-    }));
+    // 'api' est le seul mode explicite — tout autre valeur (undefined, 'manuel', null) = manuel
+    const modeManuel = valeurs['absence_mode'] !== 'api';
+
+    const settings = Object.entries(valeurs).map(([cle, valeur]) => {
+      // En mode manuel, forcer les champs API à vide
+      if (modeManuel && (cle === 'absence_api_url' || cle === 'absence_api_token')) {
+        return { cle, valeur: '' };
+      }
+      // Garantir que la valeur est serialisable en JSON (JSON! non-nullable)
+      // NaN -> 0, null/undefined -> '', les valeurs NaN passent en JSON.stringify comme null
+      if (valeur === null || valeur === undefined) return { cle, valeur: '' };
+      if (typeof valeur === 'number' && !isFinite(valeur)) return { cle, valeur: 0 };
+      return { cle, valeur };
+    });
+
     updateSettings({ variables: { settings } });
   };
 

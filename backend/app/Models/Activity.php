@@ -19,9 +19,11 @@ class Activity extends Model
         // Apres suppression (soft delete), recalculer est_feuille du parent
         static::deleted(function (Activity $activity) {
             if ($activity->parent_id) {
+                // Compter les enfants actifs (sans withTrashed) — le soft-deleted est exclu automatiquement
                 $nbEnfants = static::where('parent_id', $activity->parent_id)->count();
                 if ($nbEnfants === 0) {
-                    static::where('id', $activity->parent_id)->update(['est_feuille' => true]);
+                    // Mettre a jour avec withTrashed pour inclure les parents eux-memes soft-deleted
+                    static::withTrashed()->where('id', $activity->parent_id)->update(['est_feuille' => true]);
                 }
             }
         });

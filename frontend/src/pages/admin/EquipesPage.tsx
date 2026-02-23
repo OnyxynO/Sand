@@ -261,6 +261,7 @@ export default function EquipesPage() {
   const [modaleOuverte, setModaleOuverte] = useState(false);
   const [equipeEditee, setEquipeEditee] = useState<Equipe | null>(null);
   const [confirmationSuppression, setConfirmationSuppression] = useState<Equipe | null>(null);
+  const [erreurSuppression, setErreurSuppression] = useState('');
 
   const { data, loading, refetch } = useQuery<{ equipes: Equipe[] }>(TEAMS_FULL_QUERY, {
     variables: { actifSeulement: filtreActif || undefined },
@@ -286,9 +287,10 @@ export default function EquipesPage() {
     try {
       await deleteTeam({ variables: { id: confirmationSuppression.id } });
       setConfirmationSuppression(null);
+      setErreurSuppression('');
       refetch();
     } catch (err) {
-      console.error('Erreur suppression:', err);
+      setErreurSuppression(err instanceof Error ? err.message : 'Erreur lors de la suppression.');
     }
   };
 
@@ -395,9 +397,12 @@ export default function EquipesPage() {
                 </span>
               )}
             </p>
+            {erreurSuppression && (
+              <p className="text-sm text-red-600 mb-3">{erreurSuppression}</p>
+            )}
             <div className="flex justify-end gap-3">
               <button
-                onClick={() => setConfirmationSuppression(null)}
+                onClick={() => { setConfirmationSuppression(null); setErreurSuppression(''); }}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-lg hover:bg-gray-50"
                 disabled={suppressionEnCours}
               >

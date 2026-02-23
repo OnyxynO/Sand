@@ -7,7 +7,7 @@ use App\Models\TimeEntryLog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Validation\ValidationException;
+use Nuwave\Lighthouse\Exceptions\ValidationException;
 
 class TimeEntryMutator
 {
@@ -146,6 +146,8 @@ class TimeEntryMutator
         DB::transaction(function () use ($user, $args, &$saisies) {
             foreach ($args['entries'] as $entry) {
                 $saisie = TimeEntry::findOrFail($entry['id']);
+
+                Gate::forUser($user)->authorize('update', $saisie);
 
                 $this->validateDuree($entry['duree']);
 

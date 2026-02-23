@@ -333,6 +333,7 @@ function ConfigActivitesModal({
   // Pour le toast d'annulation
   const [toastVisible, setToastVisible] = useState(false);
   const [nbDesactivees, setNbDesactivees] = useState(0);
+  const [erreurSauvegarde, setErreurSauvegarde] = useState('');
   const etatInitialRef = useRef<Set<string>>(new Set());
 
   const { data: dataActivites } = useQuery<{ arbreActivites: Activite[] }>(ARBRE_ACTIVITES, {
@@ -417,6 +418,7 @@ function ConfigActivitesModal({
 
   // Effectuer la sauvegarde effective
   const effectuerSauvegarde = useCallback(async () => {
+    setErreurSauvegarde('');
     try {
       await setProjectActivities({
         variables: {
@@ -428,7 +430,7 @@ function ConfigActivitesModal({
       onSuccess();
       onFermer();
     } catch (err) {
-      console.error('Erreur:', err);
+      setErreurSauvegarde(err instanceof Error ? err.message : 'Erreur lors de l\'enregistrement');
       setToastVisible(false);
     }
   }, [projet, selectionnees, setProjectActivities, onSuccess, onFermer]);
@@ -501,6 +503,11 @@ function ConfigActivitesModal({
                     ))}
                   </div>
 
+                  {erreurSauvegarde && (
+                    <div className="mx-4 mb-2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                      {erreurSauvegarde}
+                    </div>
+                  )}
                   <div className="flex justify-end gap-3 p-4 border-t">
                     <button onClick={onFermer} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-lg hover:bg-gray-50">
                       Annuler
@@ -541,6 +548,7 @@ function GestionModerateursModal({
   onSuccess: () => void;
 }) {
   const [recherche, setRecherche] = useState('');
+  const [erreur, setErreur] = useState('');
 
   interface UsersData {
     users: {
@@ -575,21 +583,23 @@ function GestionModerateursModal({
 
   const handleAjouter = async (userId: string) => {
     if (!projet) return;
+    setErreur('');
     try {
       await addModerator({ variables: { projetId: projet.id, userId } });
       onSuccess();
     } catch (err) {
-      console.error('Erreur ajout moderateur:', err);
+      setErreur(err instanceof Error ? err.message : 'Erreur lors de l\'ajout');
     }
   };
 
   const handleRetirer = async (userId: string) => {
     if (!projet) return;
+    setErreur('');
     try {
       await removeModerator({ variables: { projetId: projet.id, userId } });
       onSuccess();
     } catch (err) {
-      console.error('Erreur retrait moderateur:', err);
+      setErreur(err instanceof Error ? err.message : 'Erreur lors du retrait');
     }
   };
 
@@ -681,6 +691,11 @@ function GestionModerateursModal({
                   </div>
                 </div>
 
+                {erreur && (
+                  <div className="mx-4 mb-2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                    {erreur}
+                  </div>
+                )}
                 <div className="flex justify-end px-4 py-3 border-t">
                   <button onClick={onFermer} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-lg hover:bg-gray-50">
                     Fermer
@@ -709,6 +724,7 @@ function GestionVisibilitesModal({
 }) {
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [selectedActivityId, setSelectedActivityId] = useState<string>('');
+  const [erreur, setErreur] = useState('');
 
   interface RestrictionsData {
     restrictionsVisibilite: RestrictionVisibilite[];
@@ -765,6 +781,7 @@ function GestionVisibilitesModal({
   const handleAjouterRestriction = async () => {
     if (!projet || !selectedUserId || !selectedActivityId) return;
 
+    setErreur('');
     try {
       await hideActivity({
         variables: {
@@ -778,13 +795,14 @@ function GestionVisibilitesModal({
       refetch();
       onSuccess();
     } catch (err) {
-      console.error('Erreur ajout restriction:', err);
+      setErreur(err instanceof Error ? err.message : 'Erreur lors de l\'ajout de la restriction');
     }
   };
 
   const handleSupprimerRestriction = async (restriction: RestrictionVisibilite) => {
     if (!projet) return;
 
+    setErreur('');
     try {
       await showActivity({
         variables: {
@@ -796,7 +814,7 @@ function GestionVisibilitesModal({
       refetch();
       onSuccess();
     } catch (err) {
-      console.error('Erreur suppression restriction:', err);
+      setErreur(err instanceof Error ? err.message : 'Erreur lors de la suppression de la restriction');
     }
   };
 
@@ -907,6 +925,11 @@ function GestionVisibilitesModal({
                   )}
                 </div>
 
+                {erreur && (
+                  <div className="mx-4 mb-2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                    {erreur}
+                  </div>
+                )}
                 <div className="flex justify-end px-4 py-3 border-t">
                   <button onClick={onFermer} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-lg hover:bg-gray-50">
                     Fermer
@@ -936,6 +959,7 @@ export default function ProjetsPage() {
   const [modaleVisibilitesOuverte, setModaleVisibilitesOuverte] = useState(false);
   const [projetPourVisibilites, setProjetPourVisibilites] = useState<Projet | null>(null);
   const [confirmationSuppression, setConfirmationSuppression] = useState<Projet | null>(null);
+  const [erreurSuppression, setErreurSuppression] = useState('');
 
   const { data, loading, refetch } = useQuery<{ projets: Projet[] }>(PROJETS_QUERY, {
     variables: { actif: filtreActif || undefined },
@@ -963,12 +987,13 @@ export default function ProjetsPage() {
 
   const confirmerSuppression = async () => {
     if (!confirmationSuppression) return;
+    setErreurSuppression('');
     try {
       await deleteProject({ variables: { id: confirmationSuppression.id } });
       setConfirmationSuppression(null);
       refetch();
     } catch (err) {
-      console.error('Erreur:', err);
+      setErreurSuppression(err instanceof Error ? err.message : 'Erreur lors de la suppression');
     }
   };
 
@@ -1134,8 +1159,13 @@ export default function ProjetsPage() {
             <p className="text-sm text-gray-600 mb-4">
               Voulez-vous vraiment supprimer le projet <strong>{confirmationSuppression.nom}</strong> ?
             </p>
+            {erreurSuppression && (
+              <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                {erreurSuppression}
+              </div>
+            )}
             <div className="flex justify-end gap-3">
-              <button onClick={() => setConfirmationSuppression(null)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-lg hover:bg-gray-50" disabled={suppressionEnCours}>
+              <button onClick={() => { setConfirmationSuppression(null); setErreurSuppression(''); }} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-lg hover:bg-gray-50" disabled={suppressionEnCours}>
                 Annuler
               </button>
               <button onClick={confirmerSuppression} disabled={suppressionEnCours} className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50">
