@@ -345,3 +345,9 @@ EV-12 est à **100% complétée**.
 | BUG-CONFIG-01 | declarerAbsence userId admin/modo | P2 | ✅ Corrigé | 2026-02-22 |
 | BUG-CONFIG-02/03 | handleSave null JSON! + reset API (à diagnostiquer E2E) | P2 | ✅ Corrigé | 2026-02-23 |
 | EV-12-MOTIF | Motif absence absent dans declarerAbsence manuel | P3 | ✅ Corrigé | 2026-02-23 |
+| TEST-01 | Tests PHPUnit NotificationMutator (8 tests, isolation inter-users) | Post-P4 | ✅ Corrigé | 2026-02-23 |
+| TEST-E2E-02 | Tests E2E admin-projets (9 scénarios) | Post-P4 | ✅ Corrigé | 2026-02-23 |
+| TEST-E2E-03 | Tests E2E admin-equipes (6 scénarios) | Post-P4 | ✅ Corrigé | 2026-02-23 |
+| INFRA-02 | PHPStan niveau 5 (phpstan.neon + larastan) | Post-P4 | ✅ Corrigé | 2026-02-23 |
+| DOC-05 | Versions React/Laravel dans docs/02 et docs/03 | Post-P4 | ✅ Corrigé | 2026-02-23 |
+| DOC-06 | Reformulation SAEL→SAND (docs/01 + CLAUDE.md) | Post-P4 | ✅ Corrigé | 2026-02-23 |

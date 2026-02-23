@@ -42,12 +42,12 @@ flowchart TB
 ```mermaid
 flowchart LR
     subgraph Client["Client (Browser)"]
-        REACT[React 18<br/>+ Apollo Client<br/>+ Zustand]
+        REACT[React 19<br/>+ Apollo Client<br/>+ Zustand]
     end
 
     subgraph Server["Serveur"]
         NGINX[Nginx<br/>Reverse Proxy]
-        PHP[PHP-FPM<br/>Laravel 11]
+        PHP[PHP-FPM<br/>Laravel 12]
         LIGHTHOUSE[Lighthouse<br/>GraphQL]
     end
 

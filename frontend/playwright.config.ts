@@ -44,6 +44,8 @@ export default defineConfig({
         '**/admin-activites.spec.ts',
         '**/admin-utilisateurs.spec.ts',
         '**/admin-configuration.spec.ts',
+        '**/admin-projets.spec.ts',
+        '**/admin-equipes.spec.ts',
         '**/export.spec.ts',
         '**/navigation.spec.ts',
         '**/service-overlay.spec.ts',
