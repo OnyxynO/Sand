@@ -130,8 +130,9 @@ class AbsenceMutator
 
         $date = Carbon::parse($args['date'])->format('Y-m-d');
         $duree = $args['duree'] ?? null;
+        $type = $args['type'] ?? null;
 
-        return $this->absenceService->declarerAbsenceManuellement($user, $date, $duree);
+        return $this->absenceService->declarerAbsenceManuellement($user, $date, $duree, $type);
     }
 
     /**

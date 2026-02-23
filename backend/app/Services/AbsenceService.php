@@ -198,7 +198,7 @@ class AbsenceService
      * Declarer ou supprimer une absence manuelle pour un utilisateur et une date.
      * duree null/0 = supprime l'absence existante.
      */
-    public function declarerAbsenceManuellement(User $user, string $date, ?float $duree): bool
+    public function declarerAbsenceManuellement(User $user, string $date, ?float $duree, ?string $type = null): bool
     {
         $existante = Absence::where('user_id', $user->id)
             ->where('date_debut', $date)
@@ -210,13 +210,18 @@ class AbsenceService
             $existante?->delete();
         } else {
             if ($existante) {
-                $existante->update(['duree_journaliere' => $duree]);
+                // Ne mettre à jour le type que s'il est explicitement fourni (sinon préserver l'existant)
+                $updateData = ['duree_journaliere' => $duree];
+                if ($type !== null) {
+                    $updateData['type'] = $type;
+                }
+                $existante->update($updateData);
             } else {
                 Absence::create([
                     'user_id' => $user->id,
                     'date_debut' => $date,
                     'date_fin' => $date,
-                    'type' => Absence::TYPE_AUTRE,
+                    'type' => $type ?? Absence::TYPE_AUTRE,
                     'duree_journaliere' => $duree,
                     'statut' => Absence::STATUT_VALIDE,
                 ]);

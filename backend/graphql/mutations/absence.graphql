@@ -27,7 +27,7 @@ extend type Mutation {
         @guard
 
     "Mode manuel : declarer une absence pour une journee (duree null = supprimer). userId optionnel pour admin/moderateur."
-    declarerAbsence(date: Date!, duree: Float, userId: ID): Boolean!
+    declarerAbsence(date: Date!, duree: Float, type: String, userId: ID): Boolean!
         @field(resolver: "App\\GraphQL\\Mutations\\AbsenceMutator@declarerAbsence")
         @guard
 
