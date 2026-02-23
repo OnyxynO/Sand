@@ -53,7 +53,7 @@ class Absence extends Model
      */
     public function getNombreJoursAttribute(): int
     {
-        return $this->date_debut->diffInDays($this->date_fin) + 1;
+        return (int) $this->date_debut->diffInDays($this->date_fin) + 1;
     }
 
     /**

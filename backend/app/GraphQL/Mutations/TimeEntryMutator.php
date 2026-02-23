@@ -64,7 +64,7 @@ class TimeEntryMutator
         }
 
         return DB::transaction(function () use ($user, $saisie, $args) {
-            $ancienneDuree = $saisie->duree;
+            $ancienneDuree = (float) $saisie->duree;
             $ancienCommentaire = $saisie->commentaire;
 
             $saisie->update([
@@ -151,7 +151,7 @@ class TimeEntryMutator
 
                 $this->validateDuree($entry['duree']);
 
-                $ancienneDuree = $saisie->duree;
+                $ancienneDuree = (float) $saisie->duree;
                 $ancienCommentaire = $saisie->commentaire;
 
                 $saisie->update([

@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property string $chemin Chemin materialise ltree (ex: "1.2.3")
+ */
 class Activity extends Model
 {
     use HasFactory, SoftDeletes;

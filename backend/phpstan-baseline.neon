@@ -1,0 +1,49 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Parameter \#1 \$utilisateur of static method App\\Models\\Notification\:\:creer\(\) expects App\\Models\\User, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Jobs/ExportTimeEntriesJob.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>nom" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Jobs/ExportTimeEntriesJob.php
+
+		-
+			message: '#^Method App\\Models\\Notification\:\:creer\(\) should return static\(App\\Models\\Notification\) but returns App\\Models\\Notification\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/Notification.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>valeur" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Models/Setting.php
+
+		-
+			message: '#^Method App\\Models\\TimeEntryLog\:\:logCreation\(\) should return static\(App\\Models\\TimeEntryLog\) but returns App\\Models\\TimeEntryLog\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/TimeEntryLog.php
+
+		-
+			message: '#^Method App\\Models\\TimeEntryLog\:\:logModification\(\) should return static\(App\\Models\\TimeEntryLog\) but returns App\\Models\\TimeEntryLog\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/TimeEntryLog.php
+
+		-
+			message: '#^Method App\\Models\\TimeEntryLog\:\:logSuppression\(\) should return static\(App\\Models\\TimeEntryLog\) but returns App\\Models\\TimeEntryLog\.$#'
+			identifier: return.type
+			count: 1
+			path: app/Models/TimeEntryLog.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: app/Services/RhApiClient.php
