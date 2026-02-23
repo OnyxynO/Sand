@@ -11,19 +11,7 @@ import SelecteurPeriode from '../components/dashboard/SelecteurPeriode';
 import CarteResume from '../components/dashboard/CarteResume';
 import GraphiqueRepartitionProjets from '../components/dashboard/GraphiqueRepartitionProjets';
 import GraphiqueJournalier from '../components/dashboard/GraphiqueJournalier';
-
-function dernierJourDuMois(annee: number, mois: number): number {
-  return new Date(annee, mois + 1, 0).getDate();
-}
-
-function periodeInitiale() {
-  const maintenant = new Date();
-  const a = maintenant.getFullYear();
-  const m = maintenant.getMonth();
-  const debut = `${a}-${String(m + 1).padStart(2, '0')}-01`;
-  const fin = `${a}-${String(m + 1).padStart(2, '0')}-${dernierJourDuMois(a, m)}`;
-  return { debut, fin };
-}
+import { periodeInitiale } from '../hooks/usePeriode';
 
 export default function DashboardPage() {
   const utilisateur = useAuthStore((state) => state.utilisateur);

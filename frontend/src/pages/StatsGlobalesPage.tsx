@@ -16,30 +16,7 @@ import GraphiqueActivites from '../components/dashboard/GraphiqueActivites';
 import GraphiqueUtilisateurs from '../components/dashboard/GraphiqueUtilisateurs';
 import GraphiqueEvolution from '../components/dashboard/GraphiqueEvolution';
 import { SqueletteCarte, SqueletteGraphique } from '../components/Squelette';
-
-function dernierJourDuMois(annee: number, mois: number): number {
-  return new Date(annee, mois + 1, 0).getDate();
-}
-
-function periodeInitiale() {
-  const maintenant = new Date();
-  const a = maintenant.getFullYear();
-  const m = maintenant.getMonth();
-  const debut = `${a}-${String(m + 1).padStart(2, '0')}-01`;
-  const fin = `${a}-${String(m + 1).padStart(2, '0')}-${dernierJourDuMois(a, m)}`;
-  return { debut, fin };
-}
-
-function periodePrecedente(dateDebut: string, dateFin: string) {
-  const debut = new Date(dateDebut + 'T00:00:00');
-  const fin = new Date(dateFin + 'T00:00:00');
-  // Mois precedent
-  const moisPrec = debut.getMonth() === 0 ? 11 : debut.getMonth() - 1;
-  const anneePrec = debut.getMonth() === 0 ? debut.getFullYear() - 1 : debut.getFullYear();
-  const debutPrec = `${anneePrec}-${String(moisPrec + 1).padStart(2, '0')}-01`;
-  const finPrec = `${anneePrec}-${String(moisPrec + 1).padStart(2, '0')}-${dernierJourDuMois(anneePrec, moisPrec)}`;
-  return { debutPrec, finPrec };
-}
+import { periodeInitiale, periodePrecedente } from '../hooks/usePeriode';
 
 function formatDelta(actuel: number, precedent: number): { texte: string; positif: boolean | null } {
   if (precedent === 0) return { texte: '', positif: null };
@@ -77,8 +54,8 @@ export default function StatsGlobalesPage() {
 
   // Stats periode precedente (pour comparatif)
   const { debutPrec, finPrec } = useMemo(
-    () => periodePrecedente(dateDebut, dateFin),
-    [dateDebut, dateFin],
+    () => periodePrecedente(dateDebut),
+    [dateDebut],
   );
   const { data: dataPrec } = useQuery(STATS_PERIODE_PRECEDENTE, {
     variables: {

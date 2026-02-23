@@ -4,18 +4,18 @@ import { TrashIcon } from '@heroicons/react/24/outline';
 import { useSaisieStore } from '../../stores/saisieStore';
 import { formatDuree } from '../../utils/semaineUtils';
 import CelluleSaisie from './CelluleSaisie';
+import { useGrilleSaisie } from './GrilleSaisieContext';
 import type { LigneSaisie as LigneSaisieType, JourSemaine } from '../../types';
 
 interface LigneSaisieProps {
   ligne: LigneSaisieType;
   jours: JourSemaine[];
   indexLigne: number;
-  onNavigate?: (ligneIndex: number, jourIndex: number) => void;
-  onHistorique?: (ligneId: string, dateStr: string) => void;
 }
 
-export default function LigneSaisie({ ligne, jours, indexLigne, onNavigate, onHistorique }: LigneSaisieProps) {
+export default function LigneSaisie({ ligne, jours, indexLigne }: LigneSaisieProps) {
   const { supprimerLigne, getTotalLigne } = useSaisieStore();
+  const { naviguerCellule } = useGrilleSaisie();
 
   const total = getTotalLigne(ligne.id);
 
@@ -27,19 +27,19 @@ export default function LigneSaisie({ ligne, jours, indexLigne, onNavigate, onHi
     switch (direction) {
       case 'left':
         if (jourIndex > 0) {
-          onNavigate?.(indexLigne, jourIndex - 1);
+          naviguerCellule(indexLigne, jourIndex - 1);
         }
         break;
       case 'right':
         if (jourIndex < jours.length - 1) {
-          onNavigate?.(indexLigne, jourIndex + 1);
+          naviguerCellule(indexLigne, jourIndex + 1);
         }
         break;
       case 'up':
-        onNavigate?.(indexLigne - 1, jourIndex);
+        naviguerCellule(indexLigne - 1, jourIndex);
         break;
       case 'down':
-        onNavigate?.(indexLigne + 1, jourIndex);
+        naviguerCellule(indexLigne + 1, jourIndex);
         break;
     }
   };
@@ -87,7 +87,6 @@ export default function LigneSaisie({ ligne, jours, indexLigne, onNavigate, onHi
             jour={jour}
             cellule={cellule}
             onNavigate={(direction) => handleCellNavigate(jourIndex, direction)}
-            onHistorique={onHistorique ? () => onHistorique(ligne.id, jour.dateStr) : undefined}
           />
         );
       })}

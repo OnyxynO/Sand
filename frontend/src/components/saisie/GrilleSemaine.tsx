@@ -1,6 +1,6 @@
 // Grille de saisie hebdomadaire (version desktop)
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import { useQuery } from '@apollo/client/react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { useSaisieStore } from '../../stores/saisieStore';
@@ -10,6 +10,7 @@ import LigneSaisie from './LigneSaisie';
 import TotauxJournaliers from './TotauxJournaliers';
 import SelecteurProjetActivite from './SelecteurProjetActivite';
 import HistoriqueModal from './HistoriqueModal';
+import { GrilleSaisieContext } from './GrilleSaisieContext';
 import type { AbsenceJour } from '../../types';
 
 interface GrilleSemaineProps {
@@ -45,7 +46,7 @@ export default function GrilleSemaine({ absencesParJour }: GrilleSemaineProps) {
   }, []);
 
   // Trouver l'historique de la saisie selectionnee
-  const historiqueEntries = (() => {
+  const historiqueEntries = useMemo(() => {
     if (!historique.ouvert || !historiqueData?.mesSaisiesSemaine) return [];
     const ligne = lignes.find((l) => l.id === historique.ligneId);
     if (!ligne) return [];
@@ -57,16 +58,16 @@ export default function GrilleSemaine({ absencesParJour }: GrilleSemaineProps) {
         s.activite.id === ligne.activiteId
     );
     return saisie?.historique || [];
-  })();
+  }, [historique.ouvert, historique.ligneId, historique.dateStr, historiqueData, lignes]);
 
-  const historiqueInfo = (() => {
+  const historiqueInfo = useMemo(() => {
     if (!historique.ouvert) return { activiteNom: '', projetCode: '' };
     const ligne = lignes.find((l) => l.id === historique.ligneId);
     return {
       activiteNom: ligne?.activiteNom || '',
       projetCode: ligne?.projetCode || '',
     };
-  })();
+  }, [historique.ouvert, historique.ligneId, lignes]);
 
   // Navigation entre cellules avec les fleches / Tab
   const handleCellNavigate = useCallback(
@@ -104,7 +105,8 @@ export default function GrilleSemaine({ absencesParJour }: GrilleSemaineProps) {
   }
 
   return (
-    <>
+    <GrilleSaisieContext.Provider value={{ naviguerCellule: handleCellNavigate, ouvrirHistorique: handleHistorique }}>
+      <>
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table ref={tableRef} className="min-w-full">
@@ -142,8 +144,6 @@ export default function GrilleSemaine({ absencesParJour }: GrilleSemaineProps) {
                   ligne={ligne}
                   jours={jours}
                   indexLigne={index}
-                  onNavigate={handleCellNavigate}
-                  onHistorique={handleHistorique}
                 />
               ))}
 
@@ -191,5 +191,6 @@ export default function GrilleSemaine({ absencesParJour }: GrilleSemaineProps) {
         date={historique.dateStr || new Date().toISOString().slice(0, 10)}
       />
     </>
+    </GrilleSaisieContext.Provider>
   );
 }
