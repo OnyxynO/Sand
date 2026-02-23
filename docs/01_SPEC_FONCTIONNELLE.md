@@ -8,7 +8,7 @@
 
 ### 1.1 Contexte
 
-SAND est une application web de saisie d'activités professionnelles permettant aux collaborateurs de déclarer leur temps de travail par projet. Elle succède à l'ancienne application SAEL (Saisie d'Activité En Ligne).
+SAND est une application web de saisie d'activités professionnelles permettant aux collaborateurs de déclarer leur temps de travail par projet. Elle est inspirée de SAEL (Saisie d'Activité En Ligne), l'ancienne application interne, mais a été entièrement réécrite from scratch avec une architecture moderne (React 19, Laravel 12, GraphQL/Lighthouse, PostgreSQL ltree), une couverture de tests exhaustive et une séparation stricte front/back. SAND n'est pas une migration de SAEL mais une réécriture complète.
 
 ### 1.2 Objectifs
 
@@ -311,4 +311,4 @@ Rafraîchissement : **au chargement de page** (pas de temps réel)
 
 ---
 
-*Document v1.0 - Janvier 2025*
+*Document v1.1 - Janvier 2026*

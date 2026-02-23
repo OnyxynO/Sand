@@ -467,3 +467,7 @@ docker-compose exec app php artisan migrate --seed
 | 2026-02-08 | 6 | Notifications pas de suppression | Branchement mutation deleteNotification |
 | 2026-02-08 | 6 | Saisie moderation sauvegarde pour soi | BoutonSauvegarde recoit props au lieu de creer son propre hook |
 | 2026-02-14 | EV-07 | Query absences chevauchements non detectes | Resolver custom avec scope periode() |
+| 2026-02-23 | Audit P4 | Refactoring ProjetsPage (PR #1 mergee) | 4 composants + hooks partagés (useIsMobile, usePeriode, GrilleSaisieContext) |
+| 2026-02-23 | Audit P4 | BACK-MIN-02 : invaliderToutLeCache avec Cache::tags | Invalidation sélective par tag (activites, settings) |
+| 2026-02-23 | Doc | Correction versions React 18→19 / Laravel 11→12 dans docs/02 et docs/03 | Versions mises a jour pour refléter l'etat reel |
+| 2026-02-23 | Doc | Reformulation relation SAEL→SAND dans docs/01 et CLAUDE.md | SAND = réécriture from scratch, pas migration |

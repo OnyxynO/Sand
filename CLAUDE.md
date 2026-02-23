@@ -4,7 +4,7 @@ Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte 
 
 ## Projet
 
-**SAND** (Saisie d'Activite Numerique Declarative) - Application web de saisie d'activites professionnelles. Successeur de SAEL.
+**SAND** (Saisie d'Activite Numerique Declarative) - Application web de saisie d'activites professionnelles. Inspire de SAEL (ancienne appli interne), refait entierement from scratch avec une stack moderne.
 
 ## Stack technique
 
@@ -76,6 +76,10 @@ docker-compose exec app php artisan db:seed --class=DemoSeeder
 # Linting
 docker-compose exec app ./vendor/bin/pint
 docker-compose exec frontend npm run lint
+
+# Analyse statique PHPStan (niveau 5) — installer d'abord si pas encore fait :
+# docker-compose exec app composer require --dev larastan/larastan
+docker-compose exec app ./vendor/bin/phpstan analyse
 ```
 
 ## Tests

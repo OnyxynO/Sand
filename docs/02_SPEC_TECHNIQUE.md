@@ -8,7 +8,7 @@
 
 | Composant | Technologie | Version | Justification |
 |-----------|-------------|---------|---------------|
-| Framework | Laravel | 11+ | Écosystème riche, Eloquent ORM expressif |
+| Framework | Laravel | 12 | Écosystème riche, Eloquent ORM expressif |
 | API | GraphQL (Lighthouse) | 6+ | Flexibilité, typage fort, introspection |
 | ORM | Eloquent | - | Intégré Laravel, syntaxe fluide |
 | Auth | Laravel Sanctum | - | SPA auth avec cookies, CSRF |
@@ -18,7 +18,7 @@
 
 | Composant | Technologie | Justification |
 |-----------|-------------|---------------|
-| Framework | React | 18+ | Composants réutilisables, écosystème |
+| Framework | React | 19 | Composants réutilisables, écosystème |
 | State | Zustand | Léger, simple, performant |
 | GraphQL Client | Apollo Client 4 | Cache intelligent, hooks React (imports depuis `@apollo/client/react`) |
 | UI | Tailwind CSS + Headless UI | Flexibilité, responsive, accessibilité |
@@ -113,6 +113,7 @@ Tables concernées :
 - `projects`
 - `activities`
 - `time_entries`
+- `absences`
 
 ```php
 // Migration
