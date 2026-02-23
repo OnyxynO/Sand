@@ -22,63 +22,34 @@ Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte 
 **Toutes les phases du backlog sont terminees** (Phases 1 a 5).
 
 ### Evolutions implementees
+
+Toutes les evolutions sont terminees.
+
 - EV-01 : Warning saisie non enregistree (useBlocker + beforeunload)
 - EV-02 : Changement de parent d'une activite (modale de selection)
 - EV-03 : Drag and drop activites (@dnd-kit/core)
 - EV-04 : Vue texte simplifiee des activites (parser + diff + onglets)
 - EV-05 : Reset parametres par defaut
-- EV-07 : Absences dans grille de saisie
 - EV-06 : Suppression donnees RGPD (droit a l'oubli + purge totale)
-- EV-08 : Absences mode manuel vs API externe (settings admin + grille interactive)
+- EV-07 : Absences dans grille de saisie
+- EV-08 : Absences mode manuel vs API externe configurable
+- EV-09 : Export CSV — ajustements UX
+- EV-10 : Notifications — bouton "Supprimer tout"
+- EV-11 : Notifications — synchronisation reactive sur fin d'export
+- EV-12 : Absences — refonte mecanique complete
+  - Table `absences` dediee, separation de `time_entries`
+  - Notification utilisateur a l'import/declaration
+  - Modale de selection type+duree au premier clic (mode manuel)
+  - Tests PHPUnit complets (15 tests) + tests E2E (absences-ev12.spec.ts)
 
 Voir `docs/06_EVOLUTIONS.md` pour le detail.
 
-### Reste a faire (hors fonctionnel)
+### Reste a faire
 
-**Evolutions en attente** :
-
-- **EV-12 : Absences — refonte mécanique** ⏳ 85% terminé
-  - ✅ **Dissociation projet** : table `absences` dédiée, séparée de `time_entries`, sans contrainte projet
-  - ✅ **Tous les rôles** : `declarerAbsence` accessible à tout utilisateur authentifié (pas de policy check)
-  - ✅ **Mode manuel vs API** : configurable via settings, UI admin implémentée
-  - ✅ **Affichage dans la grille** : ligne indigo avec icone et durée
-  - ✅ **Tests backend PHPUnit** : complets
-  - ❌ **Notification à l'utilisateur concerné** : manquante dans `declarerAbsence()` (voir BACK-03)
-  - ⚠️ **Placeholder token API** : URL ok, token exemple `Bearer eyJhbGci...` à compléter
-  - ❌ **Tests E2E** : manquants pour déclaration manuelle, notification, test connexion API RH
-
-- **EV-08 : Absences — mode manuel vs API externe configurable** ✓
-  - Config admin : mode `manuel` (saisie directe grille) ou `api` (import RH)
-  - Mode `api` : champs URL + token + bouton "Tester la connexion"
-  - Mode `manuel` : cellules absence cliquables (cycle vide/1 ETP/0.5 ETP)
-  - Mutations : `declarerAbsence` (tout user) + `testerConnexionRhApi` (modo/admin)
-  - **Bugs corrigés** :
-    - Page Utilisateurs liste vide : Lighthouse `max_query_complexity` trop basse (200),
-      la query `users` paginée atteint ~481 → augmentée à 500
-    - ConfigurationPage bouton "Enregistrer" : déplacé hors de la section absences,
-      maintenant en bas de toute la page ✓
-
-- **EV-09 : Export CSV — ajustements UX** ✓
-- **EV-10 : Notifications — bouton "Supprimer tout"** ✓
-- **EV-11 : Notifications — synchronisation reactive sur fin d'export** ✓
-  - Signal Zustand (refreshCount) + refetch() dans NotificationBell
-  - Fix : observer déclenche aussi quand l'export est TERMINE dès le premier poll
-    (job très rapide, precedent === undefined mais export dans exportsLocaux)
-
-**Bugs transverses corrigés** :
-- **Auth — connexion** : `Auth::login()` sans guard explicite échouait car Lighthouse
-  change le guard par défaut en `sanctum` (RequestGuard stateless).
-  Fix : `Auth::guard('web')->login($user)` pour cibler explicitement le SessionGuard.
-- **Auth — déconnexion** : refresh après logout reconnectait l'utilisateur. Le logout
-  ne détruisait pas la session. Fix : `Auth::guard('web')->logout()` +
-  `session()->invalidate()` + `session()->regenerateToken()`.
-
-**Outillage / documentation** (fait) :
-- `.env.example` avec valeurs Docker pre-remplies ✓
-- `README.md` complet (installation, troubleshooting, premiers pas) ✓
-- Script `scripts/install.sh` automatise ✓
-- `.gitattributes` (forcer LF sur scripts shell) ✓
-- Documentation API (export schema GraphQL lisible) ✓
+**Refactoring P4** (non urgent, qualite code) :
+- `FRONT-02` : Decouper `ProjetsPage.tsx` (~1200 lignes, 4 composants embarques)
+- `FRONT-03/04` : Reduire props drilling saisie, extraire `useIsMobile`, `usePeriode`
+- `FRONT-MIN-01/02` : Types `any` dans tests Vitest, `historiqueEntries` useMemo
 
 ## Commandes essentielles
 
@@ -127,9 +98,11 @@ docker-compose exec frontend npm run lint
 Structure des tests E2E :
 ```
 frontend/e2e/
-├── auth.setup.ts      # Login global → sauvegarde cookies dans .auth/utilisateur.json
-├── login.spec.ts      # Tests page connexion (sans session)
-└── saisie.spec.ts     # Tests page saisie (avec session, anti-regression)
+├── auth.setup.ts              # Login global → sauvegarde cookies dans .auth/
+├── login.spec.ts              # Tests page connexion (sans session)
+├── saisie.spec.ts             # Tests page saisie (avec session, anti-regression)
+├── absences-ev12.spec.ts      # Tests declaration manuelle + notifications absences
+└── admin-configuration.spec.ts # Tests page configuration admin (dont test connexion API RH)
 ```
 
 Pieges Playwright specifiques a ce projet :
@@ -190,7 +163,7 @@ docs/                        # Specifications
 
 - **Auth** : Sanctum SPA avec cookies HttpOnly + CSRF (pas de JWT)
 - **ltree** : Extension PostgreSQL native. Operateurs `<@` (descendants), `@>` (ancetres), index GiST. Niveau = `nlevel(chemin) - 1`
-- **Soft delete** : Sur users, projects, activities, time_entries (Absence : à ajouter — BACK-MIN-01)
+- **Soft delete** : Sur users, projects, activities, time_entries, absences
 - **Model events** : `est_feuille` recalcule automatiquement via evenements `deleted`/`restored`
 - **Export CSV** : Job queue Redis asynchrone, notification quand pret
 - **Tests** : PostgreSQL obligatoire (ltree incompatible SQLite), base `sand_test`
@@ -243,26 +216,10 @@ Rapport complet : **`docs/07_AUDIT_TECHNIQUE.md`** (audit du 2026-02-22)
 
 ### Plan d'action
 
-Les items sont identifies par ID dans le rapport. Priorites :
+**P1/P2/P3 : 100% termines** (voir `docs/07_AUDIT_TECHNIQUE.md` pour le detail).
 
-**P1 — Securite (urgent)**
-- `SEC-01` : `TeamMutator::delete()` sans autorisation — faille critique
-- `SEC-02` : `TimeEntryMutator::bulkUpdate()` sans autorisation par entree — faille critique
-
-**P2 — Finaliser EV-12**
-- `BACK-03` : Notification manquante dans `declarerAbsence()`
-- `FRONT-MIN-03` : Tests E2E (declaration manuelle, notification, test connexion API RH)
-- `DOC-02` : Documenter `declarerAbsence` dans `docs/04_API_GRAPHQL.md`
-
-**P3 — Qualite code**
-- `BACK-01` : `Activity::deleted()` event — ajouter `->withTrashed()`
-- `BACK-02` : Supprimer colonne `niveau` inutile dans `activities`
-- `FRONT-01` : Remplacer `console.error` silencieux par etats d'erreur UI
-- `BACK-04` : Creer `AbsenceService`
-- `BACK-06` : Tests PHPUnit manquants (TeamMutator, declarerAbsence user, bulkUpdate)
-
-**P4 — Refactoring**
-- `FRONT-02` : Decouper `ProjetsPage.tsx` (971 lignes)
-- `FRONT-04` : Extraire `useIsMobile`, `usePeriode` en hooks partages
-- `BACK-MIN-01` : Ajouter `SoftDeletes` au modele `Absence`
+**P4 — Refactoring (en attente)**
+- `FRONT-02` : Decouper `ProjetsPage.tsx` (~1200 lignes)
+- `FRONT-03/04` : Extraire `useIsMobile`, `usePeriode` en hooks partages
+- `FRONT-MIN-01/02` : Types `any` dans tests, `historiqueEntries` useMemo
 
