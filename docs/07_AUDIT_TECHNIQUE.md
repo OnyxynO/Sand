@@ -148,18 +148,11 @@ Corrigé dans :
 
 **Sévérité :** MAJEUR
 **Fichier :** `frontend/src/pages/ProjetsPage.tsx`
-**Statut :** ⚠️ Refactoring recommandé
+**Statut :** ✅ Corrigé — 2026-02-23
 
-4 composants imbriqués locaux, 11 `useState`. Candidat principal à la découpe.
-
-**Structure cible :**
-```
-pages/projets/
-├── ProjetsPage.tsx          ← orchestre, état global
-├── FormulaireProjet.tsx
-├── RestrictionsVisibilite.tsx
-└── ModerateursList.tsx
-```
+Découpe en 5 fichiers : `pages/projets/types.ts`, `FormulaireProjet.tsx`, `ConfigActivitesModal.tsx`
+(inclut `CheckboxTriState` et `LigneActiviteCheckbox`), `GestionModerateursModal.tsx`, `GestionVisibilitesModal.tsx`.
+`ProjetsPage.tsx` réduit de 1181 à 253 lignes (orchestrateur uniquement).
 
 ---
 
@@ -167,24 +160,24 @@ pages/projets/
 
 **Sévérité :** MAJEUR
 **Fichiers :** `GrilleSemaine.tsx → LigneSaisie.tsx → CelluleSaisie.tsx`
-**Statut :** ⚠️ Refactoring recommandé
+**Statut :** ✅ Corrigé — 2026-02-23
 
-Callbacks `onNavigate`, `onHistorique`, `onCycleAbsence` traversent 3 niveaux.
-Un `GrilleContext` ou store Zustand dédié éliminerait ce couplage.
+Création de `GrilleSaisieContext.tsx` avec `naviguerCellule` et `ouvrirHistorique`.
+`GrilleSemaine` fournit le Provider. `LigneSaisie` consomme `naviguerCellule` directement (suppression props `onNavigate`/`onHistorique`). `CelluleSaisie` consomme `ouvrirHistorique` directement (suppression prop `onHistorique`).
 
 ---
 
 ### FRONT-04 — Logique métier inline dans les pages
 
 **Sévérité :** MAJEUR
-**Statut :** ⚠️ Refactoring recommandé
+**Statut :** ✅ Corrigé — 2026-02-23
 
-| Page | Problème | Solution |
-|------|----------|----------|
-| `SaisiePage.tsx:14` | `useIsMobile` défini dans la page | Extraire → `hooks/useIsMobile.ts` |
-| `DashboardPage.tsx:15` | `periodeInitiale()` et `tauxCompletion` | Extraire → `hooks/usePeriode.ts` |
-| `StatsGlobalesPage.tsx:20` | `dernierJourDuMois()`, `periodePrecedente()` | Idem |
-| `SupervisionPage.tsx:90` | `dateVersSemaineISO()` dupliquée | Utiliser import `semaineUtils.ts` |
+| Page | Correction |
+|------|------------|
+| `SaisiePage.tsx` | `useIsMobile` extrait → `hooks/useIsMobile.ts` |
+| `DashboardPage.tsx` | `periodeInitiale()` supprimé → import `hooks/usePeriode.ts` |
+| `StatsGlobalesPage.tsx` | `dernierJourDuMois()`, `periodePrecedente()` supprimés → import `hooks/usePeriode.ts` |
+| `SupervisionPage.tsx` | `dateVersSemaineISO()` locale supprimée → import `utils/semaineUtils.ts` |
 
 ---
 
@@ -212,12 +205,16 @@ Boucle sur tous les settings. `Cache::tags('settings')->flush()` serait plus eff
 ### FRONT-MIN-01 — Types `any` dans les tests
 
 **Fichier :** `stores/authStore.test.ts:24,36,59`
-`user as any` → Utiliser `Partial<Utilisateur>`.
+**Statut :** ✅ Corrigé — 2026-02-23
+
+`user as any` supprimés. Ajout de `role: 'UTILISATEUR' as UserRole` dans les 3 fixtures de test.
 
 ### FRONT-MIN-02 — `historiqueEntries` sans `useMemo`
 
 **Fichier :** `GrilleSemaine.tsx:70-82`
-Calcul recalculé à chaque render même si la modale est fermée.
+**Statut :** ✅ Corrigé — 2026-02-23
+
+`historiqueEntries` et `historiqueInfo` convertis en `useMemo` avec dépendances explicites (`historique.ouvert`, `historique.ligneId`, `historique.dateStr`, `historiqueData`, `lignes`).
 
 ### FRONT-MIN-03 — Tests E2E incomplets
 
@@ -308,9 +305,9 @@ EV-12 est à **100% complétée**.
 
 ### P4 — Refactoring et documentation
 
-- [ ] **FRONT-02** : Découper `ProjetsPage.tsx`
-- [ ] **FRONT-03** : Réduire props drilling grille de saisie
-- [ ] **FRONT-04** : Extraire `useIsMobile`, `usePeriode`, etc.
+- [x] **FRONT-02** : Découper `ProjetsPage.tsx` — ✅ 2026-02-23
+- [x] **FRONT-03** : Réduire props drilling grille de saisie — ✅ 2026-02-23
+- [x] **FRONT-04** : Extraire `useIsMobile`, `usePeriode`, etc. — ✅ 2026-02-23
 - [x] **BACK-MIN-01** : Ajouter `SoftDeletes` au modèle `Absence` — ✅ 2026-02-22
 - [ ] **DOC-01** : Corriger React 18 → 19 dans CLAUDE.md
 - [ ] **DOC-03** : Mettre à jour statut EV-12 dans CLAUDE.md
@@ -331,11 +328,11 @@ EV-12 est à **100% complétée**.
 | BACK-05 | ValidationException GraphQL | P3 | ✅ Corrigé | 2026-02-23 |
 | BACK-06 | Tests PHPUnit manquants | P3 | ✅ Corrigé | 2026-02-23 |
 | FRONT-01 | console.error silencieux | P3 | ✅ Corrigé | 2026-02-23 |
-| FRONT-02 | ProjetsPage monolithique | P4 | ❌ Ouvert | — |
-| FRONT-03 | Props drilling grille | P4 | ❌ Ouvert | — |
-| FRONT-04 | Logique métier dans pages | P4 | ❌ Ouvert | — |
-| FRONT-MIN-01 | Types any dans tests | P4 | ❌ Ouvert | — |
-| FRONT-MIN-02 | historiqueEntries useMemo | P4 | ❌ Ouvert | — |
+| FRONT-02 | ProjetsPage monolithique | P4 | ✅ Corrigé | 2026-02-23 |
+| FRONT-03 | Props drilling grille | P4 | ✅ Corrigé | 2026-02-23 |
+| FRONT-04 | Logique métier dans pages | P4 | ✅ Corrigé | 2026-02-23 |
+| FRONT-MIN-01 | Types any dans tests | P4 | ✅ Corrigé | 2026-02-23 |
+| FRONT-MIN-02 | historiqueEntries useMemo | P4 | ✅ Corrigé | 2026-02-23 |
 | FRONT-MIN-03 | Tests E2E manquants | P2 | ✅ Corrigé | 2026-02-22 |
 | INFRA-01 | JSON scalar double encodage | P2 | ✅ Corrigé | 2026-02-22 |
 | DOC-01 | React 18 → 19 | P4 | ✅ Corrigé | 2026-02-22 |
