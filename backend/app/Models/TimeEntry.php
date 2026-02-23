@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property string|null $total       Colonne calculee via selectRaw (SUM duree)
+ * @property string|null $temps_total Colonne calculee via selectRaw (SUM duree)
+ */
 class TimeEntry extends Model
 {
     use HasFactory, SoftDeletes;

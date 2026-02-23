@@ -10,10 +10,9 @@ use Illuminate\Support\Facades\Gate;
 class MesSaisiesSemaineQuery
 {
     /**
-     * Recuperer les saisies de la semaine pour un utilisateur
-     * Si userId est fourni, verifie les droits de moderation
-     *
-     * @param string $semaine Format: "2025-W04"
+     * Recuperer les saisies de la semaine pour un utilisateur.
+     * Si userId est fourni, verifie les droits de moderation.
+     * Le parametre semaine (format "2025-W04") est lu depuis $args['semaine'].
      */
     public function __invoke($root, array $args): array
     {

@@ -39,7 +39,9 @@ class TimeEntryPolicy
             return true;
         }
 
-        return $user->peutModererProjet($entry->projet);
+        $projet = $entry->projet;
+
+        return $projet instanceof Project && $user->peutModererProjet($projet);
     }
 
     /**
@@ -82,7 +84,9 @@ class TimeEntryPolicy
             return true;
         }
 
-        return $user->peutModererProjet($entry->projet);
+        $projet = $entry->projet;
+
+        return $projet instanceof Project && $user->peutModererProjet($projet);
     }
 
     /**
@@ -98,6 +102,8 @@ class TimeEntryPolicy
             return true;
         }
 
-        return $user->peutModererProjet($entry->projet);
+        $projet = $entry->projet;
+
+        return $projet instanceof Project && $user->peutModererProjet($projet);
     }
 }
