@@ -5,7 +5,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Admin — Projets', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/admin/projets');
+    await page.goto('/projets');
     await expect(page.getByRole('heading', { name: 'Projets' })).toBeVisible({
       timeout: 10000,
     });
@@ -28,12 +28,15 @@ test.describe('Admin — Projets', () => {
   test('creer un projet - apparait dans la liste', async ({ page }) => {
     await page.getByRole('button', { name: 'Nouveau projet' }).click();
 
-    // Headless UI : tester le titre visible de la modale (pas getByRole('dialog'))
-    await expect(page.getByText('Nouveau projet', { exact: true })).toBeVisible({ timeout: 5000 });
+    // Headless UI : tester le titre h2 de la modale via son role (strict mode: bouton + titre matchent le meme texte)
+    await expect(page.getByRole('heading', { name: 'Nouveau projet' })).toBeVisible({ timeout: 5000 });
 
-    const nomUnique = `Projet E2E Test ${Date.now()}`;
-    await page.getByLabel('Nom *').fill(nomUnique);
-    await page.getByLabel('Code *').fill('E2E');
+    const suffix = Date.now();
+    const nomUnique = `Projet E2E Test ${suffix}`;
+    const codeUnique = `P${String(suffix % 10000).padStart(4, '0')}`;
+    // Les labels de FormulaireProjet n'ont pas d'attribut for/id → cibler par ordre
+    await page.locator('input[type="text"]').nth(0).fill(nomUnique);
+    await page.locator('input[type="text"]').nth(1).fill(codeUnique);
 
     await page.getByRole('button', { name: 'Creer' }).click();
 
@@ -77,8 +80,9 @@ test.describe('Admin — Projets', () => {
 
     await page.locator('button[title="Gerer les moderateurs"]').first().click();
 
-    // Headless UI : tester le texte visible de la modale
-    await expect(page.getByText('Moderateurs')).toBeVisible({ timeout: 5000 });
+    // Headless UI : tester le titre de la modale (format "Moderateurs de <nom_projet>")
+    // getByRole heading avec /Moderateurs/ matcherait aussi h4 "Moderateurs actuels" → regex plus specifique
+    await expect(page.getByRole('heading', { name: /Moderateurs de/ })).toBeVisible({ timeout: 5000 });
   });
 
   // PRJ-07 : Ouverture de la modale de restrictions de visibilité
@@ -102,8 +106,8 @@ test.describe('Admin — Projets', () => {
       timeout: 5000,
     });
 
-    // Le champ nom doit être pré-rempli
-    const champNom = page.getByLabel('Nom *');
+    // Le champ nom doit être pré-rempli (labels sans for/id → cibler par ordre dans la modale)
+    const champNom = page.locator('input[type="text"]').nth(0);
     await expect(champNom).toBeVisible();
     await expect(champNom).not.toHaveValue('');
   });
@@ -115,7 +119,8 @@ test.describe('Admin — Projets', () => {
     await page.locator('button[title="Supprimer"]').first().click();
 
     await expect(page.getByText('Confirmer la suppression')).toBeVisible({ timeout: 5000 });
-    await expect(page.getByRole('button', { name: 'Supprimer' })).toBeVisible();
+    // .last() : le bouton Supprimer du dialog vient après les boutons des lignes dans le DOM
+    await expect(page.getByRole('button', { name: 'Supprimer' }).last()).toBeVisible();
     await expect(page.getByRole('button', { name: 'Annuler' })).toBeVisible();
 
     // Annuler ferme la modale sans supprimer

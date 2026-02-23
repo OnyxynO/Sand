@@ -27,31 +27,34 @@ test.describe('Admin — Equipes', () => {
 
     await page.getByRole('button', { name: 'Nouvelle equipe' }).click();
 
-    // Headless UI : tester le titre visible de la modale
-    await expect(page.getByText('Nouvelle equipe', { exact: true })).toBeVisible({
+    // Headless UI : tester le titre h2 de la modale via son role (strict mode: bouton + titre matchent le meme texte)
+    await expect(page.getByRole('heading', { name: 'Nouvelle equipe' })).toBeVisible({
       timeout: 5000,
     });
 
-    // Les champs obligatoires sont présents
-    await expect(page.getByLabel('Nom *')).toBeVisible();
-    await expect(page.getByLabel('Code *')).toBeVisible();
+    // Les champs obligatoires sont présents (les labels n'ont pas d'attribut for/id → cibler par name)
+    await expect(page.locator('input[name="nom"]')).toBeVisible();
+    await expect(page.locator('input[name="code"]')).toBeVisible();
 
     // Fermer la modale
     await page.getByRole('button', { name: 'Annuler' }).click();
-    await expect(page.getByText('Nouvelle equipe', { exact: true })).not.toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Nouvelle equipe' })).not.toBeVisible();
   });
 
   // EQP-03 : Création d'une équipe → apparaît dans la liste
   test('creer une equipe - apparait dans la liste', async ({ page }) => {
     await page.getByRole('button', { name: 'Nouvelle equipe' }).click();
 
-    await expect(page.getByText('Nouvelle equipe', { exact: true })).toBeVisible({
+    // Headless UI : titre h2 (strict mode: bouton + titre matchent le meme texte)
+    await expect(page.getByRole('heading', { name: 'Nouvelle equipe' })).toBeVisible({
       timeout: 5000,
     });
 
-    const nomUnique = `Equipe E2E ${Date.now()}`;
-    await page.getByLabel('Nom *').fill(nomUnique);
-    await page.getByLabel('Code *').fill('E2E');
+    const suffix = Date.now();
+    const nomUnique = `Equipe E2E ${suffix}`;
+    const codeUnique = `E${String(suffix % 10000).padStart(4, '0')}`;
+    await page.locator('input[name="nom"]').fill(nomUnique);
+    await page.locator('input[name="code"]').fill(codeUnique);
 
     await page.getByRole('button', { name: 'Creer' }).click();
 
@@ -73,8 +76,8 @@ test.describe('Admin — Equipes', () => {
       timeout: 5000,
     });
 
-    // Le champ nom doit être pré-rempli
-    const champNom = page.getByLabel('Nom *');
+    // Le champ nom doit être pré-rempli (label sans for/id → cibler par name)
+    const champNom = page.locator('input[name="nom"]');
     await expect(champNom).toBeVisible();
     await expect(champNom).not.toHaveValue('');
 
@@ -90,7 +93,8 @@ test.describe('Admin — Equipes', () => {
     await page.locator('button[title="Supprimer"]').first().click();
 
     await expect(page.getByText('Confirmer la suppression')).toBeVisible({ timeout: 5000 });
-    await expect(page.getByRole('button', { name: 'Supprimer' })).toBeVisible();
+    // .last() : le bouton Supprimer du dialog vient après les boutons des cartes dans le DOM
+    await expect(page.getByRole('button', { name: 'Supprimer' }).last()).toBeVisible();
     await expect(page.getByRole('button', { name: 'Annuler' })).toBeVisible();
 
     // Annuler ferme la modale sans supprimer
