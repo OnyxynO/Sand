@@ -462,4 +462,58 @@ class AbsenceMutatorGraphQLTest extends TestCase
             'type' => Notification::TYPE_ABSENCE_IMPORTEE,
         ]);
     }
+
+    public function test_declarer_absence_avec_type_cree_absence_correct(): void
+    {
+        $response = $this->graphqlAsUser('
+            mutation DeclarerAbsence($date: Date!, $duree: Float, $type: String) {
+                declarerAbsence(date: $date, duree: $duree, type: $type)
+            }
+        ', [
+            'date' => '2026-05-05',
+            'duree' => 1.0,
+            'type' => 'rtt',
+        ], $this->utilisateur);
+
+        $this->assertGraphQLSuccess($response);
+
+        $this->assertDatabaseHas('absences', [
+            'user_id' => $this->utilisateur->id,
+            'date_debut' => '2026-05-05',
+            'type' => 'rtt',
+        ]);
+    }
+
+    public function test_cycle_duree_preserve_type_existant(): void
+    {
+        // Creer une absence avec type conges_payes
+        Absence::create([
+            'user_id' => $this->utilisateur->id,
+            'date_debut' => '2026-05-10',
+            'date_fin' => '2026-05-10',
+            'type' => Absence::TYPE_CONGES_PAYES,
+            'duree_journaliere' => 1.0,
+            'statut' => Absence::STATUT_VALIDE,
+        ]);
+
+        // Cycler la duree sans passer de type
+        $response = $this->graphqlAsUser('
+            mutation DeclarerAbsence($date: Date!, $duree: Float) {
+                declarerAbsence(date: $date, duree: $duree)
+            }
+        ', [
+            'date' => '2026-05-10',
+            'duree' => 0.5,
+        ], $this->utilisateur);
+
+        $this->assertGraphQLSuccess($response);
+
+        // Le type doit etre preserve (pas ecrase par TYPE_AUTRE)
+        $this->assertDatabaseHas('absences', [
+            'user_id' => $this->utilisateur->id,
+            'date_debut' => '2026-05-10',
+            'duree_journaliere' => 0.5,
+            'type' => Absence::TYPE_CONGES_PAYES,
+        ]);
+    }
 }

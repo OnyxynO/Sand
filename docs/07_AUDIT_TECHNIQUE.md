@@ -295,7 +295,7 @@ EV-12 est à **100% complétée**.
 
 - [x] **BUG-CONFIG-01** : `declarerAbsence` sans `userId` — admin/modo bloqué pour déclarer au nom d'un autre utilisateur. Fix : paramètre `userId: ID` optionnel dans le schéma, vérification `estModerateur()` dans `AbsenceMutator`, propagation dans mutation Apollo + prop `BlocAbsences` + `SaisiePage`. — ✅ 2026-02-22
 - [ ] **BUG-CONFIG-02/03** : `handleSave()` envoie encore `null` sur `JSON!` lors du passage `manuel → api → manuel`. Plusieurs approches frontend tentées (filter, nullish coalescing, reset dans handleChange) sans succès — la source du null n'est pas encore identifiée. **À diagnostiquer par test E2E** (inspecter les variables envoyées via Apollo DevTools ou intercepter la requête réseau). Approche suggérée : écrire un test Playwright qui joue le scénario et vérifie qu'aucune variable null n'est envoyée.
-- [ ] **EV-12-MOTIF** : La mutation `declarerAbsence` (mode manuel, grille) ne propose pas de saisir le motif de l'absence (type : congés, RTT, maladie, etc.). Le cycle actuel est vide → 1 ETP → 0.5 ETP → vide, sans sélection du type. L'absence est toujours créée avec `type = 'autre'`. À implémenter : UI de sélection du motif (modale ou select au clic) + passage du `type` dans la mutation.
+- [x] **EV-12-MOTIF** : Sélection du motif lors de la déclaration manuelle. Fix : paramètre `type: String` dans le schéma + `AbsenceMutator` + `AbsenceService::declarerAbsenceManuellement()` (type préservé lors du cycle durée, `TYPE_AUTRE` en fallback création). Frontend : modale légère au premier clic (sélection type + durée), cycle durée seul au clic suivant. 2 tests ajoutés (création avec type, préservation lors du cycle). — ✅ 2026-02-23
 
 ### P3 — Qualité code
 
@@ -345,4 +345,4 @@ EV-12 est à **100% complétée**.
 | BACK-MIN-01 | Absence SoftDeletes | P4 | ✅ Corrigé | 2026-02-22 |
 | BUG-CONFIG-01 | declarerAbsence userId admin/modo | P2 | ✅ Corrigé | 2026-02-22 |
 | BUG-CONFIG-02/03 | handleSave null JSON! + reset API (à diagnostiquer E2E) | P2 | ❌ Ouvert | — |
-| EV-12-MOTIF | Motif absence absent dans declarerAbsence manuel | P3 | ❌ Ouvert | — |
+| EV-12-MOTIF | Motif absence absent dans declarerAbsence manuel | P3 | ✅ Corrigé | 2026-02-23 |
