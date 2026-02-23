@@ -31,72 +31,72 @@ Mettre en place l'infrastructure technique et l'authentification.
 
 ### User Stories
 
-#### US-1.1 : Setup Docker
+#### US-1.1 : Setup Docker ✅
 > **En tant que** développeur
 > **Je veux** un environnement Docker fonctionnel
 > **Afin de** pouvoir développer en local sans configuration manuelle
 
 **Critères d'acceptation :**
-- [ ] `docker-compose up` démarre tous les services
-- [ ] Laravel accessible sur `localhost:8080`
-- [ ] React (Vite) accessible sur `localhost:5173`
-- [ ] PostgreSQL accessible sur `localhost:5432`
-- [ ] Redis accessible sur `localhost:6379`
+- [x] `docker-compose up` démarre tous les services
+- [x] Laravel accessible sur `localhost:8080`
+- [x] React (Vite) accessible sur `localhost:5173`
+- [x] PostgreSQL accessible sur `localhost:5432`
+- [x] Redis accessible sur `localhost:6379`
 
 ---
 
-#### US-1.2 : Modèles et migrations
+#### US-1.2 : Modèles et migrations ✅
 > **En tant que** développeur
 > **Je veux** les modèles Eloquent et migrations
 > **Afin d'** avoir la structure de base de données
 
 **Critères d'acceptation :**
-- [ ] Toutes les tables créées (voir 02_SPEC_TECHNIQUE.md)
-- [ ] Relations Eloquent définies
-- [ ] Soft delete sur User, Project, Activity, TimeEntry
-- [ ] Index de performance ajoutés
-- [ ] Seeder pour données de test
+- [x] Toutes les tables créées (voir 02_SPEC_TECHNIQUE.md)
+- [x] Relations Eloquent définies
+- [x] Soft delete sur User, Project, Activity, TimeEntry
+- [x] Index de performance ajoutés
+- [x] Seeder pour données de test
 
 ---
 
-#### US-1.3 : Authentification
+#### US-1.3 : Authentification ✅
 > **En tant qu'** utilisateur
 > **Je veux** me connecter avec email/mot de passe
 > **Afin d'** accéder à l'application
 
 **Critères d'acceptation :**
-- [ ] Sanctum SPA auth configuré
-- [ ] Login/logout fonctionnels
-- [ ] Protection CSRF active
-- [ ] Rate limiting sur login (5/minute)
-- [ ] Redirection si non authentifié
+- [x] Sanctum SPA auth configuré
+- [x] Login/logout fonctionnels
+- [x] Protection CSRF active
+- [x] Rate limiting sur login (5/minute)
+- [x] Redirection si non authentifié
 
 ---
 
-#### US-1.4 : Setup GraphQL
+#### US-1.4 : Setup GraphQL ✅
 > **En tant que** développeur
 > **Je veux** l'API GraphQL de base
 > **Afin de** pouvoir requêter les données
 
 **Critères d'acceptation :**
-- [ ] Lighthouse installé et configuré
-- [ ] Query `me` retourne l'utilisateur connecté
-- [ ] GraphQL Playground accessible en dev
-- [ ] Types de base définis (User, Team, Project, Activity)
+- [x] Lighthouse installé et configuré
+- [x] Query `me` retourne l'utilisateur connecté
+- [x] GraphQL Playground accessible en dev
+- [x] Types de base définis (User, Team, Project, Activity)
 
 ---
 
-#### US-1.5 : Setup Frontend React
+#### US-1.5 : Setup Frontend React ✅
 > **En tant que** développeur
 > **Je veux** le frontend React configuré
 > **Afin de** pouvoir développer l'interface
 
 **Critères d'acceptation :**
-- [ ] Vite + React + TypeScript
-- [ ] Apollo Client configuré
-- [ ] Tailwind CSS installé
-- [ ] Routing (React Router)
-- [ ] Page de login fonctionnelle
+- [x] Vite + React + TypeScript
+- [x] Apollo Client configuré
+- [x] Tailwind CSS installé
+- [x] Routing (React Router)
+- [x] Page de login fonctionnelle
 
 ---
 

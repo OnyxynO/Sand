@@ -151,6 +151,104 @@ Frontend :
 
 ---
 
+## EV-08 : Absences — mode manuel vs API externe configurable ✅
+
+**En tant qu'** admin
+**Je veux** choisir entre gestion manuelle des absences et import depuis une API RH externe
+**Afin de** adapter l'application a mon contexte (avec ou sans API RH)
+
+**Statut** : Implementee (2026-02-22)
+
+**Modifications realisees** :
+- Setting `absence_mode` (valeurs : `manuel` ou `api`), `absence_api_url`, `absence_api_token`
+- Page Configuration : section "Gestion des absences" avec toggle mode + champs URL/token conditionnels
+- Backend : `RhApiClient` utilise le token configure, `AbsenceMutator` branche sur le mode actif
+- Mode manuel : declaration directe via `declarerAbsence` (pas d'appel API)
+- Mode API : `syncAbsences` appelle l'API RH externe avec le token configure
+
+**Complexite** : Moyenne
+
+---
+
+## EV-09 : Export CSV — ajustements UX ✅
+
+**En tant qu'** admin
+**Je veux** une experience d'export CSV amelioree
+**Afin de** lancer et suivre les exports facilement
+
+**Statut** : Implementee (2026-02-22)
+
+**Modifications realisees** :
+- Bouton "Supprimer tout" dans le panneau de notifications pour vider d'un coup
+- Lien de telechargement direct dans la notification TYPE_EXPORT_PRET
+- Indicateur visuel pendant le traitement du job asynchrone
+
+**Complexite** : Faible
+
+---
+
+## EV-10 : Notifications — bouton "Supprimer tout" ✅
+
+**En tant qu'** utilisateur
+**Je veux** pouvoir supprimer toutes mes notifications en un clic
+**Afin de** vider rapidement le panneau
+
+**Statut** : Implementee (2026-02-22)
+
+**Modifications realisees** :
+- Bouton "Supprimer tout" dans le panneau de notifications (slide-over)
+- Mutation GraphQL `supprimerToutesNotifications`
+- Resolver + Policy backend
+- Tests PHPUnit associes
+
+**Complexite** : Faible
+
+---
+
+## EV-11 : Notifications — synchronisation reactive sur fin d'export ✅
+
+**En tant qu'** utilisateur
+**Je veux** que la notification d'export pret apparaisse sans avoir a rafraichir
+**Afin de** savoir immediatement quand mon export est disponible
+
+**Statut** : Implementee (2026-02-22)
+
+**Modifications realisees** :
+- Polling renforce du store notifications lors d'un export en cours (passage de 60s a 5s)
+- Detection etat "export en attente" dans le store Zustand
+- Retour au polling 60s une fois l'export pret ou echoue
+
+**Complexite** : Faible
+
+---
+
+## EV-12 : Absences — refonte mecanique complete ✅
+
+**En tant qu'** utilisateur
+**Je veux** declarer mes absences manuellement avec selection du type et de la duree
+**Afin de** avoir un suivi precis de mes absences sans API RH
+
+**Statut** : Implementee (2026-02-23)
+
+**Modifications realisees** :
+
+Backend :
+- Table `absences` dediee (separee de `time_entries`), avec soft delete
+- `AbsenceService` : logique metier extraite de `AbsenceMutator` (flux RH, flux manuel, flux admin)
+- Mutation `declarerAbsence` : parametre `type` (motif) + `userId` (admin/modo pour autrui)
+- Notification utilisateur a chaque declaration effective (duree > 0)
+- 15 tests PHPUnit (types, durees, roles, notifications, cas limites)
+
+Frontend :
+- Modale de selection type+duree au premier clic sur une cellule absence (mode manuel)
+- Cycle duree seul au clic suivant (le type est preserve)
+- Prop `userId` propagee dans `BlocAbsences` et `SaisiePage` (admin/modo)
+- Tests E2E : `absences-ev12.spec.ts` (declaration manuelle + notifications)
+
+**Complexite** : Elevee
+
+---
+
 ## Resume et priorisation proposee
 
 | ID | Evolution | Complexite | Statut |
@@ -162,6 +260,11 @@ Frontend :
 | EV-05 | Reset parametres par defaut | Faible | ✅ |
 | EV-06 | Suppression donnees RGPD + purge | Moyenne | ✅ |
 | EV-07 | Absences dans grille de saisie | Moyenne | ✅ |
+| EV-08 | Absences mode manuel vs API | Moyenne | ✅ |
+| EV-09 | Export CSV ajustements UX | Faible | ✅ |
+| EV-10 | Notifications — Supprimer tout | Faible | ✅ |
+| EV-11 | Notifications — sync reactive export | Faible | ✅ |
+| EV-12 | Absences — refonte mecanique complete | Elevee | ✅ |
 
 ---
 
@@ -194,4 +297,4 @@ Ces taches bonus de `docs/archive/AVANCEMENT.md` sont deja realisees :
 
 ---
 
-*Document cree le 2026-02-08, mis a jour le 2026-02-15*
+*Document cree le 2026-02-08, mis a jour le 2026-02-23*
