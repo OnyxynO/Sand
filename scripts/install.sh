@@ -82,8 +82,15 @@ titre "3. Démarrage des conteneurs Docker"
 info "Lancement de docker compose..."
 $DC up -d --build
 
+# --- Dépendances PHP ----------------------------------------------------------
+titre "4. Installation des dépendances PHP"
+
+info "Exécution de composer install..."
+$DC exec -T app composer install --no-interaction --prefer-dist --optimize-autoloader
+ok "Dépendances PHP installées"
+
 # --- Attente PostgreSQL -------------------------------------------------------
-titre "4. Attente de la base de données"
+titre "5. Attente de la base de données"
 
 info "Attente de PostgreSQL..."
 MAX=30
@@ -100,7 +107,7 @@ echo ""
 ok "PostgreSQL prêt"
 
 # --- APP_KEY ------------------------------------------------------------------
-titre "5. Clé d'application"
+titre "6. Clé d'application"
 
 CURRENT_KEY=$(grep '^APP_KEY=' backend/.env | cut -d'=' -f2)
 if [[ -z "$CURRENT_KEY" ]]; then
@@ -112,20 +119,20 @@ else
 fi
 
 # --- Base de données de test --------------------------------------------------
-titre "6. Base de données de test"
+titre "7. Base de données de test"
 
 info "Création de la base sand_test (pour PHPUnit)..."
 $DC exec -T db psql -U sand -c "CREATE DATABASE sand_test;" &>/dev/null && ok "sand_test créée" || ok "sand_test déjà existante"
 
 # --- Migrations ---------------------------------------------------------------
-titre "7. Migrations"
+titre "8. Migrations"
 
 info "Exécution des migrations..."
 $DC exec -T app php artisan migrate --force --ansi
 ok "Migrations appliquées"
 
 # --- Seeders ------------------------------------------------------------------
-titre "8. Données de base"
+titre "9. Données de base"
 
 info "Chargement des données de base (équipes, comptes, activités, projets)..."
 $DC exec -T app php artisan db:seed --class=DatabaseSeeder --force --ansi
@@ -138,7 +145,7 @@ if [[ "$AVEC_DEMO" == "true" ]]; then
 fi
 
 # --- Cache Lighthouse ---------------------------------------------------------
-titre "9. Cache"
+titre "10. Cache"
 
 $DC exec -T app php artisan lighthouse:clear-cache &>/dev/null || true
 $DC exec -T app php artisan config:clear &>/dev/null
