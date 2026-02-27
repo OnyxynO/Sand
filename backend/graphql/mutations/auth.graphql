@@ -7,4 +7,12 @@ extend type Mutation {
     logout: Boolean!
         @field(resolver: "App\\GraphQL\\Mutations\\AuthMutator@logout")
         @guard
+
+    "Demande de reinitialisation de mot de passe (envoi d'un email avec lien)"
+    demanderReinitialisationMdp(input: DemanderReinitialisationMdpInput! @spread): Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\AuthMutator@demanderReinitialisationMdp")
+
+    "Reinitialisation du mot de passe via le token recu par email"
+    reinitialiserMdp(input: ReinitialisationMdpInput! @spread): Boolean!
+        @field(resolver: "App\\GraphQL\\Mutations\\AuthMutator@reinitialiserMdp")
 }

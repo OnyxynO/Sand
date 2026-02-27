@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client/react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { LOGIN_MUTATION } from '../graphql/operations/auth';
 import { useAuthStore } from '../stores/authStore';
 import type { AuthPayload, LoginInput } from '../types';
@@ -84,12 +84,20 @@ export default function LoginPage() {
 
             {/* Champ mot de passe */}
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Mot de passe
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Mot de passe
+                </label>
+                <Link
+                  to="/mot-de-passe-oublie"
+                  className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  Mot de passe oublié ?
+                </Link>
+              </div>
               <input
                 id="password"
                 type="password"

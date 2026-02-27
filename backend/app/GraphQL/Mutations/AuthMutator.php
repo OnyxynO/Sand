@@ -6,6 +6,8 @@ use App\Models\User;
 use GraphQL\Error\Error;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Nuwave\Lighthouse\Exceptions\ValidationException;
 
 class AuthMutator
 {
@@ -36,6 +38,53 @@ class AuthMutator
         return [
             'user' => $user,
         ];
+    }
+
+    /**
+     * Demande de reinitialisation de mot de passe.
+     * Envoie un email avec un lien de reinitialisation si le compte existe.
+     * Retourne toujours true pour eviter l'enumeration d'emails.
+     */
+    public function demanderReinitialisationMdp($root, array $args): bool
+    {
+        $email = trim($args['email']);
+
+        // On envoie le mail uniquement si le compte existe et est actif,
+        // mais on retourne true dans tous les cas (anti-enumeration).
+        $user = User::where('email', $email)->first();
+        if ($user && $user->est_actif) {
+            Password::sendResetLink(['email' => $email]);
+        }
+
+        return true;
+    }
+
+    /**
+     * Reinitialisation du mot de passe via le token recu par email.
+     */
+    public function reinitialiserMdp($root, array $args): bool
+    {
+        $status = Password::reset(
+            [
+                'email'                 => $args['email'],
+                'password'              => $args['password'],
+                'password_confirmation' => $args['password_confirmation'],
+                'token'                 => $args['token'],
+            ],
+            function (User $user, string $password): void {
+                // Le cast 'hashed' sur User::$password hache automatiquement la valeur.
+                $user->password = $password;
+                $user->save();
+            }
+        );
+
+        if ($status !== Password::PASSWORD_RESET) {
+            throw ValidationException::withMessages(
+                ['token' => ['Le lien de réinitialisation est invalide ou expiré.']]
+            );
+        }
+
+        return true;
     }
 
     /**

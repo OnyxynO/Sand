@@ -16,6 +16,7 @@ use App\Policies\SettingPolicy;
 use App\Policies\TeamPolicy;
 use App\Policies\TimeEntryPolicy;
 use App\Policies\UserPolicy;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -34,6 +35,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Le lien de reinitialisation doit pointer vers le frontend React,
+        // pas vers le backend Laravel (qui n'a pas de page de reset).
+        ResetPassword::createUrlUsing(function (User $user, string $token): string {
+            $frontendUrl = rtrim(config('app.frontend_url', 'http://localhost:5173'), '/');
+            return $frontendUrl . '/reinitialiser-mdp?token=' . $token . '&email=' . urlencode($user->email);
+        });
+
         // Enregistrer les policies
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Team::class, TeamPolicy::class);
