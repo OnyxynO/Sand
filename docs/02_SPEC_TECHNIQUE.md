@@ -31,8 +31,9 @@
 |-------|-------|
 | Docker | Environnement local conteneurisé |
 | Postman / Insomnia | Tests API GraphQL |
-| PHPUnit | Tests unitaires backend |
-| Vitest | Tests frontend |
+| PHPUnit | Tests unitaires et feature backend |
+| Vitest | Tests composants et hooks frontend |
+| Playwright | Tests E2E navigateur (3 rôles) |
 | Laravel Pint | Linting PHP |
 | ESLint + Prettier | Linting JS/TS |
 
@@ -152,6 +153,16 @@ ExportTimeEntriesJob::dispatch($user, $filters);
 return response()->json(['message' => 'Export en cours...']);
 ```
 
+### 2.7 Services métier
+
+Services Laravel encapsulant la logique métier complexe :
+
+| Service | Rôle |
+|---------|------|
+| `AbsenceService` | Gestion des deux flux d'absence (API RH et manuel) — EV-12 |
+| `RhApiClient` | Client HTTP vers l'API RH externe (URL + token configurables via settings) |
+| `RgpdService` | Suppression individuelle et purge totale des données (droit à l'oubli) |
+
 ---
 
 ## 3. Base de données
@@ -239,48 +250,47 @@ public function update(User $user, TimeEntry $entry): bool
 ### 5.1 Services
 
 ```yaml
-# docker-compose.yml
+# docker-compose.yml (noms réels des services)
 services:
   app:
     build: ./docker/php
     volumes:
       - ./backend:/var/www/html
     depends_on:
-      - postgres
+      db:
+        condition: service_healthy
 
   nginx:
     image: nginx:alpine
     ports:
       - "8080:80"
-    volumes:
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      app:
+        condition: service_healthy
 
-  postgres:
+  db:                              # PostgreSQL
     image: postgres:16-alpine
     environment:
       POSTGRES_DB: sand
       POSTGRES_USER: sand
-      POSTGRES_PASSWORD: secret
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    # Ports exposés uniquement dans docker-compose.override.yml (dev)
 
-  node:
+  frontend:                        # Vite dev server (HMR activé)
     build: ./docker/node
     volumes:
       - ./frontend:/app
     ports:
       - "5173:5173"
-    command: npm run dev
 
   redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
+    image: redis:7-alpine
+    # Ports exposés uniquement dans docker-compose.override.yml (dev)
 
-  mock-rh:
-    build: ./docker/mock-rh
+  mock-rh:                         # Mock API RH (dev uniquement)
+    image: node:20-alpine
     ports:
       - "3001:3001"
 
@@ -296,13 +306,14 @@ APP_URL=http://localhost:8080
 SANCTUM_STATEFUL_DOMAINS=localhost:5173
 
 DB_CONNECTION=pgsql
-DB_HOST=postgres
+DB_HOST=db          # nom du service Docker (pas "postgres")
 DB_PORT=5432
 DB_DATABASE=sand
 DB_USERNAME=sand
 DB_PASSWORD=secret
 
-QUEUE_CONNECTION=redis
+QUEUE_CONNECTION=sync   # sync en dev — redis en prod avec worker
+CACHE_STORE=redis
 REDIS_HOST=redis
 ```
 
@@ -335,5 +346,5 @@ REDIS_HOST=redis
 
 ---
 
-*Document v1.1 - Janvier 2026*
-*Mise à jour : migration vers ltree PostgreSQL pour l'arborescence*
+*Document v1.2 - Février 2026*
+*Mise à jour : services Docker corrigés, Playwright ajouté, AbsenceService documenté*

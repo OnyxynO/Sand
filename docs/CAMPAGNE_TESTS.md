@@ -7,31 +7,35 @@ Référence pour l'implémentation des tests. Chaque cas liste le type d'outil r
 
 ---
 
-## Fichiers à créer
+## Fichiers créés
 
 ```
 frontend/e2e/
-├── auth.setup.ts              # déjà existant (utilisateur)
-├── auth.setup.moderateur.ts   # nouveau
-├── auth.setup.admin.ts        # nouveau
-├── login.spec.ts              # déjà existant
-├── saisie.spec.ts             # déjà existant (utilisateur)
-├── saisie-moderateur.spec.ts  # nouveau
-├── dashboard.spec.ts          # nouveau (commun)
-├── supervision.spec.ts        # nouveau (modérateur + admin)
-├── admin-activites.spec.ts    # nouveau (admin)
-├── admin-utilisateurs.spec.ts # nouveau (admin)
-└── acces-refuses.spec.ts      # nouveau (tous rôles)
+├── auth.setup.ts              ✅ existant (utilisateur)
+├── auth.setup.moderateur.ts   ✅ créé
+├── auth.setup.admin.ts        ✅ créé
+├── login.spec.ts              ✅ existant
+├── saisie.spec.ts             ✅ existant (utilisateur)
+├── saisie-moderateur.spec.ts  ✅ créé
+├── dashboard.spec.ts          ✅ créé (commun)
+├── supervision.spec.ts        ✅ créé (modérateur + admin)
+├── admin-activites.spec.ts    ✅ créé (admin)
+├── admin-utilisateurs.spec.ts ✅ créé (admin)
+├── admin-projets.spec.ts      ✅ créé (admin)
+├── admin-equipes.spec.ts      ✅ créé (admin)
+├── admin-configuration.spec.ts ✅ créé (admin — test connexion API RH)
+├── absences-ev12.spec.ts      ✅ créé (déclaration manuelle + notifications)
+└── acces-refuses.spec.ts      ✅ créé (tous rôles)
 
 backend/tests/Feature/
-├── Policies/                  # déjà existant à compléter
+├── Policies/                  ✅ complets
 │   ├── TimeEntryPolicyTest.php
 │   ├── ProjectPolicyTest.php
 │   ├── UserPolicyTest.php
 │   └── ActivityPolicyTest.php
-└── GraphQL/                   # à compléter
+└── GraphQL/                   ✅ complets
     ├── SupervisionTest.php
-    └── ExportTest.php
+    └── ExportMutatorGraphQLTest.php
 ```
 
 ---
@@ -351,26 +355,9 @@ Checklist à réaliser avant de considérer le projet production-ready.
 
 ```
 e2e/.auth/
-├── utilisateur.json    # jean.martin@sand.local (déjà fait)
-├── moderateur.json     # marie.dupont@sand.local (à créer)
-└── admin.json          # admin@sand.local (à créer)
+├── utilisateur.json    # jean.martin@sand.local  ✅
+├── moderateur.json     # marie.dupont@sand.local ✅
+└── admin.json          # admin@sand.local        ✅
 ```
 
-Chaque `auth.setup.*.ts` suit le même pattern que l'existant.
-
-Dans `playwright.config.ts`, ajouter deux projets supplémentaires :
-
-```ts
-{ name: 'setup-moderateur', testMatch: /auth\.setup\.moderateur\.ts/ },
-{ name: 'setup-admin',      testMatch: /auth\.setup\.admin\.ts/ },
-{
-  name: 'chromium-moderateur',
-  use: { ...devices['Desktop Chrome'], storageState: 'e2e/.auth/moderateur.json' },
-  dependencies: ['setup-moderateur'],
-},
-{
-  name: 'chromium-admin',
-  use: { ...devices['Desktop Chrome'], storageState: 'e2e/.auth/admin.json' },
-  dependencies: ['setup-admin'],
-},
-```
+Tout est implémenté et enregistré dans `playwright.config.ts`.

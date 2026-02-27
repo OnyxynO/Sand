@@ -140,6 +140,7 @@ erDiagram
         timestamp created_at
         timestamp updated_at
     }
+    %% Note : pas de colonne `niveau` — calculée dynamiquement via nlevel(chemin)-1
 
     PROJECT_ACTIVITY {
         uuid project_id PK,FK
@@ -351,6 +352,36 @@ flowchart TD
 
 ---
 
+## 7b. Flux de déclaration manuelle d'absence (EV-08/EV-12)
+
+> Ce flux s'applique quand `absence_mode = "manuel"` dans les paramètres système.
+
+```mermaid
+flowchart TD
+    START([Utilisateur clique sur une cellule]) --> CHECK{Absence existante<br/>ce jour ?}
+
+    CHECK -->|Non — première déclaration| MODAL[Modale de sélection<br/>Type + Durée]
+    CHECK -->|Oui — clic suivant| CYCLE[Cycle durée<br/>1.0 → 0.5 → suppression<br/>Type préservé]
+
+    MODAL --> CHOOSE[Utilisateur choisit<br/>type: CP / RTT / Maladie / Formation / Autre<br/>durée: 1.0 ou 0.5 ETP]
+    CHOOSE --> MUTATION[mutation declarerAbsence<br/>date, duree, type, userId?]
+    CYCLE --> MUTATION
+
+    MUTATION --> BACKEND{duree > 0 ?}
+
+    BACKEND -->|Oui| SAVE[Créer/mettre à jour<br/>absence en base]
+    BACKEND -->|Non| DELETE[Supprimer l'absence]
+
+    SAVE --> NOTIF[Créer Notification<br/>ABSENCE_IMPORTEE]
+    NOTIF --> UPDATE[Mettre à jour la grille]
+    DELETE --> UPDATE
+
+    style MODAL fill:#fff9c4
+    style NOTIF fill:#c8e6c9
+```
+
+---
+
 ## 8. Structure des dossiers
 
 ```mermaid
@@ -424,6 +455,6 @@ flowchart LR
 
 ---
 
-*Document v1.1 - Janvier 2026*
-*Mise à jour : type ltree pour l'arborescence des activités*
+*Document v1.2 - Février 2026*
+*Mise à jour : ERD corrigé (colonne niveau supprimée), diagramme flux déclaration manuelle d'absence ajouté*
 *Diagrammes Mermaid - Rendu natif GitHub/GitLab/VS Code*
