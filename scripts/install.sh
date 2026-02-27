@@ -5,6 +5,7 @@
 # Usage :
 #   bash scripts/install.sh          # installation standard
 #   bash scripts/install.sh --demo   # avec données de démo réalistes
+#   bash scripts/install.sh --help   # afficher cette aide
 #
 # Ce script doit être lancé depuis la racine du projet.
 # =============================================================================
@@ -28,13 +29,38 @@ titre() { echo -e "\n${BOLD}$*${RESET}"; }
 # --- Arguments ----------------------------------------------------------------
 AVEC_DEMO=false
 for arg in "$@"; do
-    [[ "$arg" == "--demo" ]] && AVEC_DEMO=true
+    if [[ "$arg" == "--demo" ]]; then
+        AVEC_DEMO=true
+    elif [[ "$arg" == "--help" || "$arg" == "-h" ]]; then
+        echo "Usage : bash scripts/install.sh [--demo]"
+        echo ""
+        echo "  --demo   Charger des données de démonstration réalistes"
+        echo "           (3 projets, 30 activités, 491 saisies, 3 absences)"
+        echo ""
+        echo "Ce script doit être lancé depuis la racine du projet."
+        exit 0
+    fi
 done
 
 # --- Vérification : répertoire de travail ------------------------------------
 if [[ ! -f "docker-compose.yml" ]]; then
     fail "Lancer ce script depuis la racine du projet (là où se trouve docker-compose.yml)"
 fi
+
+# --- Variable DC (initialisée tôt pour le trap) -------------------------------
+DC=""
+
+# --- Nettoyage en cas d'échec -------------------------------------------------
+cleanup_on_error() {
+    echo ""
+    warn "Échec de l'installation. Arrêt des conteneurs..."
+    if [[ -n "$DC" ]]; then
+        $DC down 2>/dev/null || true
+        warn "Voir les logs : $DC logs"
+    fi
+    exit 1
+}
+trap cleanup_on_error ERR
 
 # =============================================================================
 titre "=== Installation SAND ==="
@@ -81,21 +107,39 @@ else
     ok ".env déjà présent — non écrasé"
 fi
 
+# --- Vérification des ports ---------------------------------------------------
+titre "3. Vérification des ports"
+
+check_port() {
+    local port=$1 service=$2
+    if lsof -i :"$port" -sTCP:LISTEN -t &>/dev/null; then
+        fail "Port $port déjà utilisé — $service ne pourra pas démarrer. Libérer le port et relancer."
+    fi
+    ok "Port $port libre ($service)"
+}
+
+check_port 5173 "Frontend"
+check_port 8080 "Backend Nginx"
+check_port 3001 "Mock API RH"
+
 # --- Démarrage des conteneurs -------------------------------------------------
-titre "3. Démarrage des conteneurs Docker"
+titre "4. Démarrage des conteneurs Docker"
 
 info "Lancement de docker compose..."
 $DC up -d --build
 
 # --- Dépendances PHP ----------------------------------------------------------
-titre "4. Installation des dépendances PHP"
+# composer install est exécuté ici (pas dans le Dockerfile) car le code source
+# est monté via un volume — les dépendances doivent être installées dans ce volume
+# pour être accessibles en live reload.
+titre "5. Installation des dépendances PHP"
 
 info "Exécution de composer install..."
 $DC exec -T app composer install --no-interaction --prefer-dist --optimize-autoloader
 ok "Dépendances PHP installées"
 
 # --- Attente PostgreSQL -------------------------------------------------------
-titre "5. Attente de la base de données"
+titre "6. Attente de la base de données"
 
 info "Attente de PostgreSQL..."
 MAX=30
@@ -112,7 +156,7 @@ echo ""
 ok "PostgreSQL prêt"
 
 # --- APP_KEY ------------------------------------------------------------------
-titre "6. Clé d'application"
+titre "7. Clé d'application"
 
 CURRENT_KEY=$(grep '^APP_KEY=' backend/.env | cut -d'=' -f2 | tr -d ' ' | cut -d'#' -f1)
 if [[ -z "$CURRENT_KEY" ]]; then
@@ -124,37 +168,54 @@ else
 fi
 
 # --- Base de données de test --------------------------------------------------
-titre "7. Base de données de test"
+titre "8. Base de données de test"
 
 info "Création de la base sand_test (pour PHPUnit)..."
 $DC exec -T db psql -U sand -c "CREATE DATABASE sand_test;" &>/dev/null && ok "sand_test créée" || ok "sand_test déjà existante"
 
 # --- Migrations ---------------------------------------------------------------
-titre "8. Migrations"
+titre "9. Migrations"
 
 info "Exécution des migrations..."
 $DC exec -T app php artisan migrate --force --ansi
 ok "Migrations appliquées"
 
 # --- Seeders ------------------------------------------------------------------
-titre "9. Données de base"
+titre "10. Données de base"
 
 info "Chargement des données de base (équipes, comptes, activités, projets)..."
 $DC exec -T app php artisan db:seed --class=DatabaseSeeder --force --ansi
 ok "Données de base insérées"
 
 if [[ "$AVEC_DEMO" == "true" ]]; then
-    info "Chargement des données de démo (30 activités, 491 saisies, 3 absences)..."
+    info "Chargement des données de démo (3 projets, 30 activités, 491 saisies, 3 absences)..."
     $DC exec -T app php artisan db:seed --class=DemoSeeder --force --ansi
     ok "Données de démo insérées"
 fi
 
 # --- Cache Lighthouse ---------------------------------------------------------
-titre "10. Cache"
+titre "11. Cache"
 
 $DC exec -T app php artisan lighthouse:clear-cache &>/dev/null || true
 $DC exec -T app php artisan config:clear &>/dev/null
 ok "Cache vidé"
+
+# --- Attente frontend ---------------------------------------------------------
+titre "12. Attente du frontend"
+
+info "Attente de Vite..."
+MAX=30
+COUNT=0
+until curl -s -o /dev/null -w "%{http_code}" http://localhost:5173 2>/dev/null | grep -q "200\|304"; do
+    COUNT=$((COUNT + 1))
+    if [[ $COUNT -ge $MAX ]]; then
+        warn "Frontend pas encore prêt — patienter quelques secondes puis ouvrir http://localhost:5173"
+        break
+    fi
+    printf "."
+    sleep 3
+done
+[[ $COUNT -lt $MAX ]] && echo "" && ok "Frontend prêt"
 
 # --- Résumé ------------------------------------------------------------------
 echo ""

@@ -2,7 +2,25 @@
 
 Application web de saisie d'activités professionnelles. Les collaborateurs déclarent leur temps de travail par projet et activité (en ETP). Les modérateurs supervisent leur équipe, les admins configurent le système.
 
-Successeur de SAEL.
+## Table des matières
+
+- [Aperçu](#aperçu)
+- [Stack technique](#stack-technique)
+- [Prérequis](#prérequis)
+- [Installation](#installation)
+- [Mise à jour](#mise-à-jour)
+- [Accès](#accès)
+- [Configuration mail](#configuration-mail)
+- [Commandes de développement](#commandes-de-développement)
+- [Tests](#tests)
+- [Troubleshooting](#troubleshooting)
+- [Documentation](#documentation)
+
+---
+
+## Aperçu
+
+*Captures d'écran à venir.*
 
 ---
 
@@ -59,15 +77,39 @@ cp backend/.env.example backend/.env
 # 2. Démarrer les conteneurs
 docker compose up -d --build
 
-# 3. Générer la clé d'application
+# 3. Installer les dépendances PHP
+docker compose exec app composer install
+
+# 4. Générer la clé d'application
 docker compose exec app php artisan key:generate
 
-# 4. Migrations et données de base
+# 5. Migrations et données de base
 docker compose exec app php artisan migrate
 docker compose exec app php artisan db:seed
 
 # (optionnel) Données de démo
 docker compose exec app php artisan db:seed --class=DemoSeeder
+```
+
+---
+
+## Mise à jour
+
+Après un `git pull` :
+
+```bash
+# Reconstruire si les Dockerfiles ont changé
+docker compose up -d --build
+
+# Appliquer les nouvelles migrations
+docker compose exec app php artisan migrate
+
+# Vider le cache (obligatoire si le schéma GraphQL a changé)
+docker compose exec app php artisan lighthouse:clear-cache
+docker compose exec app php artisan config:clear
+
+# Régénérer les types TypeScript si le schéma GraphQL a changé
+docker compose exec frontend npm run generate
 ```
 
 ---
@@ -145,6 +187,9 @@ docker compose exec app php artisan tinker
 ### Frontend
 
 ```bash
+# Régénérer les types TypeScript depuis le schéma GraphQL
+docker compose exec frontend npm run generate
+
 # Linting TypeScript/React
 docker compose exec frontend npm run lint
 

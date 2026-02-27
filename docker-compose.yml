@@ -17,6 +17,12 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "php-fpm", "-t"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
   # Worker de file d'attente Laravel (traitement des exports CSV)
   queue:
@@ -53,7 +59,8 @@ services:
     networks:
       - sand-network
     depends_on:
-      - app
+      app:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost/api/health"]
       interval: 30s
@@ -99,7 +106,7 @@ services:
       retries: 5
       start_period: 5s
 
-  # Frontend React (développement)
+  # Frontend React — serveur de développement Vite (HMR activé, pas un build de production)
   frontend:
     build:
       context: ./docker/node
