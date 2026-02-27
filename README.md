@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="docs/screenshots/logo.png" alt="SAND" width="160">
+</div>
+
 # SAND — Saisie d'Activité Numérique Déclarative
 
 Application web de saisie d'activités professionnelles. Les collaborateurs déclarent leur temps de travail par projet et activité (en ETP). Les modérateurs supervisent leur équipe, les admins configurent le système.
@@ -20,7 +24,29 @@ Application web de saisie d'activités professionnelles. Les collaborateurs déc
 
 ## Aperçu
 
-*Captures d'écran à venir.*
+### Saisie hebdomadaire
+
+Déclaration du temps par projet et activité (en ETP), semaine par semaine. Les modérateurs peuvent saisir à la place d'un membre de leur équipe.
+
+![Saisie hebdomadaire](docs/screenshots/saisie-hebdomadaire.png)
+
+### Tableau de bord admin
+
+Vue agrégée des ETP par projet et par jour pour toute l'organisation, avec répartition par activité.
+
+![Tableau de bord admin](docs/screenshots/tableau-de-bord-admin.png)
+
+### Supervision
+
+Détection automatique des anomalies de saisie (jours incomplets ou manquants) pour le suivi de l'équipe.
+
+![Supervision](docs/screenshots/supervision.png)
+
+### Arborescence des activités
+
+Configuration de la hiérarchie des activités par codes métier. Seules les feuilles de l'arbre sont saisissables.
+
+![Arborescence des activités](docs/screenshots/arborescence-activites.png)
 
 ---
 
