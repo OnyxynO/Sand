@@ -111,15 +111,21 @@ else
     ok "APP_KEY déjà présente — ignorée"
 fi
 
+# --- Base de données de test --------------------------------------------------
+titre "6. Base de données de test"
+
+info "Création de la base sand_test (pour PHPUnit)..."
+$DC exec -T db psql -U sand -c "CREATE DATABASE sand_test;" &>/dev/null && ok "sand_test créée" || ok "sand_test déjà existante"
+
 # --- Migrations ---------------------------------------------------------------
-titre "6. Migrations"
+titre "7. Migrations"
 
 info "Exécution des migrations..."
 $DC exec -T app php artisan migrate --force --ansi
 ok "Migrations appliquées"
 
 # --- Seeders ------------------------------------------------------------------
-titre "7. Données de base"
+titre "8. Données de base"
 
 info "Chargement des données de base (équipes, comptes, activités, projets)..."
 $DC exec -T app php artisan db:seed --class=DatabaseSeeder --force --ansi
@@ -132,7 +138,7 @@ if [[ "$AVEC_DEMO" == "true" ]]; then
 fi
 
 # --- Cache Lighthouse ---------------------------------------------------------
-titre "8. Cache"
+titre "9. Cache"
 
 $DC exec -T app php artisan lighthouse:clear-cache &>/dev/null || true
 $DC exec -T app php artisan config:clear &>/dev/null
