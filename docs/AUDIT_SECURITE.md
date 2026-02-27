@@ -350,7 +350,7 @@ LIGHTHOUSE_SECURITY_DISABLE_INTROSPECTION=true
 ```
 
 ```bash
-docker-compose exec app php artisan lighthouse:clear-cache
+docker compose exec app php artisan lighthouse:clear-cache
 ```
 
 ---
@@ -511,19 +511,21 @@ frontend/test-results/
 
 ```bash
 # Frontend
-docker-compose exec frontend npm audit fix
-docker-compose exec frontend npm run test:run
+docker compose exec frontend npm audit fix
+docker compose exec frontend npm run test:run
 
 # Backend
-docker-compose exec app composer update psy/psysh symfony/process
-docker-compose exec app php artisan test
+docker compose exec app composer update psy/psysh symfony/process
+docker compose exec app php artisan test
 ```
 
 ---
 
 ### T-11 — Chiffrement des sessions (F-01)
 
-**Priorité** : P2 · **Effort** : ~5min · **Statut** : À activer en production uniquement (SESSION_ENCRYPT=true dans .env prod — invalide les sessions existantes)
+**Priorité** : P2 · **Effort** : ~5min · **Statut** : À activer en production uniquement
+
+Cette variable doit être définie dans le `.env` de production. Elle est documentée dans la checklist de déploiement : **[docs/DEPLOIEMENT_PROD.md](DEPLOIEMENT_PROD.md)**.
 
 **`backend/.env`** (production) :
 

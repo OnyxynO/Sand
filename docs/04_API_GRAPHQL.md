@@ -1,7 +1,7 @@
 # API GraphQL — SAND
 
 > Généré depuis le schéma Lighthouse réel (`php artisan lighthouse:print-schema`).
-> Dernière mise à jour : 2026-02-19.
+> Dernière mise à jour : 2026-02-27.
 
 **Endpoint** : `POST http://localhost:8080/graphql`
 **Playground** : `http://localhost:8080/graphiql`
@@ -236,6 +236,18 @@ type Setting {
   description: String
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+```
+
+### Anomaly
+
+```graphql
+type Anomaly {
+  type: AnomalyType!
+  date: Date!
+  detail: String!        # Description lisible (ex: "Total ETP = 0.8 sur 5 saisies")
+  utilisateur: User!
+  projet: Project
 }
 ```
 
@@ -492,7 +504,7 @@ input AbsenceInput {
 enum ConflictResolution {
   ECRASER   # Supprime les saisies en conflit
   IGNORER   # Conserve les saisies, ignore l'absence
-  AJUSTER   # Ajuste la durée de l'absence
+  AJUSTER   # Non implémenté en v1 — réservé pour une version future
 }
 
 type SyncResult {
@@ -628,6 +640,7 @@ input UpdateActivityInput {
 markNotificationRead(id: ID!): Notification!
 markAllNotificationsRead: Boolean!
 deleteNotification(id: ID!): Boolean!
+supprimerToutesNotifications: Boolean!   # Supprime toutes les notifications de l'utilisateur courant (EV-10)
 ```
 
 ### Export CSV (asynchrone)
@@ -850,5 +863,5 @@ mutation {
 Pour exporter le schéma SDL à jour :
 
 ```bash
-docker-compose exec app php artisan lighthouse:print-schema > docs/schema.graphql
+docker compose exec app php artisan lighthouse:print-schema > docs/schema.graphql
 ```

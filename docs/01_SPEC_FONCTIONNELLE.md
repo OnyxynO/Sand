@@ -199,25 +199,53 @@ Exemples :
 
 ## 6. Gestion des absences
 
-### 6.1 Source
+### 6.1 Mode de fonctionnement
 
-- API externe (système RH)
-- Authentification LDAP (mock en dev)
+L'application supporte deux modes de gestion des absences, configurables par l'administrateur via le paramètre `absence_mode` :
 
-### 6.2 Fonctionnement
+| Mode | Description |
+|------|-------------|
+| `api` | Import automatique depuis une API RH externe |
+| `manuel` | Déclaration manuelle par l'utilisateur dans la grille de saisie |
 
-- Type unique : "Absence" (distinction CP/RTT/maladie gérée par le système source)
-- Peut être **partielle** (ex: 0.5 ETP pour demi-journée)
-- Pré-remplit la journée avec l'activité "Absence"
+### 6.2 Mode API (import automatique)
 
-### 6.3 Gestion des conflits
+- Connexion à une API RH externe (URL et token configurables dans Config. Système)
+- Mock disponible en développement (`mock-rh` sur le port 3001)
+- Mutation `syncAbsences` pour déclencher l'import sur une période
+- Support absence partielle (0.5 ETP pour demi-journée)
+- Idempotent : `reference_externe` évite les doublons
+
+### 6.3 Mode manuel — déclaration utilisateur (EV-08/EV-12)
+
+En mode manuel, l'utilisateur déclare ses absences directement depuis la grille de saisie hebdomadaire.
+
+**Premier clic sur une cellule vide (journée sans absence) :**
+- Modale de sélection type + durée
+- Types disponibles : Congés payés · RTT · Maladie · Formation · Autre
+- Durée : journée entière (1.0 ETP) ou demi-journée (0.5 ETP)
+
+**Clic suivant sur une cellule avec absence existante :**
+- Cycle durée uniquement (le type est préservé)
+- Cycle : `1.0` → `0.5` → suppression → retour à vide
+
+**Déclaration pour autrui :**
+- Modérateurs et admins peuvent déclarer au nom d'un utilisateur (paramètre `userId`)
+- Mutation : `declarerAbsence(date, duree, type, userId)`
+
+**Notification :**
+- Une notification est envoyée à l'utilisateur à chaque déclaration effective (durée > 0)
+
+### 6.4 Gestion des conflits
 
 Les absences sont généralement saisies **en amont** (congés planifiés).
 
-Si une absence est importée sur un jour avec saisies existantes :
+Si une absence est importée (mode API) sur un jour avec saisies existantes :
 1. **Warning affiché** à l'utilisateur
-2. L'utilisateur choisit : écraser, ignorer, ou ajuster
+2. L'utilisateur choisit : écraser ou ignorer
 3. Si total > 1.0 → warning mais pas bloquant
+
+En mode manuel, la déclaration s'effectue directement — pas de résolution de conflit automatique.
 
 ---
 
@@ -288,6 +316,9 @@ Rafraîchissement : **au chargement de page** (pas de temps réel)
 | `week_starts_on` | Premier jour de la semaine (0=dim, 1=lun) | 1 |
 | `show_weekends` | Afficher samedi/dimanche | false |
 | `decimal_precision` | Nombre de décimales pour la saisie | 2 |
+| `absence_mode` | Mode de gestion des absences (`api` ou `manuel`) | `api` |
+| `absence_api_url` | URL de l'API RH externe (mode `api` uniquement) | — |
+| `absence_api_token` | Token d'authentification API RH (mode `api` uniquement) | — |
 
 ---
 
@@ -311,4 +342,5 @@ Rafraîchissement : **au chargement de page** (pas de temps réel)
 
 ---
 
-*Document v1.1 - Janvier 2026*
+*Document v1.2 - Février 2026*
+*Mise à jour : gestion des absences (EV-08/EV-12) — mode manuel + paramètres associés*

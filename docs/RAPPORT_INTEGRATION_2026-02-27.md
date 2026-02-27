@@ -264,3 +264,7 @@ Au total, 9 problèmes identifiés sur 2 sessions de test. Les plus critiques à
 1. **P9** — bug réel d'install, l'app démarre cassée sans avertissement
 2. **P2** — `start-dev.sh` échouerait sur Docker Desktop récent
 3. **P3** — `.env.example` racine source de confusion
+
+---
+
+**Statut au 2026-02-27 : toutes les recommandations P1–P9 ont été appliquées** dans les commits `e47dd11`, `7321925` et `b6f9a6d`. Issue GitHub #2 fermée.

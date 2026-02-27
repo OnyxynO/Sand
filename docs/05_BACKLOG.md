@@ -11,7 +11,7 @@ gantt
     title Phases de développement SAND
     dateFormat  YYYY-MM-DD
     section Phase 1
-    Fondations           :p1, 2025-02-01, 2w
+    Fondations           :p1, 2026-02-01, 2w
     section Phase 2
     Core Features        :p2, after p1, 3w
     section Phase 3
@@ -37,7 +37,7 @@ Mettre en place l'infrastructure technique et l'authentification.
 > **Afin de** pouvoir développer en local sans configuration manuelle
 
 **Critères d'acceptation :**
-- [x] `docker-compose up` démarre tous les services
+- [x] `docker compose up` démarre tous les services
 - [x] Laravel accessible sur `localhost:8080`
 - [x] React (Vite) accessible sur `localhost:5173`
 - [x] PostgreSQL accessible sur `localhost:5432`
@@ -441,10 +441,10 @@ Finalisation et qualité.
 > **Afin de** garantir la qualité
 
 **Critères d'acceptation :**
-- [x] Tests unitaires (Models, Policies) - 33 tests
-- [x] Tests Feature (GraphQL mutations) - 86 tests
-- [x] Tests Policy (autorisations) - 20 tests
-- [x] 119 tests, 504 assertions, 0 echecs
+- [x] Tests unitaires (Models, Policies)
+- [x] Tests Feature (GraphQL mutations)
+- [x] Tests Policy (autorisations)
+- [x] Couverture complète, 0 échecs (chiffre exact variable — voir CI)
 
 **Bonus** : Les tests ont revele 6 bugs applicatifs reels (voir DIFFUSION_LOG.md Phase 5)
 
@@ -459,7 +459,7 @@ Finalisation et qualité.
 - [x] Tests composants (Vitest) - CelluleSaisie, NavigationSemaine, TotauxJournaliers
 - [x] Tests stores Zustand - authStore, saisieStore, notificationStore
 - [x] Tests utilitaires - semaineUtils
-- [x] 66 tests, 0 echecs
+- [x] Couverture complète, 0 échecs (chiffre exact variable — voir CI)
 
 ---
 
@@ -489,7 +489,11 @@ Finalisation et qualité.
 
 ---
 
-## Évolutions futures (hors scope v1)
+## Évolutions post-v1 (EV-01 à EV-12)
+
+Les 12 évolutions implémentées après la v1 sont documentées dans **[06_EVOLUTIONS.md](06_EVOLUTIONS.md)** (toutes terminées).
+
+## Évolutions futures (hors scope)
 
 | Feature | Description |
 |---------|-------------|
@@ -502,4 +506,4 @@ Finalisation et qualité.
 
 ---
 
-*Document v1.0 - Janvier 2025*
+*Document v1.0 - Janvier 2026*
