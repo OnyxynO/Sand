@@ -15,7 +15,7 @@ Successeur de SAEL.
 | Base de données | PostgreSQL 16 (extension ltree) |
 | Cache / Queue | Redis 7 |
 | Conteneurs | Docker · Docker Compose |
-| Tests | PHPUnit (231 tests) · Vitest (218 tests) · Playwright (E2E) |
+| Tests | PHPUnit (262 tests) · Vitest (235 tests) · Playwright (E2E) |
 
 ---
 
@@ -23,8 +23,9 @@ Successeur de SAEL.
 
 - **Docker Desktop** — [docs.docker.com/get-docker](https://docs.docker.com/get-docker/)
 - **Git**
+- **Node.js** — uniquement pour les tests E2E Playwright (pas nécessaire pour faire tourner l'appli)
 
-C'est tout. PHP, Node et Composer tournent dans Docker.
+PHP, Composer et npm tournent dans Docker — rien à installer sur l'hôte sauf Docker.
 
 ---
 
@@ -50,6 +51,7 @@ bash scripts/install.sh --demo
 ```bash
 # 1. Copier la configuration
 cp backend/.env.example backend/.env
+# Éditer backend/.env si nécessaire (mail, clés API...)
 
 # 2. Démarrer les conteneurs
 docker compose up -d --build
@@ -86,6 +88,24 @@ docker compose exec app php artisan db:seed --class=DemoSeeder
 
 ---
 
+## Configuration mail
+
+Par défaut (`MAIL_MAILER=log`), les emails sont écrits dans les logs et non envoyés.
+
+Pour recevoir de vrais emails en développement, configurer [Mailtrap](https://mailtrap.io) dans `backend/.env` :
+
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=<votre-username-mailtrap>
+MAIL_PASSWORD=<votre-password-mailtrap>
+```
+
+Voir `backend/.env.example` pour la documentation complète des options.
+
+---
+
 ## Commandes de développement
 
 ### Conteneurs
@@ -112,6 +132,9 @@ docker compose exec app php artisan config:clear
 # Linting PHP
 docker compose exec app ./vendor/bin/pint
 
+# Analyse statique (niveau 5)
+docker compose exec app ./vendor/bin/phpstan analyse
+
 # Tinker (REPL Laravel)
 docker compose exec app php artisan tinker
 ```
@@ -137,13 +160,14 @@ docker compose exec frontend npm run build
 docker compose exec app php artisan test
 
 # Un fichier spécifique
-docker compose exec app php artisan test tests/Feature/GraphQL/MeSaisiesSemaineTest.php
+docker compose exec app php artisan test tests/Feature/AuthGraphQLTest.php
 
 # Un test par nom
-docker compose exec app php artisan test --filter test_retourne_saisies_semaine
+docker compose exec app php artisan test --filter test_login_avec_identifiants_valides
 ```
 
-> La base de test `sand_test` est requise (PostgreSQL — extension ltree incompatible avec SQLite).
+> La base de test `sand_test` est requise (PostgreSQL — ltree incompatible avec SQLite).
+> Elle est créée automatiquement par le script `scripts/install.sh`.
 
 ### Frontend (Vitest)
 
@@ -229,6 +253,10 @@ docker compose exec app php artisan db:seed --class=DemoSeeder
 
 Le fichier `docker-compose.override.yml` expose les ports 5432 et 6379 en développement — actif automatiquement avec `docker compose up`.
 
+### Les emails ne sont pas reçus
+
+En développement, `MAIL_MAILER=log` est la valeur par défaut — les emails sont écrits dans `storage/logs/laravel.log`, pas envoyés. Configurer Mailtrap pour recevoir de vrais emails (voir section *Configuration mail* ci-dessus).
+
 ---
 
 ## Documentation
@@ -241,5 +269,4 @@ Le fichier `docker-compose.override.yml` expose les ports 5432 et 6379 en dével
 | `docs/04_API_GRAPHQL.md` | Documentation complète de l'API GraphQL |
 | `docs/05_BACKLOG.md` | User stories par phase |
 | `docs/06_EVOLUTIONS.md` | Évolutions implémentées |
-| `docs/AUDIT_SECURITE.md` | Rapport d'audit sécurité et corrections |
-| `docs/CAMPAGNE_TESTS.md` | Campagne de tests et couverture |
+| `docs/07_AUDIT_TECHNIQUE.md` | Rapport d'audit qualité et suivi des corrections |
