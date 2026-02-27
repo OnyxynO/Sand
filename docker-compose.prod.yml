@@ -1,0 +1,35 @@
+# Override de production — fusionner avec le compose de base :
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Ce fichier :
+#   - Remplace nginx par une image multi-stage (React builte + nginx)
+#   - Expose le port 80 (au lieu de 8080 en dev)
+#   - Passe APP_ENV=production sur app et queue
+#   - Desactive les services dev (frontend Vite, mock-rh) via profils
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile.prod
+    ports: !reset
+      - "80:80"
+    volumes: !reset []
+
+  app:
+    environment:
+      APP_ENV: production
+
+  queue:
+    environment:
+      APP_ENV: production
+
+  # Service Vite dev — desactive en production (demarrage uniquement avec --profile dev)
+  frontend:
+    profiles:
+      - dev
+
+  # Mock API RH — desactive en production
+  mock-rh:
+    profiles:
+      - dev

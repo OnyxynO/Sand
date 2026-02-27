@@ -1,8 +1,8 @@
 import type { CodegenConfig } from '@graphql-codegen/cli'
 
 const config: CodegenConfig = {
-  // Schema depuis le backend (introspection)
-  schema: 'http://localhost:8080/graphql',
+  // Schema depuis le backend (introspection HTTP en dev, fichier local en Docker build via CODEGEN_SCHEMA)
+  schema: process.env.CODEGEN_SCHEMA ?? 'http://localhost:8080/graphql',
 
   // Fichiers contenant les operations GraphQL
   documents: ['src/**/*.ts', 'src/**/*.tsx'],
