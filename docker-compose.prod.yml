@@ -14,7 +14,8 @@ services:
       dockerfile: docker/nginx/Dockerfile.prod
     ports:
       - "80:80"
-    volumes: []
+    volumes:
+      - ./docker/nginx/prod:/etc/nginx/conf.d:ro
 
   app:
     environment:
