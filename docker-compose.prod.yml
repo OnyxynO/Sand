@@ -12,9 +12,9 @@ services:
     build:
       context: .
       dockerfile: docker/nginx/Dockerfile.prod
-    ports: !reset
+    ports:
       - "80:80"
-    volumes: !reset []
+    volumes: []
 
   app:
     environment:
