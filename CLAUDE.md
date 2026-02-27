@@ -54,13 +54,13 @@ Tout tourne dans Docker. Ne pas lancer les commandes depuis l'hote.
 
 ```bash
 # Demarrer l'environnement
-docker-compose up -d
+docker compose up -d
 
 # Tests backend (PostgreSQL obligatoire, ltree incompatible SQLite)
-docker-compose exec app php artisan test
+docker compose exec app php artisan test
 
 # Tests frontend unitaires (Vitest, dans Docker)
-docker-compose exec frontend npm run test
+docker compose exec frontend npm run test
 
 # Tests E2E Playwright (sur l'HOTE, pas dans Docker)
 cd frontend && npm run e2e            # headless
@@ -68,18 +68,18 @@ cd frontend && npm run e2e:ui         # interface graphique
 cd frontend && npm run e2e:headed     # navigateur visible
 
 # Apres modification du schema GraphQL : vider le cache Lighthouse
-docker-compose exec app php artisan lighthouse:clear-cache
+docker compose exec app php artisan lighthouse:clear-cache
 
 # Donnees de demo realistes (30 activites, 3 projets, 491 saisies, 3 absences)
-docker-compose exec app php artisan db:seed --class=DemoSeeder
+docker compose exec app php artisan db:seed --class=DemoSeeder
 
 # Linting
-docker-compose exec app ./vendor/bin/pint
-docker-compose exec frontend npm run lint
+docker compose exec app ./vendor/bin/pint
+docker compose exec frontend npm run lint
 
 # Analyse statique PHPStan (niveau 5) — installer d'abord si pas encore fait :
-# docker-compose exec app composer require --dev larastan/larastan
-docker-compose exec app ./vendor/bin/phpstan analyse
+# docker compose exec app composer require --dev larastan/larastan
+docker compose exec app ./vendor/bin/phpstan analyse
 ```
 
 ## Tests
@@ -88,13 +88,13 @@ docker-compose exec app ./vendor/bin/phpstan analyse
 
 | Couche | Outil | Ou | Commande |
 |--------|-------|----|----------|
-| Backend (PHP) | PHPUnit | Docker (`app`) | `docker-compose exec app php artisan test` |
-| Frontend (composants) | Vitest + Testing Library | Docker (`frontend`) | `docker-compose exec frontend npm run test` |
+| Backend (PHP) | PHPUnit | Docker (`app`) | `docker compose exec app php artisan test` |
+| Frontend (composants) | Vitest + Testing Library | Docker (`frontend`) | `docker compose exec frontend npm run test` |
 | E2E (navigateur) | Playwright | Hote (pas Docker) | `cd frontend && npm run e2e` |
 
 ### Playwright E2E
 
-**Prerequis** : Docker running (`docker-compose up -d`), Chromium installe (`npx playwright install chromium`)
+**Prerequis** : Docker running (`docker compose up -d`), Chromium installe (`npx playwright install chromium`)
 
 Structure des tests E2E :
 ```

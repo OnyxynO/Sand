@@ -11,16 +11,23 @@ fi
 
 echo "✓ Docker OK"
 
+# Choisir la commande docker compose disponible
+if docker compose version &>/dev/null 2>&1; then
+    DC="docker compose"
+else
+    DC="docker-compose"
+fi
+
 # Aller au bon repertoire
 cd "$(dirname "$0")"
 
 # Lancer PostgreSQL et Redis
 echo "→ Demarrage PostgreSQL et Redis..."
-docker-compose up -d db redis
+$DC up -d db redis
 sleep 3
 
 # Verifier que la DB est prete
-until docker-compose exec -T db pg_isready -U sand > /dev/null 2>&1; do
+until $DC exec -T db pg_isready -U sand > /dev/null 2>&1; do
     echo "  Attente PostgreSQL..."
     sleep 2
 done
