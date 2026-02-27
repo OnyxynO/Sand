@@ -44,6 +44,11 @@ titre "=== Installation SAND ==="
 titre "1. Vérification des prérequis"
 
 if ! command -v docker &>/dev/null; then
+    if command -v brew &>/dev/null; then
+        warn "Docker non trouvé. Pour installer via Homebrew :"
+        warn "  brew install --cask docker"
+        warn "Lance Docker Desktop, puis relance ce script."
+    fi
     fail "Docker n'est pas installé. Voir https://docs.docker.com/get-docker/"
 fi
 ok "Docker trouvé : $(docker --version | cut -d' ' -f3 | tr -d ',')"
@@ -109,7 +114,7 @@ ok "PostgreSQL prêt"
 # --- APP_KEY ------------------------------------------------------------------
 titre "6. Clé d'application"
 
-CURRENT_KEY=$(grep '^APP_KEY=' backend/.env | cut -d'=' -f2)
+CURRENT_KEY=$(grep '^APP_KEY=' backend/.env | cut -d'=' -f2 | tr -d ' ' | cut -d'#' -f1)
 if [[ -z "$CURRENT_KEY" ]]; then
     info "Génération de APP_KEY..."
     $DC exec -T app php artisan key:generate --ansi

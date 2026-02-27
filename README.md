@@ -23,9 +23,11 @@ Successeur de SAEL.
 
 - **Docker Desktop** — [docs.docker.com/get-docker](https://docs.docker.com/get-docker/)
 - **Git**
-- **Node.js** — uniquement pour les tests E2E Playwright (pas nécessaire pour faire tourner l'appli)
+- **Node.js ≥ 18** — uniquement pour les tests E2E Playwright (pas nécessaire pour faire tourner l'appli)
 
 PHP, Composer et npm tournent dans Docker — rien à installer sur l'hôte sauf Docker.
+
+> **macOS avec Homebrew** : `brew install --cask docker` pour installer Docker Desktop.
 
 ---
 
@@ -51,6 +53,7 @@ bash scripts/install.sh --demo
 ```bash
 # 1. Copier la configuration
 cp backend/.env.example backend/.env
+# Optionnel : passer APP_DEBUG=true dans backend/.env pour voir les erreurs Laravel
 # Éditer backend/.env si nécessaire (mail, clés API...)
 
 # 2. Démarrer les conteneurs
