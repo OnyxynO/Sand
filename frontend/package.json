@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "npm run codegen && tsc -b && vite build",
-    "build:docker": "tsc -b && vite build",
+    "build:docker": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "codegen": "graphql-codegen --config codegen.ts",
