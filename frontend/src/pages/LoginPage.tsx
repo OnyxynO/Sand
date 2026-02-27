@@ -78,6 +78,7 @@ export default function LoginPage() {
                 placeholder="nom@entreprise.com"
                 autoComplete="email"
                 spellCheck={false}
+                maxLength={80}
                 disabled={loading}
               />
             </div>
@@ -106,6 +107,7 @@ export default function LoginPage() {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500 transition-colors"
                 placeholder="••••••••"
                 autoComplete="current-password"
+                maxLength={80}
                 disabled={loading}
               />
             </div>
