@@ -20,6 +20,8 @@ GET http://localhost:8080/sanctum/csrf-cookie
 
 Puis inclure le header `X-XSRF-TOKEN` à chaque mutation, et envoyer les requêtes avec `credentials: 'include'`.
 
+> ⚠️ Après la mutation `login`, le cookie `XSRF-TOKEN` est régénéré avec la nouvelle session. Relire ce cookie et mettre à jour le header `X-XSRF-TOKEN` avant d'envoyer d'autres mutations.
+
 ---
 
 ## Règles métier communes
@@ -417,19 +419,19 @@ demanderReinitialisationMdp(input: DemanderReinitialisationMdpInput!): Boolean!
 reinitialiserMdp(input: ReinitialisationMdpInput!): Boolean!
 
 input LoginInput {
-  email: String!
-  password: String!
+  email: String!    # required, email, max:80
+  password: String! # required, min:6, max:80
 }
 
 input DemanderReinitialisationMdpInput {
-  email: String!
+  email: String!    # required, email, max:80
 }
 
 input ReinitialisationMdpInput {
   token: String!
-  email: String!
-  password: String!               # 8 caractères minimum
-  password_confirmation: String!  # doit être identique à password
+  email: String!                 # required, email, max:80
+  password: String!              # required, min:8, max:80, confirmed
+  password_confirmation: String! # required, max:80
 }
 
 type AuthPayload {
