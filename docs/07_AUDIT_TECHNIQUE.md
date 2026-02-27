@@ -351,3 +351,5 @@ EV-12 est à **100% complétée**.
 | INFRA-02 | PHPStan niveau 5 (phpstan.neon + larastan) | Post-P4 | ✅ Corrigé | 2026-02-23 |
 | DOC-05 | Versions React/Laravel dans docs/02 et docs/03 | Post-P4 | ✅ Corrigé | 2026-02-23 |
 | DOC-06 | Reformulation SAEL→SAND (docs/01 + CLAUDE.md) | Post-P4 | ✅ Corrigé | 2026-02-23 |
+| INFRA-03 | .env.example CACHE_STORE=redis + install.sh composer install | Post-audit | ✅ Corrigé | 2026-02-27 |
+| FEAT-01 | Feature mot de passe oublié (demanderReinitialisationMdp + reinitialiserMdp + pages + 6 tests PHPUnit) | Post-audit | ✅ Corrigé | 2026-02-27 |
