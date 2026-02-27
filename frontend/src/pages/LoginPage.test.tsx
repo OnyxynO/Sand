@@ -85,6 +85,20 @@ describe('LoginPage', () => {
     expect(emailInput).toHaveAttribute('type', 'email');
   });
 
+  it('champ email limite a 80 caracteres', () => {
+    renderAvecApollo(<LoginPage />);
+
+    const emailInput = screen.getByLabelText('Adresse email');
+    expect(emailInput).toHaveAttribute('maxLength', '80');
+  });
+
+  it('champ mot de passe limite a 80 caracteres', () => {
+    renderAvecApollo(<LoginPage />);
+
+    const passwordInput = screen.getByLabelText('Mot de passe');
+    expect(passwordInput).toHaveAttribute('maxLength', '80');
+  });
+
   it('desactive les champs pendant le chargement', async () => {
     const loginMock = {
       request: {
