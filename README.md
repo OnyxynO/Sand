@@ -6,6 +6,18 @@
 
 Application web de saisie d'activités professionnelles. Les collaborateurs déclarent leur temps de travail par projet et activité (en ETP). Les modérateurs supervisent leur équipe, les admins configurent le système.
 
+## Démo en ligne
+
+L'application est déployée et accessible à cette adresse : **http://46.225.221.116**
+
+Des données de démonstration (janvier 2026) sont préchargées. Trois comptes de test sont disponibles :
+
+| Rôle | Email | Mot de passe |
+|------|-------|--------------|
+| Admin | admin@sand.local | password |
+| Modérateur | marie.dupont@sand.local | password |
+| Utilisateur | jean.martin@sand.local | password |
+
 ## Table des matières
 
 - [Aperçu](#aperçu)
