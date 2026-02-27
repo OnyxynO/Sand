@@ -397,9 +397,27 @@ restrictionsVisibilite(projetId: ID!): [ActivityVisibility!]!
 login(input: LoginInput!): AuthPayload!
 logout: Boolean!
 
+# Demande de réinitialisation (accessible sans authentification)
+# Retourne toujours true — ne révèle pas si l'email est inscrit (anti-OAT-013)
+demanderReinitialisationMdp(input: DemanderReinitialisationMdpInput!): Boolean!
+
+# Réinitialisation du mot de passe via token reçu par email
+reinitialiserMdp(input: ReinitialisationMdpInput!): Boolean!
+
 input LoginInput {
   email: String!
   password: String!
+}
+
+input DemanderReinitialisationMdpInput {
+  email: String!
+}
+
+input ReinitialisationMdpInput {
+  token: String!
+  email: String!
+  password: String!               # 8 caractères minimum
+  password_confirmation: String!  # doit être identique à password
 }
 
 type AuthPayload {

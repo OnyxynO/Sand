@@ -5,3 +5,21 @@ input LoginInput {
     "Mot de passe (6 caracteres minimum)"
     password: String! @rules(apply: ["required", "min:6"])
 }
+
+"Demande de reinitialisation de mot de passe"
+input DemanderReinitialisationMdpInput {
+    "Adresse email du compte"
+    email: String! @rules(apply: ["required", "email"])
+}
+
+"Reinitialisation du mot de passe avec token"
+input ReinitialisationMdpInput {
+    "Token recu par email"
+    token: String! @rules(apply: ["required"])
+    "Adresse email du compte"
+    email: String! @rules(apply: ["required", "email"])
+    "Nouveau mot de passe (8 caracteres minimum)"
+    password: String! @rules(apply: ["required", "min:8", "confirmed"])
+    "Confirmation du nouveau mot de passe"
+    password_confirmation: String! @rules(apply: ["required"])
+}

@@ -5,6 +5,8 @@ import { useAuthStore } from './stores/authStore';
 
 // Pages (chargement paresseux)
 const LoginPage = lazy(() => import('./pages/LoginPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const SaisiePage = lazy(() => import('./pages/SaisiePage'));
 const SupervisionPage = lazy(() => import('./pages/SupervisionPage'));
@@ -69,6 +71,8 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { path: '/login', element: <LoginRoute /> },
+      { path: '/mot-de-passe-oublie', element: <ForgotPasswordPage /> },
+      { path: '/reinitialiser-mdp', element: <ResetPasswordPage /> },
 
       {
         // Layout protege sans path : enveloppe toutes les routes applicatives

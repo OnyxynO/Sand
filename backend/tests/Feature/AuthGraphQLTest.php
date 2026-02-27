@@ -6,7 +6,11 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\Team;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
 use Tests\Traits\GraphQLTestTrait;
 
@@ -133,5 +137,133 @@ class AuthGraphQLTest extends TestCase
         $response->assertOk();
         $data = $response->json('data.logout');
         $this->assertTrue($data);
+    }
+
+    // -------------------------------------------------------------------------
+    // Mot de passe oublie
+    // -------------------------------------------------------------------------
+
+    public function test_demander_reinitialisation_mdp_email_inexistant_retourne_true(): void
+    {
+        Notification::fake();
+
+        $response = $this->graphql('
+            mutation DemanderReinit($input: DemanderReinitialisationMdpInput!) {
+                demanderReinitialisationMdp(input: $input)
+            }
+        ', ['input' => ['email' => 'inconnu@example.com']]);
+
+        $this->assertGraphQLSuccess($response);
+        $this->assertTrue($response->json('data.demanderReinitialisationMdp'));
+        // Aucune notification envoyee (email inexistant)
+        Notification::assertNothingSent();
+    }
+
+    public function test_demander_reinitialisation_mdp_email_existant_envoie_notification(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create([
+            'email'    => 'test@example.com',
+            'est_actif' => true,
+        ]);
+
+        $response = $this->graphql('
+            mutation DemanderReinit($input: DemanderReinitialisationMdpInput!) {
+                demanderReinitialisationMdp(input: $input)
+            }
+        ', ['input' => ['email' => 'test@example.com']]);
+
+        $this->assertGraphQLSuccess($response);
+        $this->assertTrue($response->json('data.demanderReinitialisationMdp'));
+        Notification::assertSentTo($user, ResetPassword::class);
+    }
+
+    public function test_demander_reinitialisation_mdp_compte_inactif_nenvoie_pas(): void
+    {
+        Notification::fake();
+
+        User::factory()->create([
+            'email'    => 'inactif@example.com',
+            'est_actif' => false,
+        ]);
+
+        $response = $this->graphql('
+            mutation DemanderReinit($input: DemanderReinitialisationMdpInput!) {
+                demanderReinitialisationMdp(input: $input)
+            }
+        ', ['input' => ['email' => 'inactif@example.com']]);
+
+        $this->assertGraphQLSuccess($response);
+        $this->assertTrue($response->json('data.demanderReinitialisationMdp'));
+        // Compte inactif : aucune notification envoyee
+        Notification::assertNothingSent();
+    }
+
+    public function test_reinitialiser_mdp_token_valide(): void
+    {
+        $user = User::factory()->create(['email' => 'test@example.com']);
+        $token = Password::createToken($user);
+
+        $response = $this->graphql('
+            mutation ReinitMdp($input: ReinitialisationMdpInput!) {
+                reinitialiserMdp(input: $input)
+            }
+        ', [
+            'input' => [
+                'token'                 => $token,
+                'email'                 => 'test@example.com',
+                'password'              => 'nouveau_mdp_ok',
+                'password_confirmation' => 'nouveau_mdp_ok',
+            ],
+        ]);
+
+        $this->assertGraphQLSuccess($response);
+        $this->assertTrue($response->json('data.reinitialiserMdp'));
+
+        // Le mot de passe est bien change
+        $user->refresh();
+        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('nouveau_mdp_ok', $user->password));
+    }
+
+    public function test_reinitialiser_mdp_token_invalide_retourne_erreur(): void
+    {
+        User::factory()->create(['email' => 'test@example.com']);
+
+        $response = $this->graphql('
+            mutation ReinitMdp($input: ReinitialisationMdpInput!) {
+                reinitialiserMdp(input: $input)
+            }
+        ', [
+            'input' => [
+                'token'                 => 'token-bidon',
+                'email'                 => 'test@example.com',
+                'password'              => 'nouveau_mdp_ok',
+                'password_confirmation' => 'nouveau_mdp_ok',
+            ],
+        ]);
+
+        $this->assertGraphQLError($response);
+    }
+
+    public function test_reinitialiser_mdp_confirmation_differente_retourne_erreur(): void
+    {
+        $user = User::factory()->create(['email' => 'test@example.com']);
+        $token = Password::createToken($user);
+
+        $response = $this->graphql('
+            mutation ReinitMdp($input: ReinitialisationMdpInput!) {
+                reinitialiserMdp(input: $input)
+            }
+        ', [
+            'input' => [
+                'token'                 => $token,
+                'email'                 => 'test@example.com',
+                'password'              => 'nouveau_mdp_ok',
+                'password_confirmation' => 'pas_pareil',
+            ],
+        ]);
+
+        $this->assertGraphQLError($response);
     }
 }
