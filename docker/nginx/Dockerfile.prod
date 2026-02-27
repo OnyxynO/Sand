@@ -8,14 +8,14 @@ WORKDIR /app
 COPY frontend/package*.json ./
 RUN npm ci
 
-# Schema GraphQL Lighthouse (lu par codegen sans passer par HTTP)
-COPY backend/graphql/schema.graphql ./schema.graphql
+# Schema GraphQL Lighthouse complet (schema.graphql + types/ + mutations/ + queries/ + inputs/)
+COPY backend/graphql/ ./graphql/
 
 # Code source frontend
 COPY frontend/ ./
 
-# Build de production (codegen + tsc + vite build)
-RUN CODEGEN_SCHEMA=./schema.graphql npm run build
+# Build de production (codegen lit tous les fichiers .graphql via glob, sans passer par HTTP)
+RUN CODEGEN_SCHEMA='./graphql/**/*.graphql' npm run build
 
 # Stage 2 : nginx — servir React + proxyer vers PHP-FPM
 FROM nginx:alpine
