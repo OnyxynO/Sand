@@ -5,8 +5,8 @@
 | Champ | Valeur |
 |-------|--------|
 | Fournisseur | Hetzner Cloud |
-| Serveur | CX22 — 2 vCPU, 4 Go RAM, 40 Go SSD |
-| OS | Ubuntu 24.04 |
+| Serveur | CX22 — 2 vCPU, 3.7 Go RAM, 38 Go SSD |
+| OS | Ubuntu 24.04.3 LTS (Noble Numbat) |
 | Datacenter | Nuremberg (nbg1) |
 | IP | 46.225.221.116 |
 | Docker | 29.2.1 |
