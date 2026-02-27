@@ -6,9 +6,18 @@
 
 ---
 
-## Résultat : INSTALLATION BLOQUÉE
+## Historique des sessions de test
 
-Le script s'arrête dès l'étape 1.
+| Session | Contexte | Résultat |
+|---------|----------|----------|
+| Test 1 | Docker absent — machine vierge | ❌ Bloqué à l'étape 1 |
+| Test 2 | Docker 29.2.1 installé via Homebrew | ✅ Installation réussie avec 1 bug rencontré (P9) |
+
+---
+
+## Test 1 — Résultat : INSTALLATION BLOQUÉE
+
+Docker absent sur la machine. Le script s'arrête dès l'étape 1.
 
 ```
 === Installation SAND ===
@@ -34,6 +43,21 @@ Le script s'arrête dès l'étape 1.
 | gh CLI | ✅ | clone du repo | — |
 
 **Bonne nouvelle** : Homebrew est disponible, Docker Desktop peut être installé via `brew install --cask docker`.
+
+---
+
+## Test 2 — Résultat : INSTALLATION RÉUSSIE
+
+Docker 29.2.1 + Compose v5.0.2 installés via `brew install --cask docker`. L'installation s'est déroulée jusqu'au bout. Un bug a été rencontré en phase de vérification post-install (P9).
+
+**Vérification des services après installation :**
+
+| Service | URL | Statut |
+|---------|-----|--------|
+| Frontend React | http://localhost:5173 | ✅ 200 |
+| Backend Laravel | http://localhost:8080/api/health | ✅ 200 (après correction manuelle) |
+| GraphiQL | http://localhost:8080/graphiql | ✅ 200 |
+| Mock API RH | http://localhost:3001/api/health | ✅ 200 |
 
 ---
 
@@ -129,6 +153,41 @@ Les ports 5173, 8080, 5432, 6379, 3001 sont tous libres sur cette machine, mais 
 
 ---
 
+### P9 — MAJEUR : `APP_KEY` non générée malgré l'étape dédiée dans `install.sh`
+
+**Découvert lors du test 2**, après installation complète en apparence réussie.
+
+**Symptôme** : `http://localhost:8080/api/health` retourne 500. Log Laravel :
+```
+No application encryption key has been specified.
+(Illuminate\Encryption\MissingAppKeyException)
+```
+
+**Cause racine** : le commentaire inline sur la ligne `APP_KEY=` dans `backend/.env.example` trompe la détection du script :
+
+```env
+APP_KEY=                          # Générer avec : php artisan key:generate
+```
+
+Le script fait :
+```bash
+CURRENT_KEY=$(grep '^APP_KEY=' backend/.env | cut -d'=' -f2)
+if [[ -z "$CURRENT_KEY" ]]; then ...
+```
+
+`cut -d'=' -f2` retourne `<espaces># Générer avec : php artisan key:generate` — chaîne non vide → la condition `$CURRENT_KEY` est considérée comme définie → **la génération de clé est sautée**.
+
+**Impact** : Toutes les routes qui utilisent les sessions/cookies (dont `/api/health`) retournent 500. Le GraphQL fonctionnait car il ne dépend pas des sessions dans cette config, masquant partiellement le problème.
+
+**Correction appliquée manuellement** :
+```bash
+docker compose exec -T app php artisan key:generate
+```
+
+**Fix à apporter** : supprimer le commentaire inline de la ligne `APP_KEY=` dans `.env.example` (le commentaire peut rester sur la ligne précédente), ou utiliser `trim` dans le script pour ignorer les espaces et commentaires.
+
+---
+
 ## Ce qui fonctionne bien
 
 | Point | Note |
@@ -185,10 +244,23 @@ done
 
 **8. Passer `QUEUE_CONNECTION=redis` par défaut** dans le `.env.example` si le worker queue est toujours démarré — évite la confusion sur le comportement des exports.
 
+**9. Supprimer le commentaire inline sur la ligne `APP_KEY=`** dans `backend/.env.example` :
+```env
+# Générer avec : php artisan key:generate
+APP_KEY=
+```
+Ou améliorer la détection dans le script :
+```bash
+CURRENT_KEY=$(grep '^APP_KEY=' backend/.env | cut -d'=' -f2 | tr -d ' ' | cut -d'#' -f1)
+```
+
 ---
 
 ## Verdict global
 
-L'architecture et la qualité du projet sont solides. Le blocage est entièrement dû à l'environnement machine (Docker absent) et non au projet lui-même. Avec Docker installé, l'installation devrait se dérouler sans problème majeur grâce au script bien conçu.
+L'architecture et la qualité du projet sont solides. Avec Docker installé, l'installation se déroule jusqu'au bout. Cependant, **P9 est un bug silencieux** : le script annonce "Installation terminée avec succès" alors que l'application est partiellement cassée (500 sur les routes avec sessions). C'est le problème le plus trompeur de tous ceux identifiés.
 
-Les 8 problèmes identifiés sont tous corrigeables rapidement. Seuls P1 et P2 (Docker manquant + incohérence syntaxe) constituent de vrais risques d'échec d'installation sur une machine tierce.
+Au total, 9 problèmes identifiés sur 2 sessions de test. Les plus critiques à corriger :
+1. **P9** — bug réel d'install, l'app démarre cassée sans avertissement
+2. **P2** — `start-dev.sh` échouerait sur Docker Desktop récent
+3. **P3** — `.env.example` racine source de confusion
