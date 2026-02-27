@@ -124,6 +124,11 @@ export default function FormulaireUtilisateur({
       return;
     }
 
+    if (!estEdition && formData.password && formData.password.length < 8) {
+      setErreur('Le mot de passe doit contenir au moins 8 caractères');
+      return;
+    }
+
     try {
       if (estEdition) {
         await updateUser({
@@ -158,7 +163,18 @@ export default function FormulaireUtilisateur({
 
       onSuccess();
       onFermer();
-    } catch (err) {
+    } catch (err: unknown) {
+      // Extraire les erreurs de validation Lighthouse (extensions.validation)
+      // Structure : { "input.email": ["The email has already been taken."], ... }
+      if (err && typeof err === 'object' && 'graphQLErrors' in err) {
+        const graphQLErrors = (err as { graphQLErrors: Array<{ extensions?: { validation?: Record<string, string[]> } }> }).graphQLErrors;
+        const validation = graphQLErrors[0]?.extensions?.validation;
+        if (validation) {
+          const messages = Object.values(validation).flat().join(' ');
+          setErreur(messages);
+          return;
+        }
+      }
       const message = err instanceof Error ? err.message : 'Erreur inconnue';
       setErreur(message);
     }

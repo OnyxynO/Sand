@@ -6,8 +6,8 @@ input CreateUserInput {
     nom: String! @rules(apply: ["required", "max:255"])
     "Prenom"
     prenom: String! @rules(apply: ["required", "max:255"])
-    "Adresse email (unique)"
-    email: String! @rules(apply: ["required", "email", "unique:users,email"])
+    "Adresse email (unique parmi les comptes non supprimes)"
+    email: String! @rules(apply: ["required", "email", "unique:users,email,NULL,id,deleted_at,NULL"])
     "Mot de passe (8 caracteres minimum)"
     password: String! @rules(apply: ["required", "min:8"])
     "Role dans le systeme"
