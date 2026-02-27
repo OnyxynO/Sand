@@ -48,6 +48,11 @@ Voir `docs/06_EVOLUTIONS.md` pour le detail.
 
 Rien. Toutes les evolutions et l'integralite de l'audit technique (P1 a P4) sont termines.
 
+### Production
+
+L'application est deployee en production sur un VPS Hetzner CX22.
+Voir `docs/DEPLOY_PROD.md` pour le detail complet (architecture, commandes, pieges rencontres).
+
 ## Commandes essentielles
 
 Tout tourne dans Docker. Ne pas lancer les commandes depuis l'hote.
@@ -115,10 +120,15 @@ Pieges Playwright specifiques a ce projet :
 
 ## Acces
 
+### Developpement (local)
 - **Frontend** : http://localhost:5173
 - **API Backend** : http://localhost:8080
 - **GraphQL Playground** : http://localhost:8080/graphiql
 - **Mock API RH** : http://localhost:3001
+
+### Production (VPS Hetzner)
+- **Application** : http://46.225.221.116 (nginx port 80, React + API sur meme origine)
+- Pas de mock-rh en prod (service desactive via profil Docker Compose)
 
 ### Comptes de test (mot de passe : `password`)
 - Admin : admin@sand.local
@@ -180,7 +190,38 @@ docs/                        # Specifications
 | `docs/05_BACKLOG.md` | User stories par phase (toutes terminees) |
 | `docs/06_EVOLUTIONS.md` | Evolutions (toutes terminees) + reste a faire |
 | `docs/DIFFUSION_LOG.md` | Journal des sessions de travail |
+| `docs/DEPLOY_PROD.md` | Journal de deploiement production (VPS, pieges, commandes) |
 | `docs/archive/` | Fichiers obsoletes archives |
+
+## Infrastructure production
+
+Fichiers specifiques a la prod :
+```
+docker-compose.prod.yml           # Overlay prod (port 80, pas de Vite ni mock-rh)
+docker/nginx/Dockerfile.prod      # Multi-stage : node:20 build React → nginx:alpine serve
+docker/nginx/prod/app.conf        # Config nginx prod (SPA + FastCGI Laravel)
+frontend/.env.production          # VITE_API_URL=/graphql (meme origine)
+frontend/package.json             # Script build:docker (vite build seul, sans codegen)
+```
+
+Commandes de deploiement :
+```bash
+# Premier deploiement (VPS vierge)
+git clone https://github.com/OnyxynO/Sand.git /var/www/sand
+cd /var/www/sand
+cp backend/.env.example backend/.env
+# Editer backend/.env (APP_KEY, DB_PASSWORD, APP_ENV=production...)
+echo "DB_PASSWORD=<meme_valeur_que_backend_.env>" > .env   # .env racine pour Docker Compose
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.yml -f docker-compose.prod.yml exec app composer install --no-dev --optimize-autoloader
+docker compose -f docker-compose.yml -f docker-compose.prod.yml exec app php artisan migrate --force
+docker compose -f docker-compose.yml -f docker-compose.prod.yml exec app php artisan db:seed --force
+
+# Mise a jour (apres git push)
+cd /var/www/sand
+git pull
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```
 
 ## Pieges connus
 
@@ -193,6 +234,11 @@ docs/                        # Specifications
 - **Playwright h1 ambigu** : Layout a son propre h1 → utiliser `getByRole('heading', { name: '...' })`
 - **JSON scalar double encodage** : `MLL\GraphQLScalars\JSON::serialize()` faisait `json_encode($value)`, provoquant un double encodage dans la reponse HTTP (graphql-php encode une seconde fois). Apollo recevait `'"manuel"'` au lieu de `'manuel'`. Fix : `app/GraphQL/Scalars/JsonScalar.php` override `serialize()` pour retourner la valeur PHP telle quelle. Le scalar `JSON` dans schema.graphql pointe vers cette classe.
 - **Setting.valeur cast 'array'** : Le modele Setting utilise le cast Eloquent `'array'` (json_encode/decode). Utiliser `Setting::get()` ou l'accesseur Eloquent pour lire les valeurs (pas de raw SQL) pour beneficier du decode automatique.
+- **Prod — .env racine Docker Compose** : Docker Compose lit `${VAR}` depuis le `.env` a la racine du projet (pas `backend/.env`). En prod, creer `/var/www/sand/.env` avec `DB_PASSWORD=<valeur>` pour que PostgreSQL s'initialise avec le bon mot de passe.
+- **Prod — vendor/ absent** : `vendor/` est gitignore. Apres un clone, lancer `docker compose exec app composer install --no-dev --optimize-autoloader` avant les migrations.
+- **Prod — permissions backend/** : Le container PHP tourne en user `sand` (UID 1000). Si le dossier `backend/` est owned `root`, composer ne peut pas creer `vendor/`. Fix : `chown -R 1000:1000 /var/www/sand/backend/`.
+- **Prod — conf nginx prod hors conf.d/** : La config prod (`docker/nginx/prod/app.conf`) est dans un dossier separe de `conf.d/` pour eviter qu'elle soit montee en dev (double `limit_req_zone` → crash nginx).
+- **Prod — codegen Lighthouse** : Le schema SDL brut ne contient pas les types generes par Lighthouse (`@paginate` → `UserPaginator`, etc.). Ces types n'existent qu'a l'introspection HTTP. Le build Docker utilise `build:docker` (`vite build` seul) qui saute le codegen — les types generes dans `src/gql/` sont commites.
 
 ## Audit technique et qualite
 
