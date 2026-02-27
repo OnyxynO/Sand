@@ -207,6 +207,24 @@ npx playwright test --grep "anti-regression"
 
 ## Troubleshooting
 
+### Conflit de noms de conteneurs à l'installation
+
+Les conteneurs ont des noms fixes (`sand-app`, `sand-db`, etc.). Si une instance SAND tourne déjà sur la machine, le script d'installation échoue avec :
+
+```
+Error: Conflict. The container name "/sand-app" is already in use
+```
+
+Arrêter l'instance existante avant de lancer le script :
+
+```bash
+# Dans le dossier de l'instance existante
+docker compose down
+
+# Puis relancer l'installation
+bash scripts/install.sh
+```
+
 ### Les conteneurs ne démarrent pas
 
 ```bash
