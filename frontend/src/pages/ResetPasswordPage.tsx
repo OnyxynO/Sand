@@ -49,6 +49,10 @@ export default function ResetPasswordPage() {
       setErreurLocale('Le mot de passe doit contenir au moins 8 caractères.');
       return;
     }
+    if (password.length > 80) {
+      setErreurLocale('Le mot de passe ne peut pas dépasser 80 caractères.');
+      return;
+    }
 
     await reinitialiser({
       token,
@@ -103,6 +107,7 @@ export default function ResetPasswordPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500 transition-colors"
                   placeholder="8 caractères minimum"
                   autoComplete="new-password"
+                  maxLength={80}
                   disabled={loading}
                 />
               </div>
@@ -122,6 +127,7 @@ export default function ResetPasswordPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500 transition-colors"
                   placeholder="••••••••"
                   autoComplete="new-password"
+                  maxLength={80}
                   disabled={loading}
                 />
               </div>

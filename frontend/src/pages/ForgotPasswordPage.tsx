@@ -55,6 +55,7 @@ export default function ForgotPasswordPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500 transition-colors"
                   placeholder="nom@entreprise.com"
                   autoComplete="email"
+                  maxLength={80}
                   disabled={loading}
                 />
               </div>
