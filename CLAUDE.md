@@ -57,7 +57,7 @@ L'application est deployee en production sur un VPS Hetzner CX23.
 - **Firewall** : ufw actif (ports 22, 80, 443)
 - **Backups** : PostgreSQL quotidien a 2h (`/var/backups/sand/`, retention 7 jours)
 
-Voir `../DEPLOY_PROD_SAND.md` (hors repo, a la racine de `Code/`) pour le detail complet avec IP, commandes et pieges rencontres. Ce fichier n'est pas commite (contient des infos sensibles).
+Voir `../infra/DEPLOY_PROD_SAND.md` (hors repo, dans `infra/`) pour le detail complet avec IP, commandes et pieges rencontres. Ce fichier n'est pas commite (contient des infos sensibles).
 
 ## Commandes essentielles
 
@@ -196,7 +196,7 @@ docs/                        # Specifications
 | `docs/05_BACKLOG.md` | User stories par phase (toutes terminees) |
 | `docs/06_EVOLUTIONS.md` | Evolutions (toutes terminees) + reste a faire |
 | `docs/DIFFUSION_LOG.md` | Journal des sessions de travail |
-| `../DEPLOY_PROD_SAND.md` | Journal de deploiement production — hors repo (VPS, pieges, commandes, IP) |
+| `../infra/DEPLOY_PROD_SAND.md` | Journal de deploiement production — hors repo (VPS, pieges, commandes, IP) |
 | `docs/archive/` | Fichiers obsoletes archives |
 
 ## Infrastructure production
