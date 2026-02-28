@@ -3,7 +3,7 @@
 #
 # Ce fichier :
 #   - Remplace nginx par une image multi-stage (React builte + nginx)
-#   - Expose le port 80 (au lieu de 8080 en dev)
+#   - Port 80 géré par Caddy (reverse proxy hôte) — nginx accessible sur 127.0.0.1:8080
 #   - Passe APP_ENV=production sur app et queue
 #   - Desactive les services dev (frontend Vite, mock-rh) via profils
 
@@ -12,8 +12,6 @@ services:
     build:
       context: .
       dockerfile: docker/nginx/Dockerfile.prod
-    ports:
-      - "80:80"
     volumes:
       - ./docker/nginx/prod:/etc/nginx/conf.d:ro
 
