@@ -50,8 +50,14 @@ Rien. Toutes les evolutions et l'integralite de l'audit technique (P1 a P4) sont
 
 ### Production
 
-L'application est deployee en production sur un VPS Hetzner CX22.
-Voir `docs/DEPLOY_PROD.md` pour le detail complet (architecture, commandes, pieges rencontres).
+L'application est deployee en production sur un VPS Hetzner CX23.
+- **URL** : https://sand.interstice.work
+- **Domaine** : interstice.work (Cloudflare)
+- **Reverse proxy** : Caddy 2.11.1 (HTTPS automatique Let's Encrypt)
+- **Firewall** : ufw actif (ports 22, 80, 443)
+- **Backups** : PostgreSQL quotidien a 2h (`/var/backups/sand/`, retention 7 jours)
+
+Voir `../DEPLOY_PROD_SAND.md` (hors repo, a la racine de `Code/`) pour le detail complet avec IP, commandes et pieges rencontres. Ce fichier n'est pas commite (contient des infos sensibles).
 
 ## Commandes essentielles
 
@@ -190,7 +196,7 @@ docs/                        # Specifications
 | `docs/05_BACKLOG.md` | User stories par phase (toutes terminees) |
 | `docs/06_EVOLUTIONS.md` | Evolutions (toutes terminees) + reste a faire |
 | `docs/DIFFUSION_LOG.md` | Journal des sessions de travail |
-| `docs/DEPLOY_PROD.md` | Journal de deploiement production (VPS, pieges, commandes) |
+| `../DEPLOY_PROD_SAND.md` | Journal de deploiement production — hors repo (VPS, pieges, commandes, IP) |
 | `docs/archive/` | Fichiers obsoletes archives |
 
 ## Infrastructure production
