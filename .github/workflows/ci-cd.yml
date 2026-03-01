@@ -121,7 +121,8 @@ jobs:
           script: |
             set -e
             cd /var/www/sand
-            git pull
+            git fetch origin
+            git reset --hard origin/main
             docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
             docker compose -f docker-compose.yml -f docker-compose.prod.yml exec -T app \
               php artisan migrate --force
