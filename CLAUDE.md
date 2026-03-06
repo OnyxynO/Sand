@@ -1,5 +1,7 @@
 # CLAUDE.md - SAND
 
+@../GUIDELINES_PROJETS.md
+
 Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte necessaire pour travailler sur ce projet.
 
 ## Projet
@@ -61,7 +63,23 @@ Voir `../infra/DEPLOY_PROD_SAND.md` (hors repo, dans `infra/`) pour le detail co
 
 ## Commandes essentielles
 
-Tout tourne dans Docker. Ne pas lancer les commandes depuis l'hote.
+### Dev natif (sans Docker — stack locale depuis mars 2026)
+
+Postgres et Redis tournent en Homebrew natif. Demarrage rapide :
+
+```bash
+brew services start redis   # Redis natif (port 6379)
+cd backend && php artisan serve --host=0.0.0.0 --port=8080 > /tmp/sand-backend.log 2>&1 &
+cd frontend && npm run dev > /tmp/sand-frontend.log 2>&1 &
+```
+
+Points specifiques du `.env` local (differents de Docker) :
+- `REDIS_CLIENT=predis` / `REDIS_HOST=127.0.0.1` / `DB_HOST=127.0.0.1`
+- `CACHE_STORE=redis` (garder redis, pas array, pour que Cache::tags() fonctionne)
+
+Note : `start-dev.sh` a des fins de ligne CRLF — ne pas utiliser directement avec bash.
+
+### Via Docker
 
 ```bash
 # Demarrer l'environnement
@@ -133,7 +151,7 @@ Pieges Playwright specifiques a ce projet :
 - **Mock API RH** : http://localhost:3001
 
 ### Production (VPS Hetzner)
-- **Application** : http://46.225.221.116 (nginx port 80, React + API sur meme origine)
+- **Application** : https://sand.interstice.work
 - Pas de mock-rh en prod (service desactive via profil Docker Compose)
 
 ### Comptes de test (mot de passe : `password`)
@@ -245,6 +263,8 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 - **Prod — permissions backend/** : Le container PHP tourne en user `sand` (UID 1000). Si le dossier `backend/` est owned `root`, composer ne peut pas creer `vendor/`. Fix : `chown -R 1000:1000 /var/www/sand/backend/`.
 - **Prod — conf nginx prod hors conf.d/** : La config prod (`docker/nginx/prod/app.conf`) est dans un dossier separe de `conf.d/` pour eviter qu'elle soit montee en dev (double `limit_req_zone` → crash nginx).
 - **Prod — codegen Lighthouse** : Le schema SDL brut ne contient pas les types generes par Lighthouse (`@paginate` → `UserPaginator`, etc.). Ces types n'existent qu'a l'introspection HTTP. Le build Docker utilise `build:docker` (`vite build` seul) qui saute le codegen — les types generes dans `src/gql/` sont commites.
+- **Prod — SANCTUM_STATEFUL_DOMAINS** : Doit contenir le domaine reel (`sand.interstice.work`), jamais l'IP du VPS. Si mal configure, `@guard` renvoie "Unauthenticated" alors que `@auth` fonctionne (la query `me` retourne null silencieusement, les autres queries bloquent). Variables concernees dans `backend/.env` : `APP_URL`, `SESSION_DOMAIN`, `SANCTUM_STATEFUL_DOMAINS`.
+- **Prod — SESSION_SECURE_COOKIE** : Doit etre `true` sur HTTPS. Avec `false`, les cookies de session n'ont pas le flag `secure` → le navigateur les rejette sur HTTPS → erreur 419 (CSRF mismatch) au login.
 
 ## Audit technique et qualite
 
