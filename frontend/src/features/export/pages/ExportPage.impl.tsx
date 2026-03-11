@@ -308,20 +308,23 @@ export default function ExportPage() {
   return (
     <div className="space-y-6">
       {/* Titre */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h1 className="text-2xl font-bold text-gray-900">Export CSV</h1>
-        <p className="text-gray-600 mt-1">
+      <div className="sand-card rounded-[1.8rem] bg-[linear-gradient(135deg,rgba(52,78,65,0.08),rgba(238,154,104,0.14))] p-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--sand-muted)]">
+          Diffusion
+        </p>
+        <h1 className="font-['Fraunces',serif] text-3xl text-[color:var(--sand-ink)]">Export CSV</h1>
+        <p className="mt-1 text-[color:var(--sand-muted)]">
           Exporter les saisies au format CSV pour analyse externe
         </p>
       </div>
 
       {/* Formulaire filtres */}
-      <div className="bg-white rounded-xl shadow-sm p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-gray-900">Filtres</h2>
+      <div className="sand-card rounded-[1.8rem] p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-[color:var(--sand-ink)]">Filtres</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="date-debut" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="date-debut" className="mb-1 block text-sm font-medium text-[color:var(--sand-muted)]">
               Date debut
             </label>
             <input
@@ -329,11 +332,11 @@ export default function ExportPage() {
               type="date"
               value={dateDebut}
               onChange={(e) => setDateDebut(e.target.value)}
-              className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+              className="block w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 text-sm text-[color:var(--sand-ink)] shadow-sm focus:border-[color:var(--sand-accent)] focus:ring-[color:var(--sand-accent)]/20"
             />
           </div>
           <div>
-            <label htmlFor="date-fin" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="date-fin" className="mb-1 block text-sm font-medium text-[color:var(--sand-muted)]">
               Date fin
             </label>
             <input
@@ -341,19 +344,19 @@ export default function ExportPage() {
               type="date"
               value={dateFin}
               onChange={(e) => setDateFin(e.target.value)}
-              className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+              className="block w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 text-sm text-[color:var(--sand-ink)] shadow-sm focus:border-[color:var(--sand-accent)] focus:ring-[color:var(--sand-accent)]/20"
             />
           </div>
 
           <div>
-            <label htmlFor="projet-export" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="projet-export" className="mb-1 block text-sm font-medium text-[color:var(--sand-muted)]">
               Projet
             </label>
             <select
               id="projet-export"
               value={projetId}
               onChange={(e) => setProjetId(e.target.value)}
-              className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+              className="block w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 text-sm text-[color:var(--sand-ink)] shadow-sm focus:border-[color:var(--sand-accent)] focus:ring-[color:var(--sand-accent)]/20"
             >
               <option value="">Tous les projets</option>
               {projets.map((p) => (
@@ -365,14 +368,14 @@ export default function ExportPage() {
           </div>
 
           <div>
-            <label htmlFor="equipe-export" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="equipe-export" className="mb-1 block text-sm font-medium text-[color:var(--sand-muted)]">
               Equipe
             </label>
             <select
               id="equipe-export"
               value={equipeId}
               onChange={(e) => setEquipeId(e.target.value)}
-              className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+              className="block w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 text-sm text-[color:var(--sand-ink)] shadow-sm focus:border-[color:var(--sand-accent)] focus:ring-[color:var(--sand-accent)]/20"
             >
               <option value="">Toutes les equipes</option>
               {equipes.map((e) => (
@@ -388,7 +391,7 @@ export default function ExportPage() {
           <button
             onClick={handleExport}
             disabled={exporting}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+            className="inline-flex items-center gap-2 rounded-full bg-[color:var(--sand-ink)] px-4 py-2 text-sm font-medium text-white transition hover:bg-[color:var(--sand-accent-strong)] disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ArrowDownTrayIcon className="w-5 h-5" />
             {exporting ? 'Export en cours...' : 'Exporter en CSV'}
@@ -403,7 +406,7 @@ export default function ExportPage() {
 
       {/* Etat vide (chargement termine, aucun export) */}
       {dataExports && exports.length === 0 && (
-        <div className="bg-white rounded-xl shadow-sm p-8 text-center text-gray-400">
+        <div className="sand-card rounded-[1.8rem] p-8 text-center text-[color:var(--sand-muted)]">
           <ArrowDownTrayIcon className="w-8 h-8 mx-auto mb-2 opacity-40" />
           <p className="text-sm">Aucun export pour le moment</p>
         </div>
@@ -411,30 +414,30 @@ export default function ExportPage() {
 
       {/* Liste des exports */}
       {exports.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Historique des exports</h2>
+        <div className="sand-card overflow-hidden rounded-[1.8rem]">
+          <div className="border-b border-[color:var(--sand-line)] px-6 py-4">
+            <h2 className="text-lg font-semibold text-[color:var(--sand-ink)]">Historique des exports</h2>
           </div>
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-[color:var(--sand-surface-strong)]">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-[color:var(--sand-muted)]">
                   Demande le
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-[color:var(--sand-muted)]">
                   Statut
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-[color:var(--sand-muted)]">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-100">
+            <tbody className="bg-transparent divide-y divide-[color:var(--sand-line)]">
               {exports.map((exp) => {
                 const statut = statutAffiche(exp);
                 return (
-                <tr key={exp.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                <tr key={exp.id} className="transition hover:bg-[color:var(--sand-surface-strong)]/65">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-[color:var(--sand-muted)]">
                     {formaterDateHeure(exp.creeLe)}
                   </td>
                   <td className="px-6 py-4">
@@ -449,8 +452,8 @@ export default function ExportPage() {
                       {statut === 'TERMINE' && !estExpire(exp) ? (
                         <a
                           href={`${baseUrl}/exports/${exp.id}/download`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-                        >
+                            className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--sand-ink)] px-3 py-1.5 text-sm font-medium text-white transition hover:bg-[color:var(--sand-accent-strong)]"
+                          >
                           <ArrowDownTrayIcon className="w-4 h-4" />
                           Telecharger
                         </a>
@@ -459,7 +462,7 @@ export default function ExportPage() {
                           <button
                             onClick={() => handleRegenerer(exp)}
                             disabled={exporting}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                            className="inline-flex items-center gap-1.5 rounded-full bg-[color:var(--sand-surface-strong)] px-3 py-1.5 text-sm font-medium text-[color:var(--sand-ink)] transition hover:bg-[color:var(--sand-line)] disabled:opacity-50"
                           >
                             <ArrowPathIcon className="w-4 h-4" />
                             Regenerer
@@ -497,10 +500,10 @@ export default function ExportPage() {
       )}
 
       {/* Info */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+      <div className="rounded-[1.8rem] border border-[color:var(--sand-accent)]/20 bg-[color:var(--sand-accent)]/8 p-4">
         <div className="flex gap-3">
-          <ExclamationTriangleIcon className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-blue-800">
+          <ExclamationTriangleIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-[color:var(--sand-accent-strong)]" />
+          <div className="text-sm text-[color:var(--sand-ink)]">
             <p className="font-medium">Comment ca marche ?</p>
             <ul className="mt-1 list-disc list-inside space-y-1">
               <li>Selectionnez les filtres souhaites puis cliquez sur "Exporter"</li>

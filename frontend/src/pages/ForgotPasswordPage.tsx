@@ -1,5 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  ArrowLeftIcon,
+  EnvelopeIcon,
+  SparklesIcon,
+} from '@heroicons/react/24/outline';
 import { useForgotPassword } from '../hooks/useForgotPassword';
 
 export default function ForgotPasswordPage() {
@@ -14,70 +19,86 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">SAND</h1>
-          <p className="text-gray-600">Saisie d'Activite Numerique Declarative</p>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-            Mot de passe oublié
-          </h2>
-          <p className="text-gray-500 text-sm mb-6">
-            Entrez votre adresse email et nous vous enverrons un lien pour
-            réinitialiser votre mot de passe.
+    <div className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_right,_rgba(238,154,104,0.18),_transparent_28%),linear-gradient(145deg,_#f6f2ea_0%,_#edf3ee_55%,_#f6efe7_100%)] px-4 py-8">
+      <div className="mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-5xl items-center gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+        <section className="hidden rounded-[2rem] border border-white/70 bg-white/55 p-10 shadow-[0_32px_80px_-48px_rgba(52,78,65,0.65)] backdrop-blur lg:block">
+          <div className="inline-flex items-center gap-3 rounded-full border border-[color:var(--sand-line)] bg-white/80 px-4 py-2 text-sm font-semibold uppercase tracking-[0.22em] text-[color:var(--sand-muted)]">
+            <SparklesIcon className="h-4 w-4 text-[color:var(--sand-accent)]" />
+            Recuperation
+          </div>
+          <h1 className="mt-6 max-w-md font-['Fraunces',serif] text-5xl leading-tight text-[color:var(--sand-ink)]">
+            Revenir dans l'application sans detour.
+          </h1>
+          <p className="mt-4 max-w-lg text-base leading-7 text-[color:var(--sand-muted)]">
+            La v2 garde le flux simple: demande du lien, reception de l’email, retour direct sur un parcours propre et lisible.
           </p>
-
-          {succes ? (
-            <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-4 rounded-lg text-sm">
-              <p className="font-medium mb-1">Email envoyé</p>
-              <p>
-                Si un compte existe pour cette adresse, vous recevrez un email
-                avec les instructions pour réinitialiser votre mot de passe.
-              </p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="mt-8 grid gap-4">
+            <div className="sand-card flex items-start gap-3">
+              <EnvelopeIcon className="mt-1 h-5 w-5 text-[color:var(--sand-accent)]" />
               <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
-                  Adresse email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value.replace(/\s/g, ''))}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500 transition-colors"
-                  placeholder="nom@entreprise.com"
-                  autoComplete="email"
-                  maxLength={80}
-                  disabled={loading}
-                />
+                <p className="font-semibold text-[color:var(--sand-ink)]">Lien securise</p>
+                <p className="text-sm text-[color:var(--sand-muted)]">Le token est envoye uniquement si un compte existe pour l’adresse fournie.</p>
               </div>
+            </div>
+          </div>
+        </section>
 
-              <div aria-live="polite" aria-atomic="true">
-                {erreur && (
-                  <div
-                    className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"
-                    role="alert"
+        <div className="w-full max-w-md justify-self-center lg:justify-self-end">
+          <div className="sand-card rounded-[2rem] p-8 md:p-10">
+            <h2 className="mb-2 font-['Fraunces',serif] text-3xl text-[color:var(--sand-ink)]">
+            Mot de passe oublié
+            </h2>
+            <p className="mb-6 text-sm leading-6 text-[color:var(--sand-muted)]">
+              Entrez votre adresse email et nous vous enverrons un lien pour reinitialiser votre mot de passe.
+            </p>
+
+            {succes ? (
+              <div className="rounded-2xl border border-green-200 bg-green-50 px-4 py-4 text-sm text-green-800">
+                <p className="mb-1 font-medium">Email envoyé</p>
+                <p>
+                  Si un compte existe pour cette adresse, vous recevrez un email avec les instructions pour reinitialiser votre mot de passe.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="mb-1 block text-sm font-medium text-[color:var(--sand-muted)]"
                   >
-                    {erreur}
-                  </div>
-                )}
-              </div>
+                    Adresse email
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value.replace(/\s/g, ''))}
+                    className="w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 px-4 py-3 text-[color:var(--sand-ink)] shadow-sm outline-none transition focus-visible:border-[color:var(--sand-accent)] focus-visible:ring-2 focus-visible:ring-[color:var(--sand-accent)]/20"
+                    placeholder="nom@entreprise.com"
+                    autoComplete="email"
+                    maxLength={80}
+                    disabled={loading}
+                  />
+                </div>
 
-              <button
-                type="submit"
-                disabled={loading || !email.trim()}
-                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus-visible:ring-4 focus-visible:ring-blue-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center">
+                <div aria-live="polite" aria-atomic="true">
+                  {erreur && (
+                    <div
+                      className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                      role="alert"
+                    >
+                      {erreur}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading || !email.trim()}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[color:var(--sand-ink)] px-4 py-3 font-medium text-white transition hover:bg-[color:var(--sand-accent-strong)] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center">
                     <svg
                       className="animate-spin motion-reduce:animate-none -ml-1 mr-3 h-5 w-5 text-white"
                       aria-hidden="true"
@@ -100,21 +121,23 @@ export default function ForgotPasswordPage() {
                       />
                     </svg>
                     Envoi en cours…
-                  </span>
-                ) : (
-                  'Envoyer le lien'
-                )}
-              </button>
-            </form>
-          )}
+                    </span>
+                  ) : (
+                    'Envoyer le lien'
+                  )}
+                </button>
+              </form>
+            )}
 
-          <div className="mt-6 text-center">
-            <Link
-              to="/login"
-              className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-            >
-              ← Retour à la connexion
-            </Link>
+            <div className="mt-6 text-center">
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-2 text-sm font-medium text-[color:var(--sand-accent)] transition hover:text-[color:var(--sand-accent-strong)]"
+              >
+                <ArrowLeftIcon className="h-4 w-4" />
+                Retour à la connexion
+              </Link>
+            </div>
           </div>
         </div>
       </div>

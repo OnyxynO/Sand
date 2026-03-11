@@ -186,33 +186,36 @@ export default function SupervisionPage() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="sand-card flex items-center justify-between rounded-[1.8rem] bg-[linear-gradient(135deg,rgba(52,78,65,0.08),rgba(238,154,104,0.14))] p-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Supervision</h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--sand-muted)]">
+            Moderation
+          </p>
+          <h1 className="font-['Fraunces',serif] text-3xl text-[color:var(--sand-ink)]">Supervision</h1>
+          <p className="text-sm text-[color:var(--sand-muted)]">
             {anomalies.length} anomalie{anomalies.length > 1 ? 's' : ''} detectee{anomalies.length > 1 ? 's' : ''}
           </p>
         </div>
       </div>
 
       {/* Navigation periode + Filtres */}
-      <div className="bg-white rounded-lg shadow-sm p-4 space-y-4">
+      <div className="sand-card rounded-[1.8rem] p-4 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button
               onClick={allerSemainePrecedente}
-              className="p-2 rounded-lg hover:bg-gray-100 text-gray-600"
+              className="rounded-full border border-[color:var(--sand-line)] bg-white/80 p-2 text-[color:var(--sand-muted)] transition hover:border-[color:var(--sand-accent)] hover:text-[color:var(--sand-ink)]"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <span className="text-sm font-medium text-gray-900 min-w-[180px] text-center">
+            <span className="min-w-[180px] text-center text-sm font-medium text-[color:var(--sand-ink)]">
               {labelPeriode}
             </span>
             <button
               onClick={allerSemaineSuivante}
-              className="p-2 rounded-lg hover:bg-gray-100 text-gray-600"
+              className="rounded-full border border-[color:var(--sand-line)] bg-white/80 p-2 text-[color:var(--sand-muted)] transition hover:border-[color:var(--sand-accent)] hover:text-[color:var(--sand-ink)]"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -222,10 +225,10 @@ export default function SupervisionPage() {
 
           <button
             onClick={() => setFiltresOuverts(!filtresOuverts)}
-            className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg border ${
+            className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm ${
               filtreProjet || filtreEquipe || filtreType
-                ? 'bg-blue-50 border-blue-200 text-blue-700'
-                : 'hover:bg-gray-50 text-gray-600'
+                ? 'border-[color:var(--sand-accent)]/40 bg-[color:var(--sand-accent)]/10 text-[color:var(--sand-accent-strong)]'
+                : 'border-[color:var(--sand-line)] bg-white/75 text-[color:var(--sand-muted)] hover:border-[color:var(--sand-accent)]/35 hover:bg-white'
             }`}
           >
             <FunnelIcon className="w-4 h-4" />
@@ -240,13 +243,13 @@ export default function SupervisionPage() {
 
         {/* Panneau filtres */}
         {filtresOuverts && (
-          <div className="flex flex-wrap gap-4 pt-4 border-t">
+          <div className="flex flex-wrap gap-4 border-t border-[color:var(--sand-line)] pt-4">
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-xs font-medium text-gray-500 mb-1">Projet</label>
+              <label className="mb-1 block text-xs font-medium uppercase tracking-[0.16em] text-[color:var(--sand-muted)]">Projet</label>
               <select
                 value={filtreProjet}
                 onChange={(e) => setFiltreProjet(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg text-sm"
+                className="w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 px-3 py-2 text-sm text-[color:var(--sand-ink)]"
               >
                 <option value="">Tous les projets</option>
                 {projets.map((p) => (
@@ -259,11 +262,11 @@ export default function SupervisionPage() {
 
             {estAdmin && (
               <div className="flex-1 min-w-[200px]">
-                <label className="block text-xs font-medium text-gray-500 mb-1">Equipe</label>
+                <label className="mb-1 block text-xs font-medium uppercase tracking-[0.16em] text-[color:var(--sand-muted)]">Equipe</label>
                 <select
                   value={filtreEquipe}
                   onChange={(e) => setFiltreEquipe(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg text-sm"
+                  className="w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 px-3 py-2 text-sm text-[color:var(--sand-ink)]"
                 >
                   <option value="">Toutes les equipes</option>
                   {equipes.map((e) => (
@@ -276,11 +279,11 @@ export default function SupervisionPage() {
             )}
 
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-xs font-medium text-gray-500 mb-1">Type</label>
+              <label className="mb-1 block text-xs font-medium uppercase tracking-[0.16em] text-[color:var(--sand-muted)]">Type</label>
               <select
                 value={filtreType}
                 onChange={(e) => setFiltreType(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg text-sm"
+                className="w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 px-3 py-2 text-sm text-[color:var(--sand-ink)]"
               >
                 <option value="">Tous les types</option>
                 {Object.entries(typeConfig).map(([key, { label }]) => (
@@ -298,7 +301,7 @@ export default function SupervisionPage() {
                   setFiltreEquipe('');
                   setFiltreType('');
                 }}
-                className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900"
+                className="px-3 py-2 text-sm font-medium text-[color:var(--sand-muted)] transition hover:text-[color:var(--sand-ink)]"
               >
                 Reinitialiser
               </button>
@@ -308,9 +311,9 @@ export default function SupervisionPage() {
       </div>
 
       {/* Liste des anomalies */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="sand-card overflow-hidden rounded-[1.8rem]">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">Chargement...</div>
+          <div className="p-8 text-center text-[color:var(--sand-muted)]">Chargement...</div>
         ) : error ? (
           <div className="p-8 text-center text-red-500">Erreur : {error.message}</div>
         ) : anomalies.length === 0 ? (
@@ -320,30 +323,30 @@ export default function SupervisionPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <p className="text-gray-900 font-medium">Aucune anomalie</p>
-            <p className="text-sm text-gray-500 mt-1">Toutes les saisies sont correctes pour cette periode.</p>
+            <p className="font-medium text-[color:var(--sand-ink)]">Aucune anomalie</p>
+            <p className="mt-1 text-sm text-[color:var(--sand-muted)]">Toutes les saisies sont correctes pour cette periode.</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-[color:var(--sand-line)]">
             {anomaliesParUtilisateur.map(({ utilisateur, anomalies: userAnomalies }) => (
               <div key={utilisateur.id} className="p-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-medium">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[color:var(--sand-accent)]/15 font-medium text-[color:var(--sand-accent-strong)]">
                     {utilisateur.nomComplet.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">{utilisateur.nomComplet}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="font-medium text-[color:var(--sand-ink)]">{utilisateur.nomComplet}</p>
+                    <p className="text-xs text-[color:var(--sand-muted)]">
                       {utilisateur.equipe?.nom || 'Sans equipe'} • {utilisateur.email}
                     </p>
                   </div>
                   <div className="ml-auto flex items-center gap-3">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-[color:var(--sand-muted)]">
                       {userAnomalies.length} anomalie{userAnomalies.length > 1 ? 's' : ''}
                     </span>
                     <button
                       onClick={() => voirSaisie(utilisateur.id, userAnomalies[0]?.date || undefined)}
-                      className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                      className="flex items-center gap-1 rounded-full bg-[color:var(--sand-ink)] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[color:var(--sand-accent-strong)]"
                       title="Voir la saisie de cet utilisateur"
                     >
                       <EyeIcon className="w-3.5 h-3.5" />
@@ -360,7 +363,7 @@ export default function SupervisionPage() {
                     return (
                       <div
                         key={anomalie.id}
-                        className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
+                        className="flex cursor-pointer items-start gap-3 rounded-2xl border border-[color:var(--sand-line)] bg-white/75 p-3 transition hover:border-[color:var(--sand-accent)]/30 hover:bg-[color:var(--sand-surface-strong)]"
                         onClick={() => voirSaisie(utilisateur.id, anomalie.date || undefined)}
                         role="button"
                         tabIndex={0}
@@ -388,9 +391,9 @@ export default function SupervisionPage() {
                               <span className="text-xs text-gray-500">Semaine {anomalie.semaine}</span>
                             )}
                           </div>
-                          <p className="text-sm text-gray-700 mt-1">{anomalie.detail}</p>
+                          <p className="mt-1 text-sm text-[color:var(--sand-muted)]">{anomalie.detail}</p>
                           {anomalie.projet && (
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="mt-1 text-xs text-[color:var(--sand-muted)]">
                               Projet : {anomalie.projet.code} - {anomalie.projet.nom}
                             </p>
                           )}
