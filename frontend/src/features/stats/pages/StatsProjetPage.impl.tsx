@@ -14,6 +14,41 @@ import GraphiqueUtilisateurs from '../../../components/dashboard/GraphiqueUtilis
 import GraphiqueEvolution from '../../../components/dashboard/GraphiqueEvolution';
 import { SqueletteCarte, SqueletteGraphique } from '../../../components/Squelette';
 
+interface Projet {
+  id: string;
+  nom: string;
+  code: string;
+}
+
+interface UtilisateurStat {
+  utilisateur: { id: string; nomComplet: string };
+  tempsTotal: number;
+  tauxCompletion: number;
+}
+
+interface StatistiquesProjet {
+  tempsTotal: number;
+  parActivite: Array<{
+    activite: { id: string; nom: string };
+    tempsTotal: number;
+    pourcentage: number;
+  }>;
+  parUtilisateur: UtilisateurStat[];
+  parJour: Array<{
+    date: string;
+    tempsTotal: number;
+    estComplet: boolean;
+  }>;
+}
+
+interface ProjetsActifsQueryData {
+  projets: Projet[];
+}
+
+interface StatsProjetQueryData {
+  statistiques: StatistiquesProjet;
+}
+
 function dernierJourDuMois(annee: number, mois: number): number {
   return new Date(annee, mois + 1, 0).getDate();
 }
@@ -34,7 +69,7 @@ export default function StatsProjetPage() {
   const [projetId, setProjetId] = useState<string>('');
 
   // Charger la liste des projets
-  const { data: dataProjets, loading: loadingProjets } = useQuery(PROJETS_ACTIFS, {
+  const { data: dataProjets, loading: loadingProjets } = useQuery<ProjetsActifsQueryData>(PROJETS_ACTIFS, {
     fetchPolicy: 'cache-and-network',
   });
 
@@ -43,7 +78,7 @@ export default function StatsProjetPage() {
   const projetSelectionne = projetId || projets[0]?.id || '';
 
   // Charger les stats du projet selectionne
-  const { data, loading, error } = useQuery(STATS_PROJET, {
+  const { data, loading, error } = useQuery<StatsProjetQueryData>(STATS_PROJET, {
     variables: { dateDebut, dateFin, projetId: projetSelectionne },
     skip: !projetSelectionne,
     fetchPolicy: 'cache-and-network',

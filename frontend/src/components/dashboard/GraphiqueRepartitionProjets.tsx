@@ -1,4 +1,6 @@
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
+import type { PieLabelRenderProps } from 'recharts/types/polar/Pie';
 
 interface ProjetStat {
   projet: { id: string; nom: string; code: string };
@@ -32,6 +34,20 @@ export default function GraphiqueRepartitionProjets({ donnees }: GraphiqueRepart
     pourcentage: d.pourcentage,
   }));
 
+  const renderLabel = ({ payload }: PieLabelRenderProps) => {
+    const donnees = payload as { nom?: string; pourcentage?: number } | undefined;
+    return `${donnees?.nom ?? ''} (${(donnees?.pourcentage ?? 0).toFixed(0)}%)`;
+  };
+
+  const renderTooltip = (
+    valeur: ValueType | undefined,
+    _nom: NameType | undefined,
+    props: { payload?: { nomComplet?: string } }
+  ): [string, string] => [
+    `${Number(valeur ?? 0).toFixed(2)} j`,
+    props.payload?.nomComplet ?? 'Projet',
+  ];
+
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Repartition par projet</h3>
@@ -44,17 +60,14 @@ export default function GraphiqueRepartitionProjets({ donnees }: GraphiqueRepart
             cx="50%"
             cy="50%"
             outerRadius={100}
-            label={({ nom, pourcentage }) => `${nom} (${pourcentage.toFixed(0)}%)`}
+            label={renderLabel}
           >
             {dataChart.map((_entry, index) => (
               <Cell key={index} fill={COULEURS[index % COULEURS.length]} />
             ))}
           </Pie>
           <Tooltip
-            formatter={(valeur: number, _nom: string, props: { payload: { nomComplet: string } }) => [
-              `${valeur.toFixed(2)} j`,
-              props.payload.nomComplet,
-            ]}
+            formatter={renderTooltip}
           />
           <Legend />
         </PieChart>

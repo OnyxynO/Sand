@@ -13,13 +13,29 @@ import GraphiqueRepartitionProjets from '../components/dashboard/GraphiqueRepart
 import GraphiqueJournalier from '../components/dashboard/GraphiqueJournalier';
 import { periodeInitiale } from '../hooks/usePeriode';
 
+interface MesStatistiquesData {
+  statistiques: {
+    tempsTotal: number;
+    parProjet: Array<{
+      projet: { id: string; nom: string; code: string };
+      tempsTotal: number;
+      pourcentage: number;
+    }>;
+    parJour: Array<{
+      date: string;
+      tempsTotal: number;
+      estComplet: boolean;
+    }>;
+  };
+}
+
 export default function DashboardPage() {
   const utilisateur = useAuthStore((state) => state.utilisateur);
   const initial = useMemo(() => periodeInitiale(), []);
   const [dateDebut, setDateDebut] = useState(initial.debut);
   const [dateFin, setDateFin] = useState(initial.fin);
 
-  const { data, loading, error } = useQuery(MES_STATISTIQUES, {
+  const { data, loading, error } = useQuery<MesStatistiquesData>(MES_STATISTIQUES, {
     variables: { dateDebut, dateFin },
     fetchPolicy: 'cache-and-network',
   });

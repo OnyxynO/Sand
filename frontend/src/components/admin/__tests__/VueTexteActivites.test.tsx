@@ -1,8 +1,7 @@
-import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import VueTexteActivites from '../VueTexteActivites';
 import { renderAvecApollo } from '../../../test/renderAvecApollo';
-import { DELETE_ACTIVITY, CREATE_ACTIVITY } from '../../../graphql/operations/activities';
 
 const arbreTest = [
   {

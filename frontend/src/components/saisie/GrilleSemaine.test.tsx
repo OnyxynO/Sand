@@ -64,7 +64,6 @@ const ligneTest: LigneSaisie = {
   activiteNom: 'Developpement',
   activiteChemin: 'Dev > Backend',
   saisies: {},
-  estNouvelle: false,
 };
 
 function mockStore(overrides = {}) {

@@ -258,8 +258,8 @@ describe('useSaisieHebdo', () => {
     const mockLink = new MockLink(mocks as never[]);
     const client = new ApolloClient({ link: mockLink, cache: new InMemoryCache() });
 
-    const wrapper = ({ children }: { children: React.ReactNode }) =>
-      React.createElement(ApolloProvider, { client }, children);
+    const wrapper = ({ children }: React.PropsWithChildren) =>
+      React.createElement(ApolloProvider, { client, children });
 
     renderHook(() => useSaisieHebdo(), { wrapper });
 

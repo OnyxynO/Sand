@@ -51,6 +51,42 @@ interface Equipe {
   code: string;
 }
 
+interface ProjetsQueryData {
+  projets: Projet[];
+}
+
+interface EquipesQueryData {
+  equipes: Equipe[];
+}
+
+interface MesExportsQueryData {
+  mesExports: ExportJob[];
+}
+
+interface RequestExportMutationData {
+  requestExport: ExportJob;
+}
+
+interface RequestExportMutationVariables {
+  input: Record<string, string>;
+}
+
+interface DesactiverExportMutationData {
+  desactiverExport: ExportJob;
+}
+
+interface DesactiverExportMutationVariables {
+  id: string;
+}
+
+interface SupprimerExportMutationData {
+  supprimerExport: boolean;
+}
+
+interface SupprimerExportMutationVariables {
+  id: string;
+}
+
 function libStatut(statut: string): string {
   switch (statut) {
     case 'EN_ATTENTE': return 'En attente';
@@ -119,12 +155,12 @@ export default function ExportPage() {
   const [projetId, setProjetId] = useState('');
   const [equipeId, setEquipeId] = useState('');
 
-  const { data: dataProjets } = useQuery(PROJETS_ACTIFS, { fetchPolicy: 'cache-and-network' });
-  const { data: dataEquipes } = useQuery(TEAMS_FULL_QUERY, {
+  const { data: dataProjets } = useQuery<ProjetsQueryData>(PROJETS_ACTIFS, { fetchPolicy: 'cache-and-network' });
+  const { data: dataEquipes } = useQuery<EquipesQueryData>(TEAMS_FULL_QUERY, {
     variables: { actifSeulement: true },
     fetchPolicy: 'cache-and-network',
   });
-  const { data: dataExports, loading: loadingExports, refetch: refetchExports } = useQuery(MES_EXPORTS, {
+  const { data: dataExports, loading: loadingExports, refetch: refetchExports } = useQuery<MesExportsQueryData>(MES_EXPORTS, {
     fetchPolicy: 'network-only',
     pollInterval: 10000,
   });
@@ -210,7 +246,10 @@ export default function ExportPage() {
     return [...pending, ...exportsServeur];
   }, [exportsServeur, exportsLocaux]);
 
-  const [requestExport, { loading: exporting }] = useMutation(REQUEST_EXPORT, {
+  const [requestExport, { loading: exporting }] = useMutation<
+    RequestExportMutationData,
+    RequestExportMutationVariables
+  >(REQUEST_EXPORT, {
     onCompleted: (data) => {
       const id: string = data.requestExport.id;
       // Garantir 3 s minimum en état "En cours" pour que le badge soit visible
@@ -222,11 +261,17 @@ export default function ExportPage() {
     },
   });
 
-  const [desactiverExport] = useMutation(DESACTIVER_EXPORT, {
+  const [desactiverExport] = useMutation<
+    DesactiverExportMutationData,
+    DesactiverExportMutationVariables
+  >(DESACTIVER_EXPORT, {
     onCompleted: () => refetchExports(),
   });
 
-  const [supprimerExport] = useMutation(SUPPRIMER_EXPORT, {
+  const [supprimerExport] = useMutation<
+    SupprimerExportMutationData,
+    SupprimerExportMutationVariables
+  >(SUPPRIMER_EXPORT, {
     onCompleted: () => {
       // Vider le cache local : le refetch serveur fait autorité après suppression
       setExportsLocaux([]);

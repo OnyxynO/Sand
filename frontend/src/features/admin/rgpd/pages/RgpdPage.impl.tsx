@@ -20,23 +20,65 @@ interface UserBasique {
   email: string;
 }
 
+interface UsersQueryData {
+  users: {
+    data: UserBasique[];
+  };
+}
+
+interface SuppressionResultat {
+  saisiesSupprimees: number;
+  absencesSupprimees: number;
+  notificationsSupprimees: number;
+  exportsSupprimees: number;
+  logsAnonymises: number;
+}
+
+interface PurgeResultat {
+  saisiesSupprimees: number;
+  logsSupprimees: number;
+  absencesSupprimees: number;
+  notificationsSupprimees: number;
+  exportsSupprimees: number;
+}
+
+interface SupprimerDonneesMutationData {
+  supprimerDonneesUtilisateur: SuppressionResultat;
+}
+
+interface SupprimerDonneesMutationVariables {
+  userId: string;
+  confirmationNom: string;
+}
+
+interface PurgerToutesDonneesMutationData {
+  purgerToutesDonnees: PurgeResultat;
+}
+
+interface PurgerToutesDonneesMutationVariables {
+  confirmationPhrase: string;
+}
+
 export default function RgpdPage() {
   // --- Section 1 : Suppression utilisateur ---
   const [utilisateurSelectionne, setUtilisateurSelectionne] = useState<UserBasique | null>(null);
   const [modaleSuppressionOuverte, setModaleSuppressionOuverte] = useState(false);
   const [confirmationNom, setConfirmationNom] = useState('');
-  const [resultatSuppression, setResultatSuppression] = useState<Record<string, number> | null>(null);
+  const [resultatSuppression, setResultatSuppression] = useState<SuppressionResultat | null>(null);
 
   // --- Section 2 : Purge totale ---
   const [modalePurgeOuverte, setModalePurgeOuverte] = useState(false);
   const [confirmationPhrase, setConfirmationPhrase] = useState('');
-  const [resultatPurge, setResultatPurge] = useState<Record<string, number> | null>(null);
+  const [resultatPurge, setResultatPurge] = useState<PurgeResultat | null>(null);
 
-  const { data: usersData, loading: usersLoading } = useQuery(USERS_QUERY, {
+  const { data: usersData, loading: usersLoading } = useQuery<UsersQueryData>(USERS_QUERY, {
     variables: { actifSeulement: false },
   });
 
-  const [supprimerDonnees, { loading: supprimant }] = useMutation(SUPPRIMER_DONNEES_UTILISATEUR, {
+  const [supprimerDonnees, { loading: supprimant }] = useMutation<
+    SupprimerDonneesMutationData,
+    SupprimerDonneesMutationVariables
+  >(SUPPRIMER_DONNEES_UTILISATEUR, {
     onCompleted: (data) => {
       setResultatSuppression(data.supprimerDonneesUtilisateur);
       setModaleSuppressionOuverte(false);
@@ -45,7 +87,10 @@ export default function RgpdPage() {
     },
   });
 
-  const [purgerDonnees, { loading: purgeant }] = useMutation(PURGER_TOUTES_DONNEES, {
+  const [purgerDonnees, { loading: purgeant }] = useMutation<
+    PurgerToutesDonneesMutationData,
+    PurgerToutesDonneesMutationVariables
+  >(PURGER_TOUTES_DONNEES, {
     onCompleted: (data) => {
       setResultatPurge(data.purgerToutesDonnees);
       setModalePurgeOuverte(false);

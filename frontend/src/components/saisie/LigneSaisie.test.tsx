@@ -50,7 +50,6 @@ const ligneTest: LigneSaisieType = {
   saisies: {
     '2026-02-09': { duree: null, estModifiee: false },
   },
-  estNouvelle: false,
 };
 
 describe('LigneSaisie', () => {

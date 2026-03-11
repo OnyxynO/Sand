@@ -18,6 +18,7 @@ const arbreTest: ActiviteDnd[] = [
   {
     id: '1',
     nom: 'Developpement',
+    chemin: 'developpement',
     niveau: 0,
     ordre: 0,
     estFeuille: false,
@@ -27,6 +28,7 @@ const arbreTest: ActiviteDnd[] = [
       {
         id: '2',
         nom: 'Frontend',
+        chemin: 'developpement.frontend',
         niveau: 1,
         ordre: 0,
         estFeuille: false,
@@ -36,6 +38,7 @@ const arbreTest: ActiviteDnd[] = [
           {
             id: '3',
             nom: 'React',
+            chemin: 'developpement.frontend.react',
             niveau: 2,
             ordre: 0,
             estFeuille: true,
@@ -48,6 +51,7 @@ const arbreTest: ActiviteDnd[] = [
       {
         id: '4',
         nom: 'Backend',
+        chemin: 'developpement.backend',
         niveau: 1,
         ordre: 1,
         estFeuille: true,
@@ -60,6 +64,7 @@ const arbreTest: ActiviteDnd[] = [
   {
     id: '5',
     nom: 'Reunion',
+    chemin: 'reunion',
     niveau: 0,
     ordre: 1,
     estFeuille: true,
@@ -70,6 +75,7 @@ const arbreTest: ActiviteDnd[] = [
   {
     id: '6',
     nom: 'Absence',
+    chemin: 'absence',
     niveau: 0,
     ordre: 2,
     estFeuille: true,

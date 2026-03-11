@@ -17,6 +17,55 @@ import GraphiqueEvolution from '../../../components/dashboard/GraphiqueEvolution
 import { SqueletteCarte, SqueletteGraphique } from '../../../components/Squelette';
 import { periodeInitiale, periodePrecedente } from '../../../hooks/usePeriode';
 
+interface Equipe {
+  id: string;
+  nom: string;
+  code: string;
+}
+
+interface UtilisateurStat {
+  utilisateur: { id: string; nomComplet: string };
+  tempsTotal: number;
+  tauxCompletion: number;
+}
+
+interface StatistiquesGlobales {
+  tempsTotal: number;
+  parProjet: Array<{
+    projet: { id: string; nom: string; code: string };
+    tempsTotal: number;
+    pourcentage: number;
+  }>;
+  parActivite: Array<{
+    activite: { id: string; nom: string };
+    tempsTotal: number;
+    pourcentage: number;
+  }>;
+  parUtilisateur: UtilisateurStat[];
+  parJour: Array<{
+    date: string;
+    tempsTotal: number;
+    estComplet: boolean;
+  }>;
+}
+
+interface StatistiquesPeriodePrecedente {
+  tempsTotal: number;
+  parUtilisateur: UtilisateurStat[];
+}
+
+interface EquipesQueryData {
+  equipes: Equipe[];
+}
+
+interface StatsGlobalesQueryData {
+  statistiques: StatistiquesGlobales;
+}
+
+interface StatsPeriodePrecedenteQueryData {
+  statistiques: StatistiquesPeriodePrecedente;
+}
+
 function formatDelta(actuel: number, precedent: number): { texte: string; positif: boolean | null } {
   if (precedent === 0) return { texte: '', positif: null };
   const delta = ((actuel - precedent) / precedent) * 100;
@@ -31,7 +80,7 @@ export default function StatsGlobalesPage() {
   const [equipeId, setEquipeId] = useState<string>('');
 
   // Charger les equipes
-  const { data: dataEquipes } = useQuery(TEAMS_FULL_QUERY, {
+  const { data: dataEquipes } = useQuery<EquipesQueryData>(TEAMS_FULL_QUERY, {
     variables: { actifSeulement: true },
     fetchPolicy: 'cache-and-network',
   });
@@ -45,7 +94,7 @@ export default function StatsGlobalesPage() {
   };
 
   // Stats periode courante
-  const { data, loading, error } = useQuery(STATS_GLOBALES, {
+  const { data, loading, error } = useQuery<StatsGlobalesQueryData>(STATS_GLOBALES, {
     variables,
     fetchPolicy: 'cache-and-network',
   });
@@ -56,7 +105,7 @@ export default function StatsGlobalesPage() {
     () => periodePrecedente(dateDebut),
     [dateDebut],
   );
-  const { data: dataPrec } = useQuery(STATS_PERIODE_PRECEDENTE, {
+  const { data: dataPrec } = useQuery<StatsPeriodePrecedenteQueryData>(STATS_PERIODE_PRECEDENTE, {
     variables: {
       dateDebut: debutPrec,
       dateFin: finPrec,

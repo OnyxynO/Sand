@@ -1,4 +1,4 @@
-import { screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { renderAvecApollo } from '../../../test/renderAvecApollo';
 import RgpdPage from '../RgpdPage';

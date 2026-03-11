@@ -32,6 +32,11 @@ export default function GraphiqueEvolution({ donnees }: GraphiqueEvolutionProps)
     etp: d.tempsTotal,
   }));
 
+  const renderTooltip = (valeur: number | string | undefined): [string, string] => [
+    `${Number(valeur ?? 0).toFixed(2)} ETP`,
+    'Temps total',
+  ];
+
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Evolution journaliere</h3>
@@ -40,7 +45,7 @@ export default function GraphiqueEvolution({ donnees }: GraphiqueEvolutionProps)
           <XAxis dataKey="date" tick={{ fontSize: 12 }} />
           <YAxis domain={[0, 'auto']} tick={{ fontSize: 12 }} />
           <Tooltip
-            formatter={(valeur: number) => [`${valeur.toFixed(2)} ETP`, 'Temps total']}
+            formatter={renderTooltip}
           />
           <ReferenceLine y={1} stroke="#9CA3AF" strokeDasharray="3 3" label="1.0 ETP" />
           <Line

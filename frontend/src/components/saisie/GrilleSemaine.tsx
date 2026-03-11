@@ -12,6 +12,7 @@ import SelecteurProjetActivite from './SelecteurProjetActivite';
 import HistoriqueModal from './HistoriqueModal';
 import { GrilleSaisieContext } from './GrilleSaisieContext';
 import type { AbsenceJour } from '../../types';
+import type { ComponentProps } from 'react';
 
 interface GrilleSemaineProps {
   absencesParJour: Record<string, AbsenceJour>;
@@ -21,6 +22,18 @@ interface HistoriqueState {
   ouvert: boolean;
   ligneId: string;
   dateStr: string;
+}
+
+type HistoriqueEntry = ComponentProps<typeof HistoriqueModal>['historique'][number];
+
+interface HistoriqueSaisieQuery {
+  mesSaisiesSemaine: Array<{
+    id: string;
+    date: string;
+    projet: { id: string; code: string };
+    activite: { id: string; nom: string };
+    historique: HistoriqueEntry[];
+  }>;
 }
 
 export default function GrilleSemaine({ absencesParJour }: GrilleSemaineProps) {
@@ -34,7 +47,7 @@ export default function GrilleSemaine({ absencesParJour }: GrilleSemaineProps) {
   const tableRef = useRef<HTMLTableElement>(null);
 
   // Charger l'historique des saisies de la semaine
-  const { data: historiqueData } = useQuery(HISTORIQUE_SAISIE, {
+  const { data: historiqueData } = useQuery<HistoriqueSaisieQuery>(HISTORIQUE_SAISIE, {
     variables: { semaineISO },
     skip: !historique.ouvert,
     fetchPolicy: 'cache-and-network',

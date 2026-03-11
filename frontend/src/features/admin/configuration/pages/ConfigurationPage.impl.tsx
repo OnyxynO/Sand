@@ -17,6 +17,26 @@ interface Parametre {
   description: string | null;
 }
 
+interface ParametresQueryData {
+  parametres: Parametre[];
+}
+
+interface UpdateSettingsMutationData {
+  updateSettings: Parametre[];
+}
+
+interface UpdateSettingsMutationVariables {
+  settings: Array<{ cle: string; valeur: unknown }>;
+}
+
+interface ResetSettingsMutationData {
+  resetSettings: Parametre[];
+}
+
+interface TesterConnexionRhApiMutationData {
+  testerConnexionRhApi: string | null;
+}
+
 // Configuration des champs du formulaire
 const CHAMPS_CONFIG = [
   {
@@ -77,11 +97,14 @@ export default function ConfigurationPage() {
   const [confirmReset, setConfirmReset] = useState(false);
   const [testConnexionResultat, setTestConnexionResultat] = useState<{ ok: boolean; message: string } | null>(null);
 
-  const { data, loading, error } = useQuery(PARAMETRES_QUERY, {
+  const { data, loading, error } = useQuery<ParametresQueryData>(PARAMETRES_QUERY, {
     fetchPolicy: 'network-only',
   });
 
-  const [updateSettings, { loading: saving, error: saveError }] = useMutation(UPDATE_SETTINGS, {
+  const [updateSettings, { loading: saving, error: saveError }] = useMutation<
+    UpdateSettingsMutationData,
+    UpdateSettingsMutationVariables
+  >(UPDATE_SETTINGS, {
     onCompleted: () => {
       setModifie(false);
       setSucces(true);
@@ -90,9 +113,9 @@ export default function ConfigurationPage() {
     refetchQueries: [{ query: PARAMETRES_QUERY }],
   });
 
-  const [testerConnexionRhApi, { loading: testing }] = useMutation(TESTER_CONNEXION_RH_API, {
+  const [testerConnexionRhApi, { loading: testing }] = useMutation<TesterConnexionRhApiMutationData>(TESTER_CONNEXION_RH_API, {
     onCompleted: (data) => {
-      const erreur = data.testerConnexionRhApi as string | null;
+      const erreur = data.testerConnexionRhApi;
       setTestConnexionResultat(
         erreur ? { ok: false, message: erreur } : { ok: true, message: 'Connexion etablie avec succes.' }
       );
@@ -102,7 +125,7 @@ export default function ConfigurationPage() {
     },
   });
 
-  const [resetSettings, { loading: resetting }] = useMutation(RESET_SETTINGS, {
+  const [resetSettings, { loading: resetting }] = useMutation<ResetSettingsMutationData>(RESET_SETTINGS, {
     onCompleted: () => {
       setModifie(false);
       setConfirmReset(false);

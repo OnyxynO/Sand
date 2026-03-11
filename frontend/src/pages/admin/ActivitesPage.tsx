@@ -42,7 +42,7 @@ import NavAdmin from '../../components/admin/NavAdmin';
 import SelectionParentModal from '../../components/admin/SelectionParentModal';
 import VueTexteActivites from '../../components/admin/VueTexteActivites';
 import useArbreDnd from '../../hooks/useArbreDnd';
-import type { InfoDrop } from '../../hooks/useArbreDnd';
+import type { ActiviteDnd, InfoDrop } from '../../hooks/useArbreDnd';
 
 interface Activite {
   id: string;
@@ -84,7 +84,7 @@ function LigneActiviteDnd({
   activeDragId,
   infoDrop,
 }: {
-  activite: Activite;
+  activite: ActiviteDnd;
   niveau: number;
   ouverts: Set<string>;
   toggleOuvert: (id: string) => void;
@@ -252,7 +252,11 @@ function LigneActiviteDnd({
 }
 
 // Overlay affiche pendant le drag (apercu flottant)
-function DragPreview({ activite }: { activite: Activite }) {
+function DragPreview({
+  activite,
+}: {
+  activite: Pick<Activite, 'nom' | 'code' | 'estSysteme'>;
+}) {
   return (
     <div className="flex items-center gap-2 py-2 px-3 bg-white rounded-lg shadow-lg border border-blue-200 opacity-90">
       <Bars3Icon className="w-4 h-4 text-gray-400" />

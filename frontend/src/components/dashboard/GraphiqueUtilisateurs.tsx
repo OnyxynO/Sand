@@ -1,6 +1,7 @@
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts';
+import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 interface UtilisateurStat {
   utilisateur: { id: string; nomComplet: string };
@@ -30,6 +31,15 @@ export default function GraphiqueUtilisateurs({ donnees }: GraphiqueUtilisateurs
       tauxCompletion: d.tauxCompletion,
     }));
 
+  const renderTooltip = (
+    valeur: ValueType | undefined,
+    _nom: NameType | undefined,
+    props: { payload?: { tauxCompletion?: number } }
+  ): [string, string] => [
+    `${Number(valeur ?? 0).toFixed(2)} j (completion: ${props.payload?.tauxCompletion ?? 0}%)`,
+    'Temps',
+  ];
+
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Temps par utilisateur</h3>
@@ -38,10 +48,7 @@ export default function GraphiqueUtilisateurs({ donnees }: GraphiqueUtilisateurs
           <XAxis type="number" tick={{ fontSize: 12 }} />
           <YAxis dataKey="nom" type="category" tick={{ fontSize: 12 }} width={120} />
           <Tooltip
-            formatter={(valeur: number, _nom: string, props: { payload: { tauxCompletion: number } }) => [
-              `${valeur.toFixed(2)} j (completion: ${props.payload.tauxCompletion}%)`,
-              'Temps',
-            ]}
+            formatter={renderTooltip}
           />
           <Bar dataKey="temps" fill="#3B82F6" radius={[0, 4, 4, 0]} />
         </BarChart>

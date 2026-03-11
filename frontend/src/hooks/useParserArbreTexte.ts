@@ -148,8 +148,6 @@ export function validerTexte(texte: string, arbreExistant: ActiviteArbre[]): Err
   // Structure pour detecter les doublons parmi les freres
   // Pile des niveaux avec les noms a chaque niveau
   const nomsParNiveau: Map<number, Set<string>> = new Map();
-  const pileParents: number[] = []; // pile des niveaux parents
-
   let numeroLigne = 0;
 
   for (let i = 0; i < lignes.length; i++) {

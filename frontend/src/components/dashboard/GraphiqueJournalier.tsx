@@ -33,6 +33,11 @@ export default function GraphiqueJournalier({ donnees }: GraphiqueJournalierProp
     estComplet: d.estComplet,
   }));
 
+  const renderTooltip = (valeur: number | string | undefined): [string, string] => [
+    `${Number(valeur ?? 0).toFixed(2)} ETP`,
+    'Temps',
+  ];
+
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Saisies journalieres</h3>
@@ -41,7 +46,7 @@ export default function GraphiqueJournalier({ donnees }: GraphiqueJournalierProp
           <XAxis dataKey="date" tick={{ fontSize: 12 }} />
           <YAxis domain={[0, 1.2]} tick={{ fontSize: 12 }} />
           <Tooltip
-            formatter={(valeur: number) => [`${valeur.toFixed(2)} ETP`, 'Temps']}
+            formatter={renderTooltip}
           />
           <ReferenceLine y={1} stroke="#9CA3AF" strokeDasharray="3 3" label="1.0 ETP" />
           <Bar dataKey="etp" radius={[4, 4, 0, 0]}>
