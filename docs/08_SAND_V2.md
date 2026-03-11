@@ -26,6 +26,14 @@ sur la branche `main` du depot d'origine ni sur le pipeline de production.
 - `TimeEntryMutator` reduit a un orchestrateur mince
 - centralisation de la validation, des transactions, des checks d'autorisation et des logs de saisie
 
+### Shell applicatif
+
+- routes de l'application extraites dans `frontend/src/features/app/router.tsx`
+- navigation extraite dans `frontend/src/features/app/navigation.ts`
+- bootstrap de session deplace dans `features/auth/hooks/useAuthSessionBootstrap.ts`
+- logique notifications deplacee dans `features/notifications/hooks/`
+- query hebdomadaire backend deplacee dans `backend/app/Services/WeeklyTimeEntryQueryService.php`
+
 ## Garde-fou Git
 
 Dans cette copie, le remote de push a ete desactive (`upstream` fetch only, push URL invalide) pour eviter

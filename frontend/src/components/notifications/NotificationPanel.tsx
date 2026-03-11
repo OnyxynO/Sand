@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
 import {
   Dialog,
   DialogPanel,
@@ -7,81 +7,27 @@ import {
   TransitionChild,
 } from '@headlessui/react';
 import { XMarkIcon, BellSlashIcon } from '@heroicons/react/24/outline';
-import { useQuery, useMutation } from '@apollo/client/react';
-import { useNotificationStore } from '../../stores/notificationStore';
-import {
-  MES_NOTIFICATIONS,
-  NOMBRE_NOTIFICATIONS_NON_LUES,
-  MARK_NOTIFICATION_READ,
-  MARK_ALL_NOTIFICATIONS_READ,
-  DELETE_NOTIFICATION,
-  DELETE_ALL_NOTIFICATIONS,
-} from '../../graphql/operations/notifications';
 import NotificationItem from './NotificationItem';
 import ConflitResolutionModal from './ConflitResolutionModal';
-import type { Notification } from '../../types';
-
-interface MesNotificationsData {
-  mesNotifications: Notification[];
-}
+import { useNotificationPanel } from '../../features/notifications/hooks/useNotificationPanel';
 
 export default function NotificationPanel() {
-  const { panneauOuvert, fermerPanneau } = useNotificationStore();
-  const [conflitAResoudre, setConflitAResoudre] = useState<Notification | null>(null);
-
-  const { data, loading } = useQuery<MesNotificationsData>(MES_NOTIFICATIONS, {
-    variables: { limite: 50 },
-    skip: !panneauOuvert,
-    fetchPolicy: 'cache-and-network',
-  });
-
-  const [markRead] = useMutation(MARK_NOTIFICATION_READ, {
-    refetchQueries: [{ query: NOMBRE_NOTIFICATIONS_NON_LUES }],
-  });
-
-  const [markAllRead, { loading: markingAll }] = useMutation(MARK_ALL_NOTIFICATIONS_READ, {
-    refetchQueries: [
-      { query: NOMBRE_NOTIFICATIONS_NON_LUES },
-      { query: MES_NOTIFICATIONS, variables: { limite: 50 } },
-    ],
-  });
-
-  const [deleteNotification] = useMutation(DELETE_NOTIFICATION, {
-    refetchQueries: [
-      { query: NOMBRE_NOTIFICATIONS_NON_LUES },
-      { query: MES_NOTIFICATIONS, variables: { limite: 50 } },
-    ],
-  });
-
-  const [deleteAllNotifications, { loading: deletingAll }] = useMutation(DELETE_ALL_NOTIFICATIONS, {
-    refetchQueries: [
-      { query: NOMBRE_NOTIFICATIONS_NON_LUES },
-      { query: MES_NOTIFICATIONS, variables: { limite: 50 } },
-    ],
-  });
-
-  const notifications: Notification[] = data?.mesNotifications ?? [];
-  const hasNonLues = notifications.some((n) => !n.estLu);
-
-  const handleMarkRead = (id: string) => {
-    markRead({ variables: { id } });
-  };
-
-  const handleMarkAllRead = () => {
-    markAllRead();
-  };
-
-  const handleDelete = (id: string) => {
-    deleteNotification({ variables: { id } });
-  };
-
-  const handleResolveConflict = (notification: Notification) => {
-    setConflitAResoudre(notification);
-  };
-
-  const handleFermerModalConflit = () => {
-    setConflitAResoudre(null);
-  };
+  const {
+    panneauOuvert,
+    fermerPanneau,
+    loading,
+    notifications,
+    hasNonLues,
+    conflitAResoudre,
+    markingAll,
+    deletingAll,
+    marquerCommeLue,
+    toutMarquerCommeLu,
+    supprimerNotification,
+    supprimerToutes,
+    ouvrirResolutionConflit,
+    fermerResolutionConflit,
+  } = useNotificationPanel();
 
   return (
     <>
@@ -123,7 +69,7 @@ export default function NotificationPanel() {
                         <div className="flex items-center gap-2">
                           {notifications.length > 0 && (
                             <button
-                              onClick={() => deleteAllNotifications()}
+                              onClick={supprimerToutes}
                               disabled={deletingAll}
                               className="text-sm text-red-500 hover:text-red-700 font-medium disabled:opacity-50 transition-colors"
                             >
@@ -132,7 +78,7 @@ export default function NotificationPanel() {
                           )}
                           {hasNonLues && (
                             <button
-                              onClick={handleMarkAllRead}
+                              onClick={toutMarquerCommeLu}
                               disabled={markingAll}
                               className="text-sm text-blue-600 hover:text-blue-800 font-medium disabled:opacity-50 transition-colors"
                             >
@@ -171,9 +117,9 @@ export default function NotificationPanel() {
                               <NotificationItem
                                 key={notification.id}
                                 notification={notification}
-                                onMarkRead={handleMarkRead}
-                                onDelete={handleDelete}
-                                onResolveConflict={handleResolveConflict}
+                                onMarkRead={marquerCommeLue}
+                                onDelete={supprimerNotification}
+                                onResolveConflict={ouvrirResolutionConflit}
                               />
                             ))}
                           </div>
@@ -192,7 +138,7 @@ export default function NotificationPanel() {
       <ConflitResolutionModal
         notification={conflitAResoudre}
         ouvert={conflitAResoudre !== null}
-        onFermer={handleFermerModalConflit}
+        onFermer={fermerResolutionConflit}
       />
     </>
   );

@@ -6,6 +6,7 @@ import { LOGOUT_MUTATION } from '../graphql/operations/auth';
 import { apolloClient } from '../graphql/client';
 import NotificationBell from './notifications/NotificationBell';
 import NotificationPanel from './notifications/NotificationPanel';
+import { construireNavigation } from '../features/app/navigation';
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -24,24 +25,7 @@ export default function Layout() {
     logout();
   };
 
-  const navigation = [
-    { nom: 'Tableau de bord', href: '/' },
-    { nom: 'Saisie', href: '/saisie' },
-  ];
-
-  // Navigation moderateur/admin
-  if (utilisateur?.role === 'MODERATEUR' || utilisateur?.role === 'ADMIN') {
-    navigation.push({ nom: 'Projets', href: '/projets' });
-    navigation.push({ nom: 'Supervision', href: '/supervision' });
-    navigation.push({ nom: 'Stats projet', href: '/stats-projet' });
-  }
-
-  // Navigation admin
-  if (utilisateur?.role === 'ADMIN') {
-    navigation.push({ nom: 'Stats globales', href: '/stats-globales' });
-    navigation.push({ nom: 'Export', href: '/export' });
-    navigation.push({ nom: 'Administration', href: '/admin' });
-  }
+  const navigation = construireNavigation(utilisateur?.role);
 
   return (
     <div className="min-h-screen bg-gray-50">
