@@ -1,1 +1,1 @@
-export { default } from '../../../../pages/admin/EquipesPage';
+export { default } from './EquipesPage.impl';

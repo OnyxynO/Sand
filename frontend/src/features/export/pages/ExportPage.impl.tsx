@@ -170,7 +170,10 @@ export default function ExportPage() {
     [delaiFin],
   );
 
-  const exportsServeur: ExportJob[] = dataExports?.mesExports ?? [];
+  const exportsServeur = useMemo<ExportJob[]>(
+    () => dataExports?.mesExports ?? [],
+    [dataExports?.mesExports],
+  );
 
   // Observer : détecte les transitions vers TERMINE et signale à NotificationBell
   // de refetch immédiatement, sans attendre le poll de 60 s.
@@ -198,7 +201,7 @@ export default function ExportPage() {
     if (nouveauTermine) {
       signalRefreshCount();
     }
-  }, [exportsServeur, exportsLocaux, signalRefreshCount]);
+  }, [exportsLocaux, exportsServeur, signalRefreshCount]);
 
   // Merge : les exports serveur ont la priorité, on ajoute les locaux pas encore en BDD
   const exports = useMemo(() => {
@@ -248,7 +251,7 @@ export default function ExportPage() {
     if (filtres.project_id) input.projetId = filtres.project_id;
     if (filtres.team_id) input.equipeId = filtres.team_id;
     requestExport({ variables: { input } });
-  }, [exporting, dateDebut, dateFin, requestExport]);
+  }, [dateDebut, dateFin, requestExport]);
 
   const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8080/graphql').replace('/graphql', '');
 

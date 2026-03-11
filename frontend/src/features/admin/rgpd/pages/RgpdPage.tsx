@@ -1,1 +1,1 @@
-export { default } from '../../../../pages/admin/RgpdPage';
+export { default } from './RgpdPage.impl';

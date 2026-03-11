@@ -1,1 +1,1 @@
-export { default } from '../../../../pages/admin/ConfigurationPage';
+export { default } from './ConfigurationPage.impl';

@@ -1,1 +1,1 @@
-export { default } from '../../../../pages/admin/UtilisateursPage';
+export { default } from './UtilisateursPage.impl';

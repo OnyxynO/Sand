@@ -10,7 +10,6 @@ import {
 import { STATS_GLOBALES, STATS_PERIODE_PRECEDENTE } from '../../../graphql/operations/statistics';
 import { TEAMS_FULL_QUERY } from '../../../graphql/operations/teams';
 import SelecteurPeriode from '../../../components/dashboard/SelecteurPeriode';
-import CarteResume from '../../../components/dashboard/CarteResume';
 import GraphiqueRepartitionProjets from '../../../components/dashboard/GraphiqueRepartitionProjets';
 import GraphiqueActivites from '../../../components/dashboard/GraphiqueActivites';
 import GraphiqueUtilisateurs from '../../../components/dashboard/GraphiqueUtilisateurs';
