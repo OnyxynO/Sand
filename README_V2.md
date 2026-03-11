@@ -24,6 +24,7 @@ npm run dev
 cd backend
 composer install
 cp .env.v2.local.example .env
+cp .env.testing.v2.local.example .env.testing
 php artisan key:generate
 php artisan serve --host=0.0.0.0 --port=8080
 ```
@@ -48,6 +49,23 @@ REDIS_HOST=127.0.0.1
 CACHE_STORE=redis
 ```
 
+Dans `backend/.env.testing` :
+
+```env
+DB_HOST=127.0.0.1
+DB_DATABASE=sand_v2_test
+DB_USERNAME=sand
+DB_PASSWORD=secret
+QUEUE_CONNECTION=sync
+CACHE_STORE=array
+```
+
+Pre-requis PostgreSQL :
+
+- la base applicative `sand_v2` doit exister pour le run local
+- la base `sand_v2_test` doit exister pour `php artisan test`
+- dans l'etat actuel, le role `sand` ne cree pas lui-meme les bases; il faut donc les creer une fois avec un role PostgreSQL plus privilege
+
 Dans `frontend/.env.local` :
 
 ```env
@@ -60,3 +78,4 @@ VITE_API_URL=http://localhost:8080/graphql
 - les anciens dossiers `pages/`, `components/`, `hooks/` restent presents pour compatibilite progressive
 - les nouvelles extractions backend vont dans `backend/app/Services/`
 - `backend/.env.v2.local.example` et `frontend/.env.v2.local.example` sont les points de depart de la copie v2
+- `backend/.env.testing.v2.local.example` sert de base au contexte PHPUnit local

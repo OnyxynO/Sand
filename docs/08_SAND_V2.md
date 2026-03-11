@@ -50,6 +50,13 @@ tout push accidentel vers le depot qui pilote la production.
 ## Execution autonome
 
 - `backend/.env.v2.local.example` decrit le mode local natif de la copie v2
+- `backend/.env.testing.v2.local.example` decrit le mode test local natif de la copie v2
 - `frontend/.env.v2.local.example` fixe `VITE_API_URL` vers le backend local
 - `scripts/bootstrap-v2.sh` prepare les `.env` et installe les dependances manquantes
 - objectif : pouvoir faire tourner `sand-v2` sans symlink obligatoire vers le repo source
+
+### Etat actuel de l'autonomie backend
+
+- les tests PHPUnit de la copie v2 ne pointent plus vers `db:5432` comme en Docker
+- ils ciblent desormais `127.0.0.1:5432` et la base `sand_v2_test`
+- pre-requis restant : les bases `sand_v2` et `sand_v2_test` doivent etre creees localement par un role PostgreSQL ayant le droit `CREATE DATABASE`
