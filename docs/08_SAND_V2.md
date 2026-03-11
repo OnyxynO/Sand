@@ -38,6 +38,8 @@ sur la branche `main` du depot d'origine ni sur le pipeline de production.
 
 - `projets` bascule vers `frontend/src/features/projets/`
 - `admin/activities` recoit une entree v2 sous `frontend/src/features/admin/activities/`
+- `stats` et `export` passent aussi par des points d'entree `features/`
+- `admin/configuration`, `admin/users`, `admin/teams`, `admin/rgpd` recoivent une facade v2
 - les pages historiques restent presentes comme wrappers de compatibilite
 
 ## Garde-fou Git

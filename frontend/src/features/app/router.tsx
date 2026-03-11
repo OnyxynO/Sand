@@ -12,15 +12,15 @@ const ResetPasswordPage = lazy(() => import('../../pages/ResetPasswordPage'));
 const DashboardPage = lazy(() => import('../../pages/DashboardPage'));
 const SaisiePage = lazy(() => import('../../pages/SaisiePage'));
 const SupervisionPage = lazy(() => import('../../pages/SupervisionPage'));
-const StatsProjetPage = lazy(() => import('../../pages/StatsProjetPage'));
-const StatsGlobalesPage = lazy(() => import('../../pages/StatsGlobalesPage'));
-const ExportPage = lazy(() => import('../../pages/ExportPage'));
-const UtilisateursPage = lazy(() => import('../../pages/admin/UtilisateursPage'));
-const EquipesPage = lazy(() => import('../../pages/admin/EquipesPage'));
-const ActivitesPage = lazy(() => import('../../pages/admin/ActivitesPage'));
-const ConfigurationPage = lazy(() => import('../../pages/admin/ConfigurationPage'));
-const RgpdPage = lazy(() => import('../../pages/admin/RgpdPage'));
-const ProjetsPage = lazy(() => import('../../pages/ProjetsPage'));
+const StatsProjetPage = lazy(() => import('../stats/pages/StatsProjetPage'));
+const StatsGlobalesPage = lazy(() => import('../stats/pages/StatsGlobalesPage'));
+const ExportPage = lazy(() => import('../export/pages/ExportPage'));
+const UtilisateursPage = lazy(() => import('../admin/users/pages/UtilisateursPage'));
+const EquipesPage = lazy(() => import('../admin/teams/pages/EquipesPage'));
+const ActivitesPage = lazy(() => import('../admin/activities/pages/ActivitesPage'));
+const ConfigurationPage = lazy(() => import('../admin/configuration/pages/ConfigurationPage'));
+const RgpdPage = lazy(() => import('../admin/rgpd/pages/RgpdPage'));
+const ProjetsPage = lazy(() => import('../projets/pages/ProjetsPage'));
 
 function LoadingSpinner() {
   return (
