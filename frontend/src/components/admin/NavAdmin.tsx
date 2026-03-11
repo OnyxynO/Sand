@@ -12,16 +12,16 @@ const liens = [
 
 export default function NavAdmin() {
   return (
-    <div className="flex gap-1 mb-6 border-b overflow-x-auto">
+    <div className="mb-6 flex gap-2 overflow-x-auto rounded-[1.4rem] border border-[color:var(--sand-line)] bg-white/70 p-2 shadow-[0_20px_50px_-45px_rgba(52,78,65,0.7)] backdrop-blur">
       {liens.map((lien) => (
         <NavLink
           key={lien.href}
           to={lien.href}
           className={({ isActive }) =>
-            `px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+            `whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition ${
               isActive
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'bg-[color:var(--sand-ink)] text-white shadow-[0_16px_35px_-24px_rgba(52,78,65,1)]'
+                : 'text-[color:var(--sand-muted)] hover:bg-[color:var(--sand-surface-strong)] hover:text-[color:var(--sand-ink)]'
             }`
           }
         >

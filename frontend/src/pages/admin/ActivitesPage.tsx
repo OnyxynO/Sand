@@ -129,47 +129,47 @@ function LigneActiviteDnd({
       {/* Indicateur de drop entre freres (ligne bleue au-dessus) */}
       {typeDrop === 'entre-freres' && (
         <div
-          className="absolute top-0 left-0 right-0 h-0.5 bg-blue-500 z-10"
+          className="absolute left-0 right-0 top-0 z-10 h-0.5 bg-[color:var(--sand-accent-strong)]"
           style={{ marginLeft: `${niveau * 24 + 12}px` }}
         />
       )}
 
       <div
-        className={`group flex items-center gap-2 py-2 px-3 hover:bg-gray-50 border-b ${
+        className={`group flex items-center gap-2 border-b border-[color:var(--sand-line)] px-3 py-2 transition hover:bg-[color:var(--sand-surface-strong)] ${
           !activite.estActif ? 'opacity-50' : ''
-        } ${typeDrop === 'devenir-enfant' ? 'bg-blue-50 ring-2 ring-blue-300 ring-inset' : ''}`}
+        } ${typeDrop === 'devenir-enfant' ? 'bg-[color:var(--sand-accent)]/10 ring-2 ring-[color:var(--sand-accent)]/40 ring-inset' : ''}`}
         style={{ paddingLeft: `${niveau * 24 + 12}px` }}
       >
         {/* Poignee de drag */}
         <button
           {...attributes}
           {...listeners}
-          className="p-0.5 rounded cursor-grab opacity-0 group-hover:opacity-100 hover:bg-gray-200 touch-none"
+          className="cursor-grab rounded-full p-0.5 opacity-0 transition group-hover:opacity-100 hover:bg-[color:var(--sand-surface-strong)] touch-none"
           title="Glisser pour deplacer"
           data-testid={`drag-handle-${activite.id}`}
         >
-          <Bars3Icon className="w-4 h-4 text-gray-400" />
+          <Bars3Icon className="w-4 h-4 text-[color:var(--sand-muted)]" />
         </button>
 
         {/* Chevron */}
         <button
           onClick={() => toggleOuvert(activite.id)}
-          className={`p-0.5 rounded ${aEnfants ? 'hover:bg-gray-200' : 'invisible'}`}
+          className={`rounded-full p-0.5 ${aEnfants ? 'hover:bg-[color:var(--sand-surface-strong)]' : 'invisible'}`}
           disabled={!aEnfants}
         >
           {estOuvert ? (
-            <ChevronDownIcon className="w-4 h-4 text-gray-500" />
+            <ChevronDownIcon className="w-4 h-4 text-[color:var(--sand-muted)]" />
           ) : (
-            <ChevronRightIcon className="w-4 h-4 text-gray-500" />
+            <ChevronRightIcon className="w-4 h-4 text-[color:var(--sand-muted)]" />
           )}
         </button>
 
         {/* Nom et code */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-900">{activite.nom}</span>
+            <span className="font-medium text-[color:var(--sand-ink)]">{activite.nom}</span>
             {activite.code && (
-              <span className="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
+              <span className="rounded-full bg-[color:var(--sand-surface-strong)] px-1.5 py-0.5 text-xs text-[color:var(--sand-muted)]">
                 {activite.code}
               </span>
             )}
@@ -177,7 +177,7 @@ function LigneActiviteDnd({
               <LockClosedIcon className="w-4 h-4 text-orange-500" title="Activite systeme" />
             )}
             {activite.estFeuille && (
-              <span className="text-xs text-green-600 bg-green-50 px-1.5 py-0.5 rounded">
+              <span className="rounded-full bg-green-50 px-1.5 py-0.5 text-xs text-green-600">
                 Saisissable
               </span>
             )}
@@ -190,7 +190,7 @@ function LigneActiviteDnd({
           <button
             onClick={() => onMonter(activite)}
             disabled={estPremier}
-            className="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-100 disabled:opacity-30"
+            className="rounded-full p-1 text-[color:var(--sand-muted)] transition hover:bg-[color:var(--sand-surface-strong)] hover:text-[color:var(--sand-ink)] disabled:opacity-30"
             title="Monter"
           >
             <ArrowUpIcon className="w-4 h-4" />
@@ -198,7 +198,7 @@ function LigneActiviteDnd({
           <button
             onClick={() => onDescendre(activite)}
             disabled={estDernier}
-            className="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-100 disabled:opacity-30"
+            className="rounded-full p-1 text-[color:var(--sand-muted)] transition hover:bg-[color:var(--sand-surface-strong)] hover:text-[color:var(--sand-ink)] disabled:opacity-30"
             title="Descendre"
           >
             <ArrowDownIcon className="w-4 h-4" />
@@ -208,7 +208,7 @@ function LigneActiviteDnd({
           {!activite.estSysteme && (
             <button
               onClick={() => onDeplacer(activite)}
-              className="p-1 text-gray-400 hover:text-purple-600 rounded hover:bg-purple-50"
+              className="rounded-full p-1 text-[color:var(--sand-muted)] transition hover:bg-[color:var(--sand-surface-strong)] hover:text-[color:var(--sand-accent-strong)]"
               title="Deplacer vers un autre parent"
             >
               <ArrowRightIcon className="w-4 h-4" />
@@ -218,7 +218,7 @@ function LigneActiviteDnd({
           {/* Ajouter enfant */}
           <button
             onClick={() => onAjouterEnfant(activite.id)}
-            className="p-1 text-gray-400 hover:text-green-600 rounded hover:bg-green-50"
+            className="rounded-full p-1 text-[color:var(--sand-muted)] transition hover:bg-[color:var(--sand-surface-strong)] hover:text-green-700"
             title="Ajouter une sous-activite"
           >
             <PlusIcon className="w-4 h-4" />
@@ -228,7 +228,7 @@ function LigneActiviteDnd({
           {!activite.estSysteme && (
             <button
               onClick={() => onEditer(activite)}
-              className="p-1 text-gray-400 hover:text-blue-600 rounded hover:bg-blue-50"
+              className="rounded-full p-1 text-[color:var(--sand-muted)] transition hover:bg-[color:var(--sand-surface-strong)] hover:text-[color:var(--sand-accent-strong)]"
               title="Modifier"
             >
               <PencilSquareIcon className="w-4 h-4" />
@@ -239,7 +239,7 @@ function LigneActiviteDnd({
           {!activite.estSysteme && (
             <button
               onClick={() => onSupprimer(activite)}
-              className="p-1 text-gray-400 hover:text-red-600 rounded hover:bg-red-50"
+              className="rounded-full p-1 text-[color:var(--sand-muted)] transition hover:bg-[color:var(--sand-surface-strong)] hover:text-red-600"
               title="Supprimer"
             >
               <TrashIcon className="w-4 h-4" />
@@ -258,11 +258,11 @@ function DragPreview({
   activite: Pick<Activite, 'nom' | 'code' | 'estSysteme'>;
 }) {
   return (
-    <div className="flex items-center gap-2 py-2 px-3 bg-white rounded-lg shadow-lg border border-blue-200 opacity-90">
-      <Bars3Icon className="w-4 h-4 text-gray-400" />
-      <span className="font-medium text-gray-900">{activite.nom}</span>
+    <div className="flex items-center gap-2 rounded-[1.2rem] border border-[color:var(--sand-accent)]/30 bg-white/95 px-3 py-2 opacity-95 shadow-[0_20px_45px_-28px_rgba(52,78,65,0.8)] backdrop-blur">
+      <Bars3Icon className="w-4 h-4 text-[color:var(--sand-muted)]" />
+      <span className="font-medium text-[color:var(--sand-ink)]">{activite.nom}</span>
       {activite.code && (
-        <span className="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
+        <span className="rounded-full bg-[color:var(--sand-surface-strong)] px-1.5 py-0.5 text-xs text-[color:var(--sand-muted)]">
           {activite.code}
         </span>
       )}
@@ -387,7 +387,7 @@ function FormulaireActivite({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/30" />
+          <div className="fixed inset-0 bg-[color:var(--sand-ink)]/35" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -401,49 +401,49 @@ function FormulaireActivite({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-xl bg-white shadow-xl transition-all">
-                <div className="flex items-center justify-between border-b px-4 py-3">
-                  <Dialog.Title className="text-lg font-semibold text-gray-900">
+              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-[1.8rem] border border-white/70 bg-white/95 shadow-[0_32px_70px_-40px_rgba(52,78,65,0.8)] backdrop-blur transition-all">
+                <div className="flex items-center justify-between border-b border-[color:var(--sand-line)] px-4 py-4">
+                  <Dialog.Title className="font-['Fraunces',serif] text-2xl text-[color:var(--sand-ink)]">
                     {estEdition ? 'Modifier l\'activite' : 'Nouvelle activite'}
                   </Dialog.Title>
-                  <button onClick={onFermer} className="p-1 rounded hover:bg-gray-100">
-                    <XMarkIcon className="w-5 h-5 text-gray-500" />
+                  <button onClick={onFermer} className="rounded-full p-1.5 transition hover:bg-[color:var(--sand-surface-strong)]">
+                    <XMarkIcon className="w-5 h-5 text-[color:var(--sand-muted)]" />
                   </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-4 space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Nom *</label>
+                    <label className="mb-1 block text-sm font-medium text-[color:var(--sand-muted)]">Nom *</label>
                     <input
                       type="text"
                       name="nom"
                       value={formData.nom}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 px-3 py-2 text-[color:var(--sand-ink)] outline-none transition focus:ring-2 focus:ring-[color:var(--sand-accent)]/20"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Code</label>
+                    <label className="mb-1 block text-sm font-medium text-[color:var(--sand-muted)]">Code</label>
                     <input
                       type="text"
                       name="code"
                       value={formData.code}
                       onChange={handleChange}
                       placeholder="Ex: DEV, REUNION"
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 px-3 py-2 text-[color:var(--sand-ink)] outline-none transition focus:ring-2 focus:ring-[color:var(--sand-accent)]/20"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <label className="mb-1 block text-sm font-medium text-[color:var(--sand-muted)]">Description</label>
                     <textarea
                       name="description"
                       value={formData.description}
                       onChange={handleChange}
                       rows={3}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 px-3 py-2 text-[color:var(--sand-ink)] outline-none transition focus:ring-2 focus:ring-[color:var(--sand-accent)]/20"
                     />
                   </div>
 
@@ -457,22 +457,22 @@ function FormulaireActivite({
                           onChange={handleChange}
                           className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
-                        <span className="text-sm text-gray-700">Activite active</span>
+                        <span className="text-sm text-[color:var(--sand-ink)]">Activite active</span>
                       </label>
                     </div>
                   )}
 
                   {erreur && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                    <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                       {erreur}
                     </div>
                   )}
 
-                  <div className="flex justify-end gap-3 pt-4 border-t">
+                  <div className="flex justify-end gap-3 border-t border-[color:var(--sand-line)] pt-4">
                     <button
                       type="button"
                       onClick={onFermer}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-lg hover:bg-gray-50"
+                      className="rounded-full border border-[color:var(--sand-line)] bg-white/90 px-4 py-2 text-sm font-medium text-[color:var(--sand-ink)] transition hover:bg-[color:var(--sand-surface-strong)]"
                       disabled={enCours}
                     >
                       Annuler
@@ -480,7 +480,7 @@ function FormulaireActivite({
                     <button
                       type="submit"
                       disabled={enCours}
-                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                      className="rounded-full bg-[color:var(--sand-ink)] px-4 py-2 text-sm font-medium text-white transition hover:bg-[color:var(--sand-accent-strong)] disabled:opacity-50"
                     >
                       {enCours ? 'Enregistrement...' : estEdition ? 'Modifier' : 'Creer'}
                     </button>
@@ -707,15 +707,16 @@ export default function ActivitesPage() {
       <NavAdmin />
 
       {/* En-tete */}
-      <div className="flex items-center justify-between">
+      <div className="sand-card flex items-center justify-between rounded-[1.8rem] bg-[linear-gradient(135deg,rgba(52,78,65,0.08),rgba(238,154,104,0.14))] p-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Activites</h1>
-          <p className="text-sm text-gray-500">Arborescence des types d'activites</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--sand-muted)]">Administration</p>
+          <h1 className="font-['Fraunces',serif] text-3xl text-[color:var(--sand-ink)]">Activites</h1>
+          <p className="text-sm text-[color:var(--sand-muted)]">Arborescence des types d'activites</p>
         </div>
         {vueActive === 'arbre' && (
           <button
             onClick={() => ouvrirCreation(null)}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+            className="flex items-center gap-2 rounded-full bg-[color:var(--sand-ink)] px-4 py-2 text-sm font-medium text-white transition hover:bg-[color:var(--sand-accent-strong)]"
           >
             <PlusIcon className="w-4 h-4" />
             Nouvelle activite racine
@@ -724,23 +725,23 @@ export default function ActivitesPage() {
       </div>
 
       {/* Onglets */}
-      <div className="flex gap-1 border-b">
+      <div className="flex gap-2 overflow-x-auto rounded-[1.4rem] border border-[color:var(--sand-line)] bg-white/70 p-2 shadow-[0_20px_50px_-45px_rgba(52,78,65,0.7)] backdrop-blur">
         <button
           onClick={() => { setVueActive('arbre'); refetch(); }}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+          className={`rounded-full px-4 py-2 text-sm font-medium transition ${
             vueActive === 'arbre'
-              ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700'
+              ? 'bg-[color:var(--sand-ink)] text-white'
+              : 'text-[color:var(--sand-muted)] hover:bg-[color:var(--sand-surface-strong)] hover:text-[color:var(--sand-ink)]'
           }`}
         >
           Vue arbre
         </button>
         <button
           onClick={() => { setVueActive('texte'); refetch(); }}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+          className={`rounded-full px-4 py-2 text-sm font-medium transition ${
             vueActive === 'texte'
-              ? 'border-blue-600 text-blue-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700'
+              ? 'bg-[color:var(--sand-ink)] text-white'
+              : 'text-[color:var(--sand-muted)] hover:bg-[color:var(--sand-surface-strong)] hover:text-[color:var(--sand-ink)]'
           }`}
         >
           Vue texte
@@ -754,18 +755,18 @@ export default function ActivitesPage() {
 
       {/* Erreur deplacement */}
       {erreurDeplacement && (
-        <div className="flex items-center justify-between bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+        <div className="flex items-center justify-between rounded-[1.4rem] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           <span>{erreurDeplacement}</span>
           <button onClick={() => setErreurDeplacement('')} className="ml-4 text-red-500 hover:text-red-700">✕</button>
         </div>
       )}
 
       {/* Arborescence avec DnD */}
-      {vueActive === 'arbre' && <><div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      {vueActive === 'arbre' && <><div className="sand-card overflow-hidden rounded-[1.8rem]">
         {loading && activites.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">Chargement...</div>
+          <div className="p-8 text-center text-[color:var(--sand-muted)]">Chargement...</div>
         ) : activites.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">Aucune activite</div>
+          <div className="p-8 text-center text-[color:var(--sand-muted)]">Aucune activite</div>
         ) : (
           <DndContext
             sensors={sensors}
@@ -811,7 +812,7 @@ export default function ActivitesPage() {
       </div>
 
       {/* Legende */}
-      <div className="flex items-center gap-4 text-xs text-gray-500">
+      <div className="flex items-center gap-4 text-xs text-[color:var(--sand-muted)]">
         <span className="flex items-center gap-1">
           <LockClosedIcon className="w-4 h-4 text-orange-500" />
           Activite systeme (non modifiable)
@@ -845,10 +846,10 @@ export default function ActivitesPage() {
 
       {/* Modal confirmation suppression */}
       {confirmationSuppression && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Confirmer la suppression</h3>
-            <p className="text-sm text-gray-600 mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--sand-ink)]/35">
+          <div className="mx-4 w-full max-w-sm rounded-[1.8rem] border border-white/70 bg-white/95 p-6 shadow-[0_32px_70px_-40px_rgba(52,78,65,0.8)] backdrop-blur">
+            <h3 className="mb-2 font-['Fraunces',serif] text-2xl text-[color:var(--sand-ink)]">Confirmer la suppression</h3>
+            <p className="mb-4 text-sm text-[color:var(--sand-muted)]">
               Voulez-vous vraiment supprimer l'activite <strong>{confirmationSuppression.nom}</strong> ?
               {confirmationSuppression.enfants && confirmationSuppression.enfants.length > 0 && (
                 <span className="block mt-2 text-orange-600">
@@ -862,7 +863,7 @@ export default function ActivitesPage() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => { setConfirmationSuppression(null); setErreurSuppression(''); }}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-lg hover:bg-gray-50"
+                className="rounded-full border border-[color:var(--sand-line)] bg-white/90 px-4 py-2 text-sm font-medium text-[color:var(--sand-ink)] transition hover:bg-[color:var(--sand-surface-strong)]"
                 disabled={suppressionEnCours}
               >
                 Annuler
@@ -870,7 +871,7 @@ export default function ActivitesPage() {
               <button
                 onClick={confirmerSuppression}
                 disabled={suppressionEnCours}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50"
+                className="rounded-full bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50"
               >
                 {suppressionEnCours ? 'Suppression...' : 'Supprimer'}
               </button>

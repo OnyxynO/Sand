@@ -148,7 +148,7 @@ function FormulaireEquipe({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/30" />
+          <div className="fixed inset-0 bg-[color:var(--sand-ink)]/35" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
@@ -162,50 +162,50 @@ function FormulaireEquipe({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-xl bg-white shadow-xl transition-all">
-                <div className="flex items-center justify-between border-b px-4 py-3">
-                  <Dialog.Title className="text-lg font-semibold text-gray-900">
+              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-[1.8rem] border border-white/70 bg-white/95 shadow-[0_32px_70px_-40px_rgba(52,78,65,0.8)] backdrop-blur transition-all">
+                <div className="flex items-center justify-between border-b border-[color:var(--sand-line)] px-4 py-4">
+                  <Dialog.Title className="font-['Fraunces',serif] text-2xl text-[color:var(--sand-ink)]">
                     {estEdition ? 'Modifier l\'equipe' : 'Nouvelle equipe'}
                   </Dialog.Title>
-                  <button onClick={onFermer} className="p-1 rounded hover:bg-gray-100">
-                    <XMarkIcon className="w-5 h-5 text-gray-500" />
+                  <button onClick={onFermer} className="rounded-full p-1.5 transition hover:bg-[color:var(--sand-surface-strong)]">
+                    <XMarkIcon className="w-5 h-5 text-[color:var(--sand-muted)]" />
                   </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-4 space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Nom *</label>
+                    <label className="mb-1 block text-sm font-medium text-[color:var(--sand-muted)]">Nom *</label>
                     <input
                       type="text"
                       name="nom"
                       value={formData.nom}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 px-3 py-2 text-[color:var(--sand-ink)] outline-none transition focus:ring-2 focus:ring-[color:var(--sand-accent)]/20"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Code *</label>
+                    <label className="mb-1 block text-sm font-medium text-[color:var(--sand-muted)]">Code *</label>
                     <input
                       type="text"
                       name="code"
                       value={formData.code}
                       onChange={handleChange}
                       placeholder="Ex: DEV, RH, COMPTA"
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase"
+                      className="w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 px-3 py-2 uppercase text-[color:var(--sand-ink)] outline-none transition focus:ring-2 focus:ring-[color:var(--sand-accent)]/20"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <label className="mb-1 block text-sm font-medium text-[color:var(--sand-muted)]">Description</label>
                     <textarea
                       name="description"
                       value={formData.description}
                       onChange={handleChange}
                       rows={3}
-                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 px-3 py-2 text-[color:var(--sand-ink)] outline-none transition focus:ring-2 focus:ring-[color:var(--sand-accent)]/20"
                     />
                   </div>
 
@@ -219,22 +219,22 @@ function FormulaireEquipe({
                           onChange={handleChange}
                           className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
-                        <span className="text-sm text-gray-700">Equipe active</span>
+                        <span className="text-sm text-[color:var(--sand-ink)]">Equipe active</span>
                       </label>
                     </div>
                   )}
 
                   {erreur && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                    <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                       {erreur}
                     </div>
                   )}
 
-                  <div className="flex justify-end gap-3 pt-4 border-t">
+                  <div className="flex justify-end gap-3 border-t border-[color:var(--sand-line)] pt-4">
                     <button
                       type="button"
                       onClick={onFermer}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-lg hover:bg-gray-50"
+                      className="rounded-full border border-[color:var(--sand-line)] bg-white/90 px-4 py-2 text-sm font-medium text-[color:var(--sand-ink)] transition hover:bg-[color:var(--sand-surface-strong)]"
                       disabled={enCours}
                     >
                       Annuler
@@ -242,7 +242,7 @@ function FormulaireEquipe({
                     <button
                       type="submit"
                       disabled={enCours}
-                      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                      className="rounded-full bg-[color:var(--sand-ink)] px-4 py-2 text-sm font-medium text-white transition hover:bg-[color:var(--sand-accent-strong)] disabled:opacity-50"
                     >
                       {enCours ? 'Enregistrement...' : estEdition ? 'Modifier' : 'Creer'}
                     </button>
@@ -301,14 +301,15 @@ export default function EquipesPage() {
       <NavAdmin />
 
       {/* En-tete */}
-      <div className="flex items-center justify-between">
+      <div className="sand-card flex items-center justify-between rounded-[1.8rem] bg-[linear-gradient(135deg,rgba(52,78,65,0.08),rgba(238,154,104,0.14))] p-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Equipes</h1>
-          <p className="text-sm text-gray-500">{equipes.length} equipe{equipes.length > 1 ? 's' : ''}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--sand-muted)]">Administration</p>
+          <h1 className="font-['Fraunces',serif] text-3xl text-[color:var(--sand-ink)]">Equipes</h1>
+          <p className="text-sm text-[color:var(--sand-muted)]">{equipes.length} equipe{equipes.length > 1 ? 's' : ''}</p>
         </div>
         <button
           onClick={ouvrirCreation}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+          className="flex items-center gap-2 rounded-full bg-[color:var(--sand-ink)] px-4 py-2 text-sm font-medium text-white transition hover:bg-[color:var(--sand-accent-strong)]"
         >
           <PlusIcon className="w-4 h-4" />
           Nouvelle equipe
@@ -316,48 +317,48 @@ export default function EquipesPage() {
       </div>
 
       {/* Filtre */}
-      <div className="bg-white rounded-lg shadow-sm p-4">
+      <div className="sand-card rounded-[1.8rem] p-4">
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
             checked={filtreActif}
             onChange={(e) => setFiltreActif(e.target.checked)}
-            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            className="rounded border-[color:var(--sand-line)] text-[color:var(--sand-accent)] focus:ring-[color:var(--sand-accent)]/20"
           />
-          <span className="text-sm text-gray-700">Afficher uniquement les equipes actives</span>
+          <span className="text-sm text-[color:var(--sand-ink)]">Afficher uniquement les equipes actives</span>
         </label>
       </div>
 
       {/* Liste */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {loading && equipes.length === 0 ? (
-          <div className="col-span-full p-8 text-center text-gray-500">Chargement...</div>
+          <div className="col-span-full p-8 text-center text-[color:var(--sand-muted)]">Chargement...</div>
         ) : equipes.length === 0 ? (
-          <div className="col-span-full p-8 text-center text-gray-500">Aucune equipe trouvee</div>
+          <div className="col-span-full p-8 text-center text-[color:var(--sand-muted)]">Aucune equipe trouvee</div>
         ) : (
           equipes.map((equipe) => (
             <div
               key={equipe.id}
-              className={`bg-white rounded-lg shadow-sm p-4 ${!equipe.estActif ? 'opacity-50' : ''}`}
+              className={`sand-card rounded-[1.8rem] p-5 ${!equipe.estActif ? 'opacity-50' : ''}`}
             >
               <div className="flex items-start justify-between mb-2">
                 <div>
-                  <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded bg-blue-100 text-blue-700 mb-1">
+                  <span className="mb-1 inline-flex items-center rounded-full bg-[color:var(--sand-accent)]/12 px-2.5 py-0.5 text-xs font-medium text-[color:var(--sand-accent-strong)]">
                     {equipe.code}
                   </span>
-                  <h3 className="font-semibold text-gray-900">{equipe.nom}</h3>
+                  <h3 className="font-semibold text-[color:var(--sand-ink)]">{equipe.nom}</h3>
                 </div>
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => ouvrirEdition(equipe)}
-                    className="p-1.5 text-gray-400 hover:text-blue-600 rounded hover:bg-blue-50"
+                    className="rounded-full p-1.5 text-[color:var(--sand-muted)] transition hover:bg-[color:var(--sand-surface-strong)] hover:text-[color:var(--sand-accent-strong)]"
                     title="Modifier"
                   >
                     <PencilSquareIcon className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setConfirmationSuppression(equipe)}
-                    className="p-1.5 text-gray-400 hover:text-red-600 rounded hover:bg-red-50"
+                    className="rounded-full p-1.5 text-[color:var(--sand-muted)] transition hover:bg-[color:var(--sand-surface-strong)] hover:text-red-600"
                     title="Supprimer"
                   >
                     <TrashIcon className="w-4 h-4" />
@@ -366,10 +367,10 @@ export default function EquipesPage() {
               </div>
 
               {equipe.description && (
-                <p className="text-sm text-gray-600 mb-3">{equipe.description}</p>
+                <p className="mb-3 text-sm text-[color:var(--sand-muted)]">{equipe.description}</p>
               )}
 
-              <div className="flex items-center gap-1 text-xs text-gray-500">
+              <div className="flex items-center gap-1 text-xs text-[color:var(--sand-muted)]">
                 <UsersIcon className="w-4 h-4" />
                 <span>{equipe.membres.length} membre{equipe.membres.length > 1 ? 's' : ''}</span>
               </div>
@@ -388,10 +389,10 @@ export default function EquipesPage() {
 
       {/* Modal confirmation suppression */}
       {confirmationSuppression && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Confirmer la suppression</h3>
-            <p className="text-sm text-gray-600 mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--sand-ink)]/35">
+          <div className="mx-4 w-full max-w-sm rounded-[1.8rem] border border-white/70 bg-white/95 p-6 shadow-[0_32px_70px_-40px_rgba(52,78,65,0.8)] backdrop-blur">
+            <h3 className="mb-2 font-['Fraunces',serif] text-2xl text-[color:var(--sand-ink)]">Confirmer la suppression</h3>
+            <p className="mb-4 text-sm text-[color:var(--sand-muted)]">
               Voulez-vous vraiment supprimer l'equipe <strong>{confirmationSuppression.nom}</strong> ?
               {confirmationSuppression.membres.length > 0 && (
                 <span className="block mt-2 text-orange-600">
@@ -400,12 +401,12 @@ export default function EquipesPage() {
               )}
             </p>
             {erreurSuppression && (
-              <p className="text-sm text-red-600 mb-3">{erreurSuppression}</p>
+              <p className="mb-3 text-sm text-red-600">{erreurSuppression}</p>
             )}
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => { setConfirmationSuppression(null); setErreurSuppression(''); }}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-lg hover:bg-gray-50"
+                className="rounded-full border border-[color:var(--sand-line)] bg-white/90 px-4 py-2 text-sm font-medium text-[color:var(--sand-ink)] transition hover:bg-[color:var(--sand-surface-strong)]"
                 disabled={suppressionEnCours}
               >
                 Annuler
@@ -413,7 +414,7 @@ export default function EquipesPage() {
               <button
                 onClick={confirmerSuppression}
                 disabled={suppressionEnCours}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50"
+                className="rounded-full bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50"
               >
                 {suppressionEnCours ? 'Suppression...' : 'Supprimer'}
               </button>

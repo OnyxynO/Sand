@@ -125,27 +125,28 @@ export default function RgpdPage() {
       <NavAdmin />
 
       {/* Titre */}
-      <div className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-3">
-        <ShieldExclamationIcon className="w-7 h-7 text-gray-700" />
+      <div className="sand-card flex items-center gap-3 rounded-[1.8rem] bg-[linear-gradient(135deg,rgba(52,78,65,0.08),rgba(238,154,104,0.14))] p-6">
+        <ShieldExclamationIcon className="w-7 h-7 text-[color:var(--sand-accent-strong)]" />
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">RGPD - Gestion des donnees</h1>
-          <p className="text-gray-600 mt-1">Suppression des donnees personnelles et purge</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--sand-muted)]">Conformite</p>
+          <h1 className="font-['Fraunces',serif] text-3xl text-[color:var(--sand-ink)]">RGPD - Gestion des donnees</h1>
+          <p className="mt-1 text-[color:var(--sand-muted)]">Suppression des donnees personnelles et purge</p>
         </div>
       </div>
 
       {/* Section 1 : Suppression donnees utilisateur */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+      <div className="sand-card rounded-[1.8rem] p-6">
+        <h2 className="flex items-center gap-2 text-lg font-semibold text-[color:var(--sand-ink)]">
           <TrashIcon className="w-5 h-5" />
           Suppression des donnees d'un utilisateur
         </h2>
-        <p className="text-sm text-gray-600 mt-1">
+        <p className="mt-1 text-sm text-[color:var(--sand-muted)]">
           Supprime toutes les saisies, absences, notifications et exports d'un utilisateur (droit a l'oubli).
           Les logs de modification sont anonymises.
         </p>
 
         <div className="mt-4">
-          <label htmlFor="select-utilisateur" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="select-utilisateur" className="mb-1 block text-sm font-medium text-[color:var(--sand-muted)]">
             Selectionner un utilisateur
           </label>
           {usersLoading ? (
@@ -159,7 +160,7 @@ export default function RgpdPage() {
                 setUtilisateurSelectionne(user ?? null);
                 setResultatSuppression(null);
               }}
-              className="block w-full max-w-md rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+              className="block w-full max-w-md rounded-2xl border border-[color:var(--sand-line)] bg-white/90 text-sm text-[color:var(--sand-ink)] shadow-sm focus:border-[color:var(--sand-accent)] focus:ring-[color:var(--sand-accent)]/20"
             >
               <option value="">-- Choisir un utilisateur --</option>
               {utilisateurs.map((u) => (
@@ -178,7 +179,7 @@ export default function RgpdPage() {
                 setModaleSuppressionOuverte(true);
                 setConfirmationNom('');
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+              className="inline-flex items-center gap-2 rounded-full bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
             >
               <TrashIcon className="w-4 h-4" />
               Supprimer les donnees de {utilisateurSelectionne.prenom} {utilisateurSelectionne.nom}
@@ -188,7 +189,7 @@ export default function RgpdPage() {
 
         {/* Resultat suppression */}
         {resultatSuppression && (
-          <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="mt-4 rounded-[1.4rem] border border-green-200 bg-green-50 p-4">
             <p className="text-sm font-medium text-green-800">Donnees supprimees avec succes :</p>
             <ul className="mt-2 text-sm text-green-700 space-y-1">
               <li>{resultatSuppression.saisiesSupprimees} saisie(s) supprimee(s)</li>
@@ -202,12 +203,12 @@ export default function RgpdPage() {
       </div>
 
       {/* Section 2 : Purge totale */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+      <div className="sand-card rounded-[1.8rem] p-6">
+        <h2 className="flex items-center gap-2 text-lg font-semibold text-[color:var(--sand-ink)]">
           <ExclamationTriangleIcon className="w-5 h-5 text-red-600" />
           Purge totale des donnees
         </h2>
-        <div className="mt-2 bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="mt-2 rounded-[1.4rem] border border-red-200 bg-red-50 p-4">
           <p className="text-sm font-bold text-red-800">
             ATTENTION : Cette action supprime TOUTES les saisies, absences, notifications, exports et logs de l'application.
           </p>
@@ -223,7 +224,7 @@ export default function RgpdPage() {
               setModalePurgeOuverte(true);
               setConfirmationPhrase('');
             }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors text-sm font-medium"
+            className="inline-flex items-center gap-2 rounded-full bg-red-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-800"
           >
             <ExclamationTriangleIcon className="w-4 h-4" />
             Purger toutes les donnees
@@ -232,7 +233,7 @@ export default function RgpdPage() {
 
         {/* Resultat purge */}
         {resultatPurge && (
-          <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="mt-4 rounded-[1.4rem] border border-green-200 bg-green-50 p-4">
             <p className="text-sm font-medium text-green-800">Purge effectuee avec succes :</p>
             <ul className="mt-2 text-sm text-green-700 space-y-1">
               <li>{resultatPurge.saisiesSupprimees} saisie(s) supprimee(s)</li>
@@ -247,12 +248,12 @@ export default function RgpdPage() {
 
       {/* Modale suppression utilisateur */}
       {modaleSuppressionOuverte && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-xl shadow-xl p-6 max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--sand-ink)]/40">
+          <div className="mx-4 max-w-md rounded-[1.8rem] border border-white/70 bg-white/95 p-6 shadow-[0_32px_70px_-40px_rgba(52,78,65,0.8)] backdrop-blur">
+            <h3 className="font-['Fraunces',serif] text-2xl text-[color:var(--sand-ink)]">
               Confirmer la suppression
             </h3>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-[color:var(--sand-muted)]">
               Pour confirmer, retapez le nom complet de l'utilisateur :
             </p>
             <p className="mt-1 text-sm font-bold text-gray-900">{nomCompletAttendu}</p>
@@ -261,20 +262,20 @@ export default function RgpdPage() {
               value={confirmationNom}
               onChange={(e) => setConfirmationNom(e.target.value)}
               placeholder="Prenom Nom"
-              className="mt-3 block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-sm"
+              className="mt-3 block w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 text-sm text-[color:var(--sand-ink)] shadow-sm focus:border-red-500 focus:ring-red-500"
               data-testid="input-confirmation-nom"
             />
             <div className="mt-4 flex justify-end gap-3">
               <button
                 onClick={() => setModaleSuppressionOuverte(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="rounded-full border border-[color:var(--sand-line)] bg-white/90 px-4 py-2 text-sm font-medium text-[color:var(--sand-ink)] transition hover:bg-[color:var(--sand-surface-strong)]"
               >
                 Annuler
               </button>
               <button
                 onClick={handleSuppression}
                 disabled={confirmationNom !== nomCompletAttendu || supprimant}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-full bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {supprimant ? 'Suppression...' : 'Supprimer definitivement'}
               </button>
@@ -285,12 +286,12 @@ export default function RgpdPage() {
 
       {/* Modale purge totale */}
       {modalePurgeOuverte && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-xl shadow-xl p-6 max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-red-700">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--sand-ink)]/40">
+          <div className="mx-4 max-w-md rounded-[1.8rem] border border-white/70 bg-white/95 p-6 shadow-[0_32px_70px_-40px_rgba(52,78,65,0.8)] backdrop-blur">
+            <h3 className="font-['Fraunces',serif] text-2xl text-red-700">
               Purge totale - Confirmation
             </h3>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-[color:var(--sand-muted)]">
               Pour confirmer, tapez exactement :
             </p>
             <p className="mt-1 text-sm font-bold text-red-700">CONFIRMER SUPPRESSION</p>
@@ -299,20 +300,20 @@ export default function RgpdPage() {
               value={confirmationPhrase}
               onChange={(e) => setConfirmationPhrase(e.target.value)}
               placeholder="Tapez la phrase de confirmation"
-              className="mt-3 block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-sm"
+              className="mt-3 block w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 text-sm text-[color:var(--sand-ink)] shadow-sm focus:border-red-500 focus:ring-red-500"
               data-testid="input-confirmation-purge"
             />
             <div className="mt-4 flex justify-end gap-3">
               <button
                 onClick={() => setModalePurgeOuverte(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="rounded-full border border-[color:var(--sand-line)] bg-white/90 px-4 py-2 text-sm font-medium text-[color:var(--sand-ink)] transition hover:bg-[color:var(--sand-surface-strong)]"
               >
                 Annuler
               </button>
               <button
                 onClick={handlePurge}
                 disabled={confirmationPhrase !== 'CONFIRMER SUPPRESSION' || purgeant}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-700 rounded-lg hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-full bg-red-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-800 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {purgeant ? 'Purge en cours...' : 'Purger toutes les donnees'}
               </button>
