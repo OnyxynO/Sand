@@ -8,7 +8,7 @@ import GrilleSemaine from '../components/saisie/GrilleSemaine';
 import GrilleSemaineMobile from '../components/saisie/GrilleSemaineMobile';
 import BoutonSauvegarde from '../components/saisie/BoutonSauvegarde';
 import SelecteurUtilisateur from '../components/saisie/SelecteurUtilisateur';
-import { useSaisieHebdo } from '../hooks/useSaisieHebdo';
+import { useSaisieHebdo } from '../features/saisie/hooks/useSaisieHebdo';
 import { useAuthStore } from '../stores/authStore';
 import { useSaisieStore } from '../stores/saisieStore';
 import { useIsMobile } from '../hooks/useIsMobile';
