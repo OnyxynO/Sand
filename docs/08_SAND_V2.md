@@ -46,3 +46,10 @@ sur la branche `main` du depot d'origine ni sur le pipeline de production.
 
 Dans cette copie, le remote de push a ete desactive (`upstream` fetch only, push URL invalide) pour eviter
 tout push accidentel vers le depot qui pilote la production.
+
+## Execution autonome
+
+- `backend/.env.v2.local.example` decrit le mode local natif de la copie v2
+- `frontend/.env.v2.local.example` fixe `VITE_API_URL` vers le backend local
+- `scripts/bootstrap-v2.sh` prepare les `.env` et installe les dependances manquantes
+- objectif : pouvoir faire tourner `sand-v2` sans symlink obligatoire vers le repo source

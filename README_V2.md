@@ -12,9 +12,6 @@ Ce dossier est une copie de travail isolee du projet SAND pour un refacto de fon
 
 ### Frontend
 
-Le dossier `frontend/node_modules` est symlinkable vers le projet source pour accelerer l'exploration,
-mais la version propre pour une execution autonome reste :
-
 ```bash
 cd frontend
 npm install
@@ -23,14 +20,18 @@ npm run dev
 
 ### Backend
 
-Le dossier `backend/vendor` peut aussi etre symlinkable temporairement, mais pour une execution autonome :
-
 ```bash
 cd backend
 composer install
-cp .env.example .env
+cp .env.v2.local.example .env
 php artisan key:generate
 php artisan serve --host=0.0.0.0 --port=8080
+```
+
+### Bootstrap rapide
+
+```bash
+bash scripts/bootstrap-v2.sh
 ```
 
 ## Configuration locale recommandee
@@ -47,8 +48,15 @@ REDIS_HOST=127.0.0.1
 CACHE_STORE=redis
 ```
 
+Dans `frontend/.env.local` :
+
+```env
+VITE_API_URL=http://localhost:8080/graphql
+```
+
 ## Intention architecture
 
 - `frontend/src/features/` contient la structure v2 cible par domaines metier
 - les anciens dossiers `pages/`, `components/`, `hooks/` restent presents pour compatibilite progressive
 - les nouvelles extractions backend vont dans `backend/app/Services/`
+- `backend/.env.v2.local.example` et `frontend/.env.v2.local.example` sont les points de depart de la copie v2
