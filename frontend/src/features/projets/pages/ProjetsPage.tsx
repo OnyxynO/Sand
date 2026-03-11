@@ -55,10 +55,13 @@ export default function ProjetsPageFeature() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="sand-card flex items-center justify-between rounded-[1.8rem] bg-[linear-gradient(135deg,rgba(52,78,65,0.08),rgba(238,154,104,0.14))] p-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Projets</h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--sand-muted)]">
+            Gouvernance
+          </p>
+          <h1 className="font-['Fraunces',serif] text-3xl text-[color:var(--sand-ink)]">Projets</h1>
+          <p className="text-sm text-[color:var(--sand-muted)]">
             {projets.length} projet{projets.length > 1 ? 's' : ''}
           </p>
         </div>
@@ -68,7 +71,7 @@ export default function ProjetsPageFeature() {
               setProjetEdite(null);
               setModaleProjetOuverte(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+            className="flex items-center gap-2 rounded-full bg-[color:var(--sand-ink)] px-4 py-2 text-sm font-medium text-white transition hover:bg-[color:var(--sand-accent-strong)]"
           >
             <PlusIcon className="w-4 h-4" />
             Nouveau projet
@@ -76,77 +79,77 @@ export default function ProjetsPageFeature() {
         )}
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm p-4">
+      <div className="sand-card rounded-[1.8rem] p-4">
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
             checked={filtreActif}
             onChange={(e) => setFiltreActif(e.target.checked)}
-            className="rounded border-gray-300 text-blue-600"
+            className="rounded border-[color:var(--sand-line)] text-[color:var(--sand-accent)]"
           />
-          <span className="text-sm text-gray-700">Afficher uniquement les projets actifs</span>
+          <span className="text-sm text-[color:var(--sand-ink)]">Afficher uniquement les projets actifs</span>
         </label>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="sand-card overflow-hidden rounded-[1.8rem]">
         {loading && projets.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">Chargement...</div>
+          <div className="p-8 text-center text-[color:var(--sand-muted)]">Chargement...</div>
         ) : projets.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">Aucun projet</div>
+          <div className="p-8 text-center text-[color:var(--sand-muted)]">Aucun projet</div>
         ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-[color:var(--sand-line)]">
+            <thead className="bg-[color:var(--sand-surface-strong)]">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--sand-muted)]">
                   Projet
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--sand-muted)]">
                   Moderateurs
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--sand-muted)]">
                   Periode
                 </th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">
+                <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--sand-muted)]">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-[color:var(--sand-line)]">
               {projets.map((projet) => (
                 <tr
                   key={projet.id}
-                  className={`hover:bg-gray-50 ${!projet.estActif ? 'opacity-50' : ''}`}
+                  className={`transition hover:bg-[color:var(--sand-surface-strong)]/65 ${!projet.estActif ? 'opacity-50' : ''}`}
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded bg-blue-100 text-blue-700">
+                      <span className="inline-flex items-center rounded-full bg-[color:var(--sand-accent)]/12 px-2.5 py-0.5 text-xs font-medium text-[color:var(--sand-accent-strong)]">
                         {projet.code}
                       </span>
-                      <span className="font-medium text-gray-900">{projet.nom}</span>
+                      <span className="font-medium text-[color:var(--sand-ink)]">{projet.nom}</span>
                     </div>
                     {projet.description && (
-                      <p className="text-xs text-gray-500 mt-1">{projet.description}</p>
+                      <p className="mt-1 text-xs text-[color:var(--sand-muted)]">{projet.description}</p>
                     )}
                   </td>
                   <td className="px-4 py-3">
                     {projet.moderateurs && projet.moderateurs.length > 0 ? (
                       <div className="flex items-center gap-1">
-                        <UserGroupIcon className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-600">
+                        <UserGroupIcon className="w-4 h-4 text-[color:var(--sand-muted)]" />
+                        <span className="text-sm text-[color:var(--sand-muted)]">
                           {projet.moderateurs.map((m) => m.nomComplet).join(', ')}
                         </span>
                       </div>
                     ) : (
-                      <span className="text-sm text-gray-400">Aucun</span>
+                      <span className="text-sm text-[color:var(--sand-muted)]">Aucun</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
+                  <td className="px-4 py-3 text-sm text-[color:var(--sand-muted)]">
                     {projet.dateDebut || projet.dateFin ? (
                       <>
                         {projet.dateDebut || '...'} - {projet.dateFin || '...'}
                       </>
                     ) : (
-                      <span className="text-gray-400">Non definie</span>
+                      <span className="text-[color:var(--sand-muted)]">Non definie</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -156,7 +159,7 @@ export default function ProjetsPageFeature() {
                           setProjetPourActivites(projet);
                           setModaleActivitesOuverte(true);
                         }}
-                        className="p-1.5 text-gray-400 hover:text-purple-600 rounded hover:bg-purple-50"
+                        className="rounded-full p-1.5 text-[color:var(--sand-muted)] transition hover:bg-[color:var(--sand-surface-strong)] hover:text-[color:var(--sand-accent-strong)]"
                         title="Configurer les activites"
                       >
                         <Cog6ToothIcon className="w-4 h-4" />
@@ -167,7 +170,7 @@ export default function ProjetsPageFeature() {
                             setProjetPourModerateurs(projet);
                             setModaleModerateursOuverte(true);
                           }}
-                          className="p-1.5 text-gray-400 hover:text-green-600 rounded hover:bg-green-50"
+                          className="rounded-full p-1.5 text-[color:var(--sand-muted)] transition hover:bg-[color:var(--sand-surface-strong)] hover:text-green-700"
                           title="Gerer les moderateurs"
                         >
                           <UserGroupIcon className="w-4 h-4" />
@@ -179,7 +182,7 @@ export default function ProjetsPageFeature() {
                             setProjetPourVisibilites(projet);
                             setModaleVisibilitesOuverte(true);
                           }}
-                          className="p-1.5 text-gray-400 hover:text-orange-600 rounded hover:bg-orange-50"
+                          className="rounded-full p-1.5 text-[color:var(--sand-muted)] transition hover:bg-[color:var(--sand-surface-strong)] hover:text-orange-600"
                           title="Restrictions de visibilite"
                         >
                           <EyeSlashIcon className="w-4 h-4" />
@@ -192,14 +195,14 @@ export default function ProjetsPageFeature() {
                               setProjetEdite(projet);
                               setModaleProjetOuverte(true);
                             }}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 rounded hover:bg-blue-50"
+                            className="rounded-full p-1.5 text-[color:var(--sand-muted)] transition hover:bg-[color:var(--sand-surface-strong)] hover:text-[color:var(--sand-accent-strong)]"
                             title="Modifier"
                           >
                             <PencilSquareIcon className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setConfirmationSuppression(projet)}
-                            className="p-1.5 text-gray-400 hover:text-red-600 rounded hover:bg-red-50"
+                            className="rounded-full p-1.5 text-[color:var(--sand-muted)] transition hover:bg-[color:var(--sand-surface-strong)] hover:text-red-600"
                             title="Supprimer"
                           >
                             <TrashIcon className="w-4 h-4" />
@@ -244,16 +247,16 @@ export default function ProjetsPageFeature() {
       />
 
       {confirmationSuppression && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--sand-ink)]/35">
+          <div className="w-full max-w-sm rounded-[1.8rem] border border-white/70 bg-white/95 p-6 shadow-[0_32px_70px_-40px_rgba(52,78,65,0.8)] backdrop-blur mx-4">
+            <h3 className="mb-2 font-['Fraunces',serif] text-2xl text-[color:var(--sand-ink)]">
               Confirmer la suppression
             </h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="mb-4 text-sm text-[color:var(--sand-muted)]">
               Voulez-vous vraiment supprimer le projet <strong>{confirmationSuppression.nom}</strong> ?
             </p>
             {erreurSuppression && (
-              <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                 {erreurSuppression}
               </div>
             )}

@@ -1,5 +1,11 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import {
+  ArrowLeftIcon,
+  CheckBadgeIcon,
+  KeyIcon,
+  SparklesIcon,
+} from '@heroicons/react/24/outline';
 import { useResetPassword } from '../hooks/useResetPassword';
 
 export default function ResetPasswordPage() {
@@ -16,19 +22,21 @@ export default function ResetPasswordPage() {
   // Lien invalide : token ou email manquant
   if (!token || !email) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">SAND</h1>
-          </div>
-          <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-            <p className="text-red-600 mb-4">
+      <div className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(238,154,104,0.18),_transparent_32%),linear-gradient(145deg,_#f6f2ea_0%,_#edf3ee_55%,_#f6efe7_100%)] px-4 py-8">
+        <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-5xl items-center justify-center">
+          <div className="sand-card w-full max-w-md rounded-[2rem] p-8 text-center md:p-10">
+            <div className="mx-auto mb-5 inline-flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-red-600">
+              <KeyIcon className="h-7 w-7" />
+            </div>
+            <h1 className="font-['Fraunces',serif] text-3xl text-[color:var(--sand-ink)]">Lien invalide</h1>
+            <p className="mb-5 mt-3 text-red-600">
               Ce lien de réinitialisation est invalide ou incomplet.
             </p>
             <Link
               to="/mot-de-passe-oublie"
-              className="text-blue-600 hover:underline text-sm"
+              className="inline-flex items-center gap-2 text-sm font-medium text-[color:var(--sand-accent)] transition hover:text-[color:var(--sand-accent-strong)]"
             >
+              <ArrowLeftIcon className="h-4 w-4" />
               Faire une nouvelle demande
             </Link>
           </div>
@@ -63,28 +71,46 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">SAND</h1>
-          <p className="text-gray-600">Saisie d'Activite Numerique Declarative</p>
-        </div>
+    <div className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(238,154,104,0.18),_transparent_32%),linear-gradient(145deg,_#f6f2ea_0%,_#edf3ee_55%,_#f6efe7_100%)] px-4 py-8">
+      <div className="mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-5xl items-center gap-8 lg:grid-cols-[1fr_0.95fr]">
+        <section className="hidden rounded-[2rem] border border-white/70 bg-white/55 p-10 shadow-[0_32px_80px_-48px_rgba(52,78,65,0.65)] backdrop-blur lg:block">
+          <div className="inline-flex items-center gap-3 rounded-full border border-[color:var(--sand-line)] bg-white/80 px-4 py-2 text-sm font-semibold uppercase tracking-[0.22em] text-[color:var(--sand-muted)]">
+            <SparklesIcon className="h-4 w-4 text-[color:var(--sand-accent)]" />
+            Mot de passe
+          </div>
+          <h1 className="mt-6 max-w-md font-['Fraunces',serif] text-5xl leading-tight text-[color:var(--sand-ink)]">
+            Repartir sur une base propre, sans bruit.
+          </h1>
+          <p className="mt-4 max-w-lg text-base leading-7 text-[color:var(--sand-muted)]">
+            La v2 conserve un flux simple et frontal: nouveau secret, validation claire, retour rapide vers la session.
+          </p>
+          <div className="mt-8 grid gap-4">
+            <div className="sand-card flex items-start gap-3">
+              <CheckBadgeIcon className="mt-1 h-5 w-5 text-[color:var(--sand-accent)]" />
+              <div>
+                <p className="font-semibold text-[color:var(--sand-ink)]">Validation immédiate</p>
+                <p className="text-sm text-[color:var(--sand-muted)]">Contrôle local des mots de passe et retour d’état explicite avant même l’aller-retour API.</p>
+              </div>
+            </div>
+          </div>
+        </section>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+        <div className="w-full max-w-md justify-self-center lg:justify-self-end">
+          <div className="sand-card rounded-[2rem] p-8 md:p-10">
+            <h2 className="mb-6 font-['Fraunces',serif] text-3xl text-[color:var(--sand-ink)]">
             Nouveau mot de passe
-          </h2>
+            </h2>
 
           {succes ? (
             <div className="space-y-4">
-              <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-4 rounded-lg text-sm">
+              <div className="rounded-2xl border border-green-200 bg-green-50 px-4 py-4 text-sm text-green-800">
                 <p className="font-medium mb-1">Mot de passe modifié</p>
                 <p>Votre mot de passe a été réinitialisé avec succès.</p>
               </div>
               <div className="text-center">
                 <Link
                   to="/login"
-                  className="inline-block bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-[color:var(--sand-ink)] px-6 py-3 font-medium text-white transition hover:bg-[color:var(--sand-accent-strong)]"
                 >
                   Se connecter
                 </Link>
@@ -95,7 +121,7 @@ export default function ResetPasswordPage() {
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="mb-1 block text-sm font-medium text-[color:var(--sand-muted)]"
                 >
                   Nouveau mot de passe
                 </label>
@@ -104,7 +130,7 @@ export default function ResetPasswordPage() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500 transition-colors"
+                  className="w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 px-4 py-3 text-[color:var(--sand-ink)] shadow-sm outline-none transition focus-visible:border-[color:var(--sand-accent)] focus-visible:ring-2 focus-visible:ring-[color:var(--sand-accent)]/20"
                   placeholder="8 caractères minimum"
                   autoComplete="new-password"
                   maxLength={80}
@@ -115,7 +141,7 @@ export default function ResetPasswordPage() {
               <div>
                 <label
                   htmlFor="password_confirmation"
-                  className="block text-sm font-medium text-gray-700 mb-1"
+                  className="mb-1 block text-sm font-medium text-[color:var(--sand-muted)]"
                 >
                   Confirmer le mot de passe
                 </label>
@@ -124,7 +150,7 @@ export default function ResetPasswordPage() {
                   type="password"
                   value={passwordConfirmation}
                   onChange={(e) => setPasswordConfirmation(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:border-blue-500 transition-colors"
+                  className="w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 px-4 py-3 text-[color:var(--sand-ink)] shadow-sm outline-none transition focus-visible:border-[color:var(--sand-accent)] focus-visible:ring-2 focus-visible:ring-[color:var(--sand-accent)]/20"
                   placeholder="••••••••"
                   autoComplete="new-password"
                   maxLength={80}
@@ -135,7 +161,7 @@ export default function ResetPasswordPage() {
               <div aria-live="polite" aria-atomic="true">
                 {(erreurLocale || erreur) && (
                   <div
-                    className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"
+                    className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
                     role="alert"
                   >
                     {erreurLocale || erreur}
@@ -146,7 +172,7 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus-visible:ring-4 focus-visible:ring-blue-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[color:var(--sand-ink)] px-4 py-3 font-medium text-white transition hover:bg-[color:var(--sand-accent-strong)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? (
                   <span className="flex items-center justify-center">
@@ -184,12 +210,14 @@ export default function ResetPasswordPage() {
             <div className="mt-6 text-center">
               <Link
                 to="/login"
-                className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                className="inline-flex items-center gap-2 text-sm font-medium text-[color:var(--sand-accent)] transition hover:text-[color:var(--sand-accent-strong)]"
               >
-                ← Retour à la connexion
+                <ArrowLeftIcon className="h-4 w-4" />
+                Retour à la connexion
               </Link>
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>

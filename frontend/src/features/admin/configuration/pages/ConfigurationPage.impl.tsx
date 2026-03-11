@@ -184,17 +184,20 @@ export default function ConfigurationPage() {
       <NavAdmin />
 
       {/* Titre */}
-      <div className="bg-white rounded-xl shadow-sm p-6 flex items-center gap-3">
-        <Cog6ToothIcon className="w-7 h-7 text-gray-700" />
+      <div className="sand-card flex items-center gap-3 rounded-[1.8rem] bg-[linear-gradient(135deg,rgba(52,78,65,0.08),rgba(238,154,104,0.14))] p-6">
+        <Cog6ToothIcon className="w-7 h-7 text-[color:var(--sand-accent-strong)]" />
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Configuration systeme</h1>
-          <p className="text-gray-600 mt-1">Parametres globaux de l'application</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--sand-muted)]">
+            Administration
+          </p>
+          <h1 className="font-['Fraunces',serif] text-3xl text-[color:var(--sand-ink)]">Configuration systeme</h1>
+          <p className="mt-1 text-[color:var(--sand-muted)]">Parametres globaux de l'application</p>
         </div>
       </div>
 
       {/* Erreur */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700">
+        <div className="rounded-[1.4rem] border border-red-200 bg-red-50 p-4 text-red-700">
           Erreur lors du chargement : {error.message}
         </div>
       )}
@@ -208,14 +211,14 @@ export default function ConfigurationPage() {
 
       {/* Formulaire */}
       {!loading && data && (
-        <div className="bg-white rounded-xl shadow-sm divide-y divide-gray-100">
+        <div className="sand-card divide-y divide-[color:var(--sand-line)] rounded-[1.8rem]">
           {CHAMPS_CONFIG.map((champ) => (
             <div key={champ.cle} className="p-6 flex items-center justify-between gap-8">
               <div className="flex-1">
-                <label className="text-sm font-medium text-gray-900">
+                <label className="text-sm font-medium text-[color:var(--sand-ink)]">
                   {champ.label}
                 </label>
-                <p className="text-xs text-gray-500 mt-0.5">{champ.description}</p>
+                <p className="mt-0.5 text-xs text-[color:var(--sand-muted)]">{champ.description}</p>
               </div>
 
               <div className="flex-shrink-0 w-48">
@@ -226,7 +229,7 @@ export default function ConfigurationPage() {
                     onChange={(e) => handleChange(champ.cle, Number(e.target.value))}
                     min={champ.min}
                     max={champ.max}
-                    className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                    className="block w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 text-sm text-[color:var(--sand-ink)] shadow-sm focus:border-[color:var(--sand-accent)] focus:ring-[color:var(--sand-accent)]/20"
                   />
                 )}
 
@@ -235,7 +238,7 @@ export default function ConfigurationPage() {
                     type="button"
                     onClick={() => handleChange(champ.cle, !valeurs[champ.cle])}
                     className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                      valeurs[champ.cle] ? 'bg-blue-600' : 'bg-gray-200'
+                      valeurs[champ.cle] ? 'bg-[color:var(--sand-accent-strong)]' : 'bg-[color:var(--sand-line)]'
                     }`}
                   >
                     <span
@@ -253,7 +256,7 @@ export default function ConfigurationPage() {
                       const opt = champ.options?.find((o) => String(o.valeur) === e.target.value);
                       handleChange(champ.cle, opt?.valeur ?? e.target.value);
                     }}
-                    className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                    className="block w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 text-sm text-[color:var(--sand-ink)] shadow-sm focus:border-[color:var(--sand-accent)] focus:ring-[color:var(--sand-accent)]/20"
                   >
                     {champ.options?.map((opt) => (
                       <option key={String(opt.valeur)} value={String(opt.valeur)}>
@@ -271,17 +274,17 @@ export default function ConfigurationPage() {
 
       {/* Section Gestion des absences */}
       {!loading && data && (
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
-            <CalendarDaysIcon className="w-5 h-5 text-gray-500" />
-            <h2 className="text-base font-semibold text-gray-900">Gestion des absences</h2>
+        <div className="sand-card overflow-hidden rounded-[1.8rem]">
+          <div className="flex items-center gap-2 border-b border-[color:var(--sand-line)] px-6 py-4">
+            <CalendarDaysIcon className="w-5 h-5 text-[color:var(--sand-accent-strong)]" />
+            <h2 className="text-base font-semibold text-[color:var(--sand-ink)]">Gestion des absences</h2>
           </div>
 
           {/* Mode */}
-          <div className="p-6 flex items-center justify-between gap-8 border-b border-gray-100">
+          <div className="flex items-center justify-between gap-8 border-b border-[color:var(--sand-line)] p-6">
             <div className="flex-1">
-              <label className="text-sm font-medium text-gray-900">Mode de saisie</label>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <label className="text-sm font-medium text-[color:var(--sand-ink)]">Mode de saisie</label>
+              <p className="mt-0.5 text-xs text-[color:var(--sand-muted)]">
                 Manuel : les utilisateurs declarent leurs absences directement dans la grille.
                 API : les absences sont importees automatiquement depuis le systeme RH externe.
               </p>
@@ -290,7 +293,7 @@ export default function ConfigurationPage() {
               <select
                 value={String(valeurs['absence_mode'] ?? 'manuel')}
                 onChange={(e) => handleChange('absence_mode', e.target.value)}
-                className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                className="block w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 text-sm text-[color:var(--sand-ink)] shadow-sm focus:border-[color:var(--sand-accent)] focus:ring-[color:var(--sand-accent)]/20"
               >
                 <option value="manuel">Manuel</option>
                 <option value="api">API externe</option>
@@ -301,10 +304,10 @@ export default function ConfigurationPage() {
           {/* Champs API (conditionnels) */}
           {valeurs['absence_mode'] === 'api' && (
             <>
-              <div className="p-6 flex items-center justify-between gap-8 border-b border-gray-100">
+              <div className="flex items-center justify-between gap-8 border-b border-[color:var(--sand-line)] p-6">
                 <div className="flex-1">
-                  <label className="text-sm font-medium text-gray-900">URL de l'API RH</label>
-                  <p className="text-xs text-gray-500 mt-0.5">Adresse de l'API RH externe (ex : http://rh.entreprise.fr/api)</p>
+                  <label className="text-sm font-medium text-[color:var(--sand-ink)]">URL de l'API RH</label>
+                  <p className="mt-0.5 text-xs text-[color:var(--sand-muted)]">Adresse de l'API RH externe (ex : http://rh.entreprise.fr/api)</p>
                 </div>
                 <div className="flex-shrink-0 w-72">
                   <input
@@ -312,15 +315,15 @@ export default function ConfigurationPage() {
                     value={String(valeurs['absence_api_url'] ?? '')}
                     onChange={(e) => handleChange('absence_api_url', e.target.value)}
                     placeholder="https://rh.exemple.fr/api"
-                    className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                    className="block w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 text-sm text-[color:var(--sand-ink)] shadow-sm focus:border-[color:var(--sand-accent)] focus:ring-[color:var(--sand-accent)]/20"
                   />
                 </div>
               </div>
 
-              <div className="p-6 flex items-center justify-between gap-8 border-b border-gray-100">
+              <div className="flex items-center justify-between gap-8 border-b border-[color:var(--sand-line)] p-6">
                 <div className="flex-1">
-                  <label className="text-sm font-medium text-gray-900">Token d'authentification</label>
-                  <p className="text-xs text-gray-500 mt-0.5">Token Bearer pour l'API RH (stocke en base de donnees)</p>
+                  <label className="text-sm font-medium text-[color:var(--sand-ink)]">Token d'authentification</label>
+                  <p className="mt-0.5 text-xs text-[color:var(--sand-muted)]">Token Bearer pour l'API RH (stocke en base de donnees)</p>
                 </div>
                 <div className="flex-shrink-0 w-72">
                   <input
@@ -328,12 +331,12 @@ export default function ConfigurationPage() {
                     value={String(valeurs['absence_api_token'] ?? '')}
                     onChange={(e) => handleChange('absence_api_token', e.target.value)}
                     placeholder="Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                    className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                    className="block w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 text-sm text-[color:var(--sand-ink)] shadow-sm focus:border-[color:var(--sand-accent)] focus:ring-[color:var(--sand-accent)]/20"
                   />
                 </div>
               </div>
 
-              <div className="p-6 flex items-center gap-4 bg-gray-50">
+              <div className="flex items-center gap-4 bg-[color:var(--sand-surface-strong)] p-6">
                 <button
                   onClick={() => {
                     setTestConnexionResultat(null);
@@ -341,13 +344,13 @@ export default function ConfigurationPage() {
                   }}
                   disabled={testing || modifie}
                   title={modifie ? 'Enregistrez d\'abord les modifications avant de tester' : undefined}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+                  className="inline-flex items-center gap-2 rounded-full bg-[color:var(--sand-ink)] px-4 py-2 text-sm font-medium text-white transition hover:bg-[color:var(--sand-accent-strong)] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <WifiIcon className="w-4 h-4" />
                   {testing ? 'Test en cours...' : 'Tester la connexion'}
                 </button>
                 {modifie && (
-                  <span className="text-xs text-gray-500">Enregistrez d'abord avant de tester.</span>
+                  <span className="text-xs text-[color:var(--sand-muted)]">Enregistrez d'abord avant de tester.</span>
                 )}
                 {testConnexionResultat && !modifie && (
                   <span className={`text-sm font-medium ${testConnexionResultat.ok ? 'text-green-700' : 'text-red-700'}`}>
@@ -359,7 +362,7 @@ export default function ConfigurationPage() {
               {/* Config de test — mock RH dev uniquement */}
               {import.meta.env.DEV && (
                 <div className="px-6 pb-6">
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <div className="rounded-[1.4rem] border border-amber-200 bg-amber-50 p-4">
                     <p className="text-sm font-medium text-amber-800 mb-2">
                       Config de test (mock RH local) :
                     </p>
@@ -385,19 +388,19 @@ export default function ConfigurationPage() {
 
       {/* Erreur de sauvegarde */}
       {saveError && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">
+        <div className="rounded-[1.4rem] border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           Erreur lors de l'enregistrement : {saveError.message}
         </div>
       )}
 
       {/* Barre d'actions — en bas de toute la configuration */}
       {!loading && data && (
-        <div className="bg-white rounded-xl shadow-sm p-6 flex items-center justify-between">
+        <div className="sand-card flex items-center justify-between rounded-[1.8rem] p-6">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setConfirmReset(true)}
               disabled={resetting}
-              className="inline-flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+              className="inline-flex items-center gap-2 rounded-full border border-[color:var(--sand-line)] bg-white/90 px-4 py-2 text-sm font-medium text-[color:var(--sand-ink)] transition hover:bg-[color:var(--sand-surface-strong)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               <ArrowPathIcon className="w-4 h-4" />
               Reinitialiser
@@ -412,7 +415,7 @@ export default function ConfigurationPage() {
           <button
             onClick={handleSave}
             disabled={!modifie || saving}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+            className="inline-flex items-center gap-2 rounded-full bg-[color:var(--sand-ink)] px-4 py-2 text-sm font-medium text-white transition hover:bg-[color:var(--sand-accent-strong)] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {saving ? 'Enregistrement...' : 'Enregistrer'}
           </button>
@@ -421,25 +424,25 @@ export default function ConfigurationPage() {
 
       {/* Modale de confirmation reset */}
       {confirmReset && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-xl shadow-xl p-6 max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--sand-ink)]/40">
+          <div className="mx-4 max-w-md rounded-[1.8rem] border border-white/70 bg-white/95 p-6 shadow-[0_32px_70px_-40px_rgba(52,78,65,0.8)] backdrop-blur">
+            <h3 className="font-['Fraunces',serif] text-2xl text-[color:var(--sand-ink)]">
               Reinitialiser les parametres ?
             </h3>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-[color:var(--sand-muted)]">
               Tous les parametres seront remis a leurs valeurs par defaut. Cette action est irreversible.
             </p>
             <div className="mt-4 flex justify-end gap-3">
               <button
                 onClick={() => setConfirmReset(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="rounded-full border border-[color:var(--sand-line)] bg-white/90 px-4 py-2 text-sm font-medium text-[color:var(--sand-ink)] transition hover:bg-[color:var(--sand-surface-strong)]"
               >
                 Annuler
               </button>
               <button
                 onClick={() => resetSettings()}
                 disabled={resetting}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50"
+                className="rounded-full bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50"
               >
                 {resetting ? 'Reinitialisation...' : 'Reinitialiser'}
               </button>

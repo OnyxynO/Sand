@@ -149,14 +149,15 @@ export default function UtilisateursPage() {
       <NavAdmin />
 
       {/* En-tete */}
-      <div className="flex flex-wrap gap-2 items-center justify-between">
+      <div className="sand-card flex flex-wrap items-center justify-between gap-2 rounded-[1.8rem] bg-[linear-gradient(135deg,rgba(52,78,65,0.08),rgba(238,154,104,0.14))] p-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Utilisateurs</h1>
-          <p className="text-sm text-gray-500">{total} utilisateur{total > 1 ? 's' : ''}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[color:var(--sand-muted)]">Administration</p>
+          <h1 className="font-['Fraunces',serif] text-3xl text-[color:var(--sand-ink)]">Utilisateurs</h1>
+          <p className="text-sm text-[color:var(--sand-muted)]">{total} utilisateur{total > 1 ? 's' : ''}</p>
         </div>
         <button
           onClick={ouvrirCreation}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+          className="flex items-center gap-2 rounded-full bg-[color:var(--sand-ink)] px-4 py-2 text-sm font-medium text-white transition hover:bg-[color:var(--sand-accent-strong)]"
         >
           <PlusIcon className="w-4 h-4" />
           Nouvel utilisateur
@@ -164,25 +165,25 @@ export default function UtilisateursPage() {
       </div>
 
       {/* Barre de recherche et filtres */}
-      <div className="bg-white rounded-lg shadow-sm p-4 space-y-4">
+      <div className="sand-card rounded-[1.8rem] p-4 space-y-4">
         <div className="flex items-center gap-4">
           {/* Recherche */}
           <div className="flex-1 relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[color:var(--sand-muted)]" />
             <input
               type="text"
               value={recherche}
               onChange={(e) => changerRecherche(e.target.value)}
               placeholder="Rechercher par nom..."
-              className="w-full pl-9 pr-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 py-2 pl-9 pr-4 text-sm text-[color:var(--sand-ink)] outline-none transition focus:ring-2 focus:ring-[color:var(--sand-accent)]/20"
             />
           </div>
 
           {/* Bouton filtres */}
           <button
             onClick={() => setFiltresOuverts(!filtresOuverts)}
-            className={`flex items-center gap-2 px-3 py-2 text-sm border rounded-lg ${
-              filtresOuverts ? 'bg-blue-50 border-blue-300 text-blue-700' : 'hover:bg-gray-50'
+            className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm ${
+              filtresOuverts ? 'border-[color:var(--sand-accent)]/40 bg-[color:var(--sand-accent)]/10 text-[color:var(--sand-accent-strong)]' : 'border-[color:var(--sand-line)] bg-white/75 text-[color:var(--sand-muted)] hover:bg-white'
             }`}
           >
             <FunnelIcon className="w-4 h-4" />
@@ -192,14 +193,14 @@ export default function UtilisateursPage() {
 
         {/* Filtres depliables */}
         {filtresOuverts && (
-          <div className="flex items-center gap-4 pt-4 border-t">
+          <div className="flex items-center gap-4 border-t border-[color:var(--sand-line)] pt-4">
             {/* Equipe */}
             <div className="flex-1">
-              <label className="block text-xs font-medium text-gray-500 mb-1">Equipe</label>
+              <label className="mb-1 block text-xs font-medium uppercase tracking-[0.16em] text-[color:var(--sand-muted)]">Equipe</label>
               <select
                 value={filtreEquipe}
                 onChange={(e) => changerFiltreEquipe(e.target.value)}
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 px-3 py-2 text-sm text-[color:var(--sand-ink)] outline-none focus:ring-2 focus:ring-[color:var(--sand-accent)]/20"
               >
                 <option value="">Toutes les equipes</option>
                 {dataEquipes?.equipes?.map((equipe) => (
@@ -212,11 +213,11 @@ export default function UtilisateursPage() {
 
             {/* Role */}
             <div className="flex-1">
-              <label className="block text-xs font-medium text-gray-500 mb-1">Role</label>
+              <label className="mb-1 block text-xs font-medium uppercase tracking-[0.16em] text-[color:var(--sand-muted)]">Role</label>
               <select
                 value={filtreRole}
                 onChange={(e) => changerFiltreRole(e.target.value as UserRole | '')}
-                className="w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 px-3 py-2 text-sm text-[color:var(--sand-ink)] outline-none focus:ring-2 focus:ring-[color:var(--sand-accent)]/20"
               >
                 <option value="">Tous les roles</option>
                 <option value="UTILISATEUR">Utilisateur</option>
@@ -227,13 +228,13 @@ export default function UtilisateursPage() {
 
             {/* Actif */}
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Statut</label>
-              <label className="flex items-center gap-2 px-3 py-2 text-sm">
+              <label className="mb-1 block text-xs font-medium uppercase tracking-[0.16em] text-[color:var(--sand-muted)]">Statut</label>
+              <label className="flex items-center gap-2 px-3 py-2 text-sm text-[color:var(--sand-ink)]">
                 <input
                   type="checkbox"
                   checked={filtreActif}
                   onChange={(e) => changerFiltreActif(e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-[color:var(--sand-line)] text-[color:var(--sand-accent)] focus:ring-[color:var(--sand-accent)]/20"
                 />
                 Actifs uniquement
               </label>
