@@ -22,8 +22,8 @@ export default function BoutonSauvegarde({
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 py-3">
+    <div className="fixed bottom-4 left-0 right-0 z-40 px-4">
+      <div className="sand-card mx-auto max-w-5xl rounded-[24px] border border-white/60 px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           {/* Message */}
           <div className="flex items-center gap-2 text-sm">
@@ -44,7 +44,7 @@ export default function BoutonSauvegarde({
           <div className="flex items-center gap-2">
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-lg hover:bg-gray-50 disabled:opacity-50"
+              className="rounded-full border border-[var(--sand-line)] bg-white/70 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-white disabled:opacity-50"
               disabled={sauvegarde}
             >
               Annuler
@@ -52,7 +52,7 @@ export default function BoutonSauvegarde({
             <button
               onClick={sauvegarder}
               disabled={sauvegarde || !aDesModifications}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 rounded-full bg-[var(--sand-accent)] px-5 py-2 text-sm font-medium text-white shadow-lg shadow-teal-900/20 hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {sauvegarde ? (
                 <>

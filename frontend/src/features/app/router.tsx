@@ -24,10 +24,11 @@ const ProjetsPage = lazy(() => import('../projets/pages/ProjetsPage'));
 
 function LoadingSpinner() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
-        <p className="mt-4 text-gray-600">Chargement...</p>
+    <div className="flex min-h-screen items-center justify-center px-6">
+      <div className="sand-card w-full max-w-md rounded-[28px] p-10 text-center">
+        <div className="mx-auto flex h-14 w-14 animate-spin items-center justify-center rounded-full border-2 border-[var(--sand-accent-soft)] border-t-[var(--sand-accent)]" />
+        <p className="sand-display mt-6 text-3xl text-gray-900">SAND v2</p>
+        <p className="mt-2 text-sm uppercase tracking-[0.22em] text-gray-500">Chargement de l'espace de travail</p>
       </div>
     </div>
   );

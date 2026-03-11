@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams, useBlocker } from 'react-router';
+import { SparklesIcon } from '@heroicons/react/24/outline';
 import NavigationSemaine from '../components/saisie/NavigationSemaine';
 import BlocAbsences from '../components/saisie/BlocAbsences';
 import GrilleSemaine from '../components/saisie/GrilleSemaine';
@@ -59,8 +60,42 @@ export default function SaisiePage() {
   return (
     <div className={`space-y-4 ${aDesModifications || erreur ? 'pb-20' : ''}`}>
       {/* Titre */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Saisie hebdomadaire</h1>
+      <div className="sand-card overflow-hidden rounded-[32px]">
+        <div className="grid gap-6 px-6 py-7 lg:grid-cols-[1.4fr_0.8fr] lg:px-8">
+          <div>
+            <p className="text-xs uppercase tracking-[0.26em] text-[var(--sand-accent)]">Atelier de saisie</p>
+            <h1 className="sand-display mt-3 text-4xl text-gray-900">Saisie hebdomadaire</h1>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-600">
+              La grille reste la meme fonctionnellement, mais la v2 cherche une lecture plus calme:
+              navigation plus lisible, surfaces plus nettes et separation plus claire entre absences et travail saisi.
+            </p>
+          </div>
+          <div className="rounded-[28px] border border-[var(--sand-line)] bg-white/65 p-4">
+            <div className="flex items-center gap-3">
+              <div className="rounded-2xl bg-[var(--sand-accent-soft)] p-3 text-[var(--sand-accent)]">
+                <SparklesIcon className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-[0.18em] text-gray-500">Contexte</p>
+                <p className="mt-1 text-sm font-medium text-gray-900">
+                  {estModerateurOuAdmin && userIdModeration ? 'Saisie en mode moderation' : 'Saisie personnelle'}
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 grid gap-3 text-sm text-gray-600">
+              <div className="rounded-2xl bg-amber-50 px-3 py-3">
+                <p className="text-xs uppercase tracking-[0.16em] text-gray-500">Profil</p>
+                <p className="mt-2 font-medium text-gray-900">
+                  {utilisateur?.prenom} {utilisateur?.nom}
+                </p>
+              </div>
+              <div className="rounded-2xl bg-white/80 px-3 py-3">
+                <p className="text-xs uppercase tracking-[0.16em] text-gray-500">Equipe</p>
+                <p className="mt-2 font-medium text-gray-900">{utilisateur?.equipe?.nom || 'Non assignee'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Selecteur d'utilisateur (moderateurs/admins) */}
@@ -102,8 +137,8 @@ export default function SaisiePage() {
       {/* Modale de confirmation si navigation avec modifications non sauvegardees */}
       {blocker.state === 'blocked' && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-xl shadow-xl p-6 max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900">
+          <div className="sand-card max-w-md rounded-[28px] p-6 shadow-xl mx-4">
+            <h3 className="sand-display text-2xl text-gray-900">
               Modifications non enregistrees
             </h3>
             <p className="mt-2 text-sm text-gray-600">
@@ -112,13 +147,13 @@ export default function SaisiePage() {
             <div className="mt-4 flex justify-end gap-3">
               <button
                 onClick={() => blocker.reset()}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="rounded-full border border-[var(--sand-line)] bg-white/70 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-white"
               >
                 Rester sur la page
               </button>
               <button
                 onClick={() => blocker.proceed()}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700"
+                className="rounded-full bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
               >
                 Quitter sans enregistrer
               </button>

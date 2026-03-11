@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useMutation } from '@apollo/client/react';
+import {
+  ArrowRightStartOnRectangleIcon,
+  Bars3Icon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
 import { useAuthStore } from '../stores/authStore';
 import { LOGOUT_MUTATION } from '../graphql/operations/auth';
 import { apolloClient } from '../graphql/client';
@@ -26,9 +31,14 @@ export default function Layout() {
   };
 
   const navigation = construireNavigation(utilisateur?.role);
+  const roleLabel = utilisateur?.role === 'ADMIN'
+    ? 'Administration'
+    : utilisateur?.role === 'MODERATEUR'
+      ? 'Pilotage'
+      : 'Saisie';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="sand-shell min-h-screen text-gray-900">
       {/* Skip link */}
       <a
         href="#main-content"
@@ -38,25 +48,37 @@ export default function Layout() {
       </a>
 
       {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+      <header className="sticky top-0 z-20 px-4 pt-4 sm:px-6 lg:px-8">
+        <div className="sand-card mx-auto max-w-7xl rounded-[28px] border border-white/60">
+          <div className="flex items-center justify-between border-b border-[var(--sand-line)] px-5 py-3 text-xs uppercase tracking-[0.24em] text-gray-500">
+            <span>Sand v2 workspace</span>
+            <span>{roleLabel}</span>
+          </div>
+          <div className="flex justify-between items-center px-5 py-4">
             {/* Logo */}
-            <div className="flex items-center">
-              <span className="text-xl font-bold text-blue-600">SAND</span>
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--sand-accent)] text-sm font-semibold tracking-[0.3em] text-white shadow-lg shadow-teal-900/20">
+                SD
+              </div>
+              <div>
+                <p className="sand-display text-2xl leading-none text-gray-900">SAND</p>
+                <p className="mt-1 text-xs uppercase tracking-[0.24em] text-gray-500">
+                  Saisie d'activite numerique declarative
+                </p>
+              </div>
             </div>
 
             {/* Navigation desktop */}
-            <nav className="hidden md:flex space-x-1">
+            <nav className="hidden md:flex flex-wrap justify-center gap-2 px-6">
               {navigation.map((item) => (
                 <NavLink
                   key={item.href}
                   to={item.href}
                   className={({ isActive }) =>
-                    `px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    `rounded-full border px-4 py-2 text-sm font-medium transition-all ${
                       isActive
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'border-transparent bg-[var(--sand-accent)] text-white shadow-md shadow-teal-900/15'
+                        : 'border-[var(--sand-line)] bg-white/70 text-gray-600 hover:border-[var(--sand-accent)] hover:text-[var(--sand-accent)]'
                     }`
                   }
                 >
@@ -70,65 +92,32 @@ export default function Layout() {
               {/* Notifications */}
               <NotificationBell />
 
-              <div className="hidden sm:block text-right">
+              <div className="hidden rounded-2xl border border-[var(--sand-line)] bg-white/70 px-4 py-2 text-right sm:block">
                 <p className="text-sm font-medium text-gray-900">
                   {utilisateur?.prenom} {utilisateur?.nom}
                 </p>
-                <p className="text-xs text-gray-500">{utilisateur?.equipe?.nom}</p>
+                <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
+                  {utilisateur?.equipe?.nom || roleLabel}
+                </p>
               </div>
 
               {/* Bouton deconnexion */}
               <button
                 onClick={handleLogout}
-                className="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-100 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="rounded-full border border-[var(--sand-line)] bg-white/70 p-2.5 text-gray-500 transition-colors hover:border-[var(--sand-warm)] hover:text-[var(--sand-warm)] focus-visible:ring-2 focus-visible:ring-[var(--sand-accent)]"
                 aria-label="Se déconnecter"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                  />
-                </svg>
+                <ArrowRightStartOnRectangleIcon className="h-5 w-5" />
               </button>
 
               {/* Bouton menu mobile */}
               <button
                 onClick={() => setMenuOuvert(!menuOuvert)}
-                className="md:hidden p-2 rounded-lg hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-blue-500"
+                className="rounded-full border border-[var(--sand-line)] bg-white/70 p-2.5 md:hidden focus-visible:ring-2 focus-visible:ring-[var(--sand-accent)]"
                 aria-label={menuOuvert ? 'Fermer le menu' : 'Ouvrir le menu'}
                 aria-expanded={menuOuvert}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  {menuOuvert ? (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  ) : (
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  )}
-                </svg>
+                {menuOuvert ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
               </button>
             </div>
           </div>
@@ -136,18 +125,18 @@ export default function Layout() {
 
         {/* Navigation mobile */}
         {menuOuvert && (
-          <div className="md:hidden border-t border-gray-200">
-            <nav className="px-4 py-2 space-y-1">
+          <div className="sand-card mx-auto mt-3 max-w-7xl rounded-[24px] border border-white/60 px-4 py-4 md:hidden">
+            <nav className="grid gap-2">
               {navigation.map((item) => (
                 <NavLink
                   key={item.href}
                   to={item.href}
                   onClick={() => setMenuOuvert(false)}
                   className={({ isActive }) =>
-                    `block px-4 py-2 rounded-lg text-sm font-medium ${
+                    `block rounded-2xl border px-4 py-3 text-sm font-medium ${
                       isActive
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? 'border-transparent bg-[var(--sand-accent)] text-white'
+                        : 'border-[var(--sand-line)] bg-white/60 text-gray-600'
                     }`
                   }
                 >
@@ -160,7 +149,7 @@ export default function Layout() {
       </header>
 
       {/* Contenu principal */}
-      <main id="main-content" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main id="main-content" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <Outlet />
       </main>
 

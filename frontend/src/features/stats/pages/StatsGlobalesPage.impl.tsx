@@ -149,23 +149,24 @@ export default function StatsGlobalesPage() {
   return (
     <div className="space-y-6">
       {/* Titre */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h1 className="text-2xl font-bold text-gray-900">Statistiques globales</h1>
-        <p className="text-gray-600 mt-1">
+      <div className="sand-card rounded-[32px] p-6 lg:p-8">
+        <p className="text-xs uppercase tracking-[0.26em] text-[var(--sand-accent)]">Vue organisationnelle</p>
+        <h1 className="sand-display mt-3 text-4xl text-gray-900">Statistiques globales</h1>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-gray-600">
           Vue d'ensemble de l'activite de l'organisation
         </p>
       </div>
 
       {/* Filtre equipe */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <label htmlFor="equipe-select" className="block text-sm font-medium text-gray-700 mb-2">
+      <div className="sand-card rounded-[28px] p-6">
+        <label htmlFor="equipe-select" className="block text-xs uppercase tracking-[0.18em] text-gray-500 mb-2">
           Equipe
         </label>
         <select
           id="equipe-select"
           value={equipeId}
           onChange={(e) => setEquipeId(e.target.value)}
-          className="block w-full max-w-md rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+          className="block w-full max-w-md rounded-2xl border border-[var(--sand-line)] bg-white/80 px-4 py-3 text-sm shadow-sm focus:border-[var(--sand-accent)] focus:ring-[var(--sand-accent)]"
         >
           <option value="">Toutes les equipes</option>
           {equipes.map((e: { id: string; nom: string; code: string }) => (
@@ -185,7 +186,7 @@ export default function StatsGlobalesPage() {
 
       {/* Erreur */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700">
+        <div className="rounded-[24px] border border-red-200 bg-red-50 p-4 text-red-700">
           Erreur lors du chargement des statistiques : {error.message}
         </div>
       )}

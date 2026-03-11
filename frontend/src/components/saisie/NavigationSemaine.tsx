@@ -11,12 +11,12 @@ export default function NavigationSemaine() {
   const estCourante = estSemaineCourante(semaineISO);
 
   return (
-    <div className="flex items-center justify-between bg-white rounded-lg p-4 shadow-sm">
+    <div className="sand-card flex items-center justify-between rounded-[26px] px-5 py-4">
       {/* Boutons de navigation */}
       <div className="flex items-center gap-2">
         <button
           onClick={allerSemainePrecedente}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+          className="rounded-full border border-[var(--sand-line)] bg-white/80 p-2.5 transition-colors hover:border-[var(--sand-accent)] hover:text-[var(--sand-accent)] focus-visible:ring-2 focus-visible:ring-[var(--sand-accent)]"
           aria-label="Semaine précédente"
         >
           <ChevronLeftIcon className="w-5 h-5 text-gray-600" aria-hidden="true" />
@@ -24,7 +24,7 @@ export default function NavigationSemaine() {
 
         <button
           onClick={allerSemaineSuivante}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500"
+          className="rounded-full border border-[var(--sand-line)] bg-white/80 p-2.5 transition-colors hover:border-[var(--sand-accent)] hover:text-[var(--sand-accent)] focus-visible:ring-2 focus-visible:ring-[var(--sand-accent)]"
           aria-label="Semaine suivante"
         >
           <ChevronRightIcon className="w-5 h-5 text-gray-600" aria-hidden="true" />
@@ -33,7 +33,7 @@ export default function NavigationSemaine() {
         {!estCourante && (
           <button
             onClick={allerSemaineActuelle}
-            className="ml-2 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+            className="ml-2 rounded-full bg-[var(--sand-accent-soft)] px-4 py-2 text-sm font-medium text-[var(--sand-accent)] transition-colors hover:bg-[var(--sand-accent)] hover:text-white"
           >
             Aujourd'hui
           </button>
@@ -41,7 +41,7 @@ export default function NavigationSemaine() {
       </div>
 
       {/* Titre de la semaine */}
-      <h2 className="text-lg font-semibold text-gray-900">
+      <h2 className="sand-display text-2xl text-gray-900">
         {formatSemainePourAffichage(semaineISO)}
       </h2>
 

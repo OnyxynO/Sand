@@ -105,23 +105,24 @@ export default function StatsProjetPage() {
   return (
     <div className="space-y-6">
       {/* Titre */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h1 className="text-2xl font-bold text-gray-900">Statistiques projet</h1>
-        <p className="text-gray-600 mt-1">
+      <div className="sand-card rounded-[32px] p-6 lg:p-8">
+        <p className="text-xs uppercase tracking-[0.26em] text-[var(--sand-accent)]">Analyse ciblee</p>
+        <h1 className="sand-display mt-3 text-4xl text-gray-900">Statistiques projet</h1>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-gray-600">
           Suivi de l'activite par projet
         </p>
       </div>
 
       {/* Selecteur de projet */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <label htmlFor="projet-select" className="block text-sm font-medium text-gray-700 mb-2">
+      <div className="sand-card rounded-[28px] p-6">
+        <label htmlFor="projet-select" className="block text-xs uppercase tracking-[0.18em] text-gray-500 mb-2">
           Projet
         </label>
         <select
           id="projet-select"
           value={projetSelectionne}
           onChange={(e) => setProjetId(e.target.value)}
-          className="block w-full max-w-md rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+          className="block w-full max-w-md rounded-2xl border border-[var(--sand-line)] bg-white/80 px-4 py-3 text-sm shadow-sm focus:border-[var(--sand-accent)] focus:ring-[var(--sand-accent)]"
           disabled={loadingProjets}
         >
           {loadingProjets && <option>Chargement...</option>}
@@ -142,7 +143,7 @@ export default function StatsProjetPage() {
 
       {/* Erreur */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700">
+        <div className="rounded-[24px] border border-red-200 bg-red-50 p-4 text-red-700">
           Erreur lors du chargement des statistiques : {error.message}
         </div>
       )}
@@ -191,7 +192,9 @@ export default function StatsProjetPage() {
             <GraphiqueUtilisateurs donnees={stats.parUtilisateur} />
           </div>
 
-          <GraphiqueEvolution donnees={stats.parJour} />
+          <div className="sand-card rounded-[28px] p-2">
+            <GraphiqueEvolution donnees={stats.parJour} />
+          </div>
         </>
       )}
     </div>

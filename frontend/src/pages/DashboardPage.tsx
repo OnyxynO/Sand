@@ -80,40 +80,64 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Message de bienvenue */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Bonjour, {utilisateur?.prenom} !
-        </h1>
-        <p className="text-gray-600 mt-1">
-          Bienvenue sur SAND - Saisie d'Activite Numerique Declarative
-        </p>
+      <div className="sand-card overflow-hidden rounded-[32px]">
+        <div className="grid gap-6 px-6 py-8 lg:grid-cols-[1.4fr_0.8fr] lg:px-8">
+          <div>
+            <p className="text-xs uppercase tracking-[0.28em] text-[var(--sand-accent)]">Tableau de bord personnel</p>
+            <h1 className="sand-display mt-3 text-4xl leading-tight text-gray-900">
+              Bonjour, {utilisateur?.prenom}.
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-600">
+              Cette v2 garde les memes flux que SAND, mais pose une presentation plus calme et plus lisible.
+              Tu retrouves ici ta charge recente, tes projets actifs et ton rythme de saisie du mois.
+            </p>
+          </div>
+          <div className="grid gap-3 rounded-[28px] border border-[var(--sand-line)] bg-white/65 p-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.22em] text-gray-500">Profil</p>
+              <p className="mt-2 text-lg font-medium text-gray-900">
+                {utilisateur?.prenom} {utilisateur?.nom}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-sm text-gray-600">
+              <div className="rounded-2xl bg-[var(--sand-accent-soft)] px-3 py-3">
+                <p className="text-xs uppercase tracking-[0.16em] text-gray-500">Equipe</p>
+                <p className="mt-2 font-medium text-gray-900">{utilisateur?.equipe?.nom || 'Non assignee'}</p>
+              </div>
+              <div className="rounded-2xl bg-amber-50 px-3 py-3">
+                <p className="text-xs uppercase tracking-[0.16em] text-gray-500">Role</p>
+                <p className="mt-2 font-medium text-gray-900">{getRoleLabel(utilisateur?.role || '')}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Carte profil */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Mon profil</h2>
+      <div className="sand-card rounded-[28px] p-6">
+        <h2 className="sand-display text-2xl text-gray-900">Mon profil</h2>
         <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <dt className="text-sm text-gray-500">Nom complet</dt>
-            <dd className="text-gray-900 font-medium">
+            <dt className="text-xs uppercase tracking-[0.18em] text-gray-500">Nom complet</dt>
+            <dd className="mt-2 text-gray-900 font-medium">
               {utilisateur?.prenom} {utilisateur?.nom}
             </dd>
           </div>
           <div>
-            <dt className="text-sm text-gray-500">Email</dt>
-            <dd className="text-gray-900">{utilisateur?.email}</dd>
+            <dt className="text-xs uppercase tracking-[0.18em] text-gray-500">Email</dt>
+            <dd className="mt-2 text-gray-900">{utilisateur?.email}</dd>
           </div>
           <div>
-            <dt className="text-sm text-gray-500">Equipe</dt>
-            <dd className="text-gray-900">
+            <dt className="text-xs uppercase tracking-[0.18em] text-gray-500">Equipe</dt>
+            <dd className="mt-2 text-gray-900">
               {utilisateur?.equipe?.nom || 'Non assignee'}
             </dd>
           </div>
           <div>
-            <dt className="text-sm text-gray-500">Role</dt>
-            <dd>
+            <dt className="text-xs uppercase tracking-[0.18em] text-gray-500">Role</dt>
+            <dd className="mt-2">
               <span
-                className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getRoleBadgeColor(utilisateur?.role || '')}`}
+                className={`inline-flex px-3 py-1.5 text-xs font-medium rounded-full ${getRoleBadgeColor(utilisateur?.role || '')}`}
               >
                 {getRoleLabel(utilisateur?.role || '')}
               </span>
