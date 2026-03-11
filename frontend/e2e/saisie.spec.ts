@@ -4,6 +4,14 @@
 
 import { test, expect } from '@playwright/test';
 
+async function allerSurSaisie(page: Parameters<Parameters<typeof test>[1]>[0]) {
+  try {
+    await page.goto('/saisie');
+  } catch {
+    await page.goto('/saisie');
+  }
+}
+
 test.describe('Page de saisie', () => {
   const getTableauSaisie = (page: Parameters<typeof test>[1]['page']) =>
     page.locator('table').last();
@@ -12,7 +20,7 @@ test.describe('Page de saisie', () => {
     page.locator('h2').filter({ hasText: /\d{4}/ }).first().locator('..');
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/saisie');
+    await allerSurSaisie(page);
     // Attendre que React soit completement rendu avant chaque test
     // (evite les races sur page.goto apres une navigation precedente)
     await expect(page.getByRole('heading', { name: 'Saisie hebdomadaire' })).toBeVisible({

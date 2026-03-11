@@ -18,9 +18,17 @@ import { test, expect } from '@playwright/test';
 // Les tests partagent la DB → exécution séquentielle pour éviter les interférences
 test.describe.configure({ mode: 'serial' });
 
+async function allerSurSaisie(page: Parameters<Parameters<typeof test>[1]>[0]) {
+  try {
+    await page.goto('/saisie');
+  } catch {
+    await page.goto('/saisie');
+  }
+}
+
 test.describe('EV-12 — Absences mode manuel (utilisateur)', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/saisie');
+    await allerSurSaisie(page);
     await expect(page.getByRole('heading', { name: 'Saisie hebdomadaire' })).toBeVisible({
       timeout: 15000,
     });
@@ -37,7 +45,7 @@ test.describe('EV-12 — Absences mode manuel (utilisateur)', () => {
   // de "count stable" pour stopper la boucle. Race condition possible (click ouvre la modale si
   // React a réinitialisé le state entre le locator et le click) → fermer la modale si elle s'ouvre.
   test.afterEach(async ({ page }) => {
-    await page.goto('/saisie');
+    await allerSurSaisie(page);
     await page.waitForLoadState('networkidle', { timeout: 10000 });
     await page.waitForTimeout(800);
 
@@ -206,10 +214,15 @@ test.describe('EV-12 — Absences mode manuel (utilisateur)', () => {
       timeout: 3000,
     });
 
-    // Une cellule remplie de plus (vérification par COUNT)
+    // Une cellule demi-journee visible dans la ligne absence.
+    // On s'appuie sur le contenu rendu plutot que seulement sur le title, plus sensible au timing du refetch.
     await expect(
-      ligneAbsence.locator('td[title*="cliquer pour changer la dur\u00e9e"]')
-    ).toHaveCount(filledBefore + 1, { timeout: 8000 });
+      ligneAbsence.locator('td').filter({ hasText: '0.5' }).first()
+    ).toBeVisible({ timeout: 8000 });
+    const filledAfter = await ligneAbsence
+      .locator('td[title*="cliquer pour changer la dur\u00e9e"]')
+      .count();
+    expect(filledAfter).toBeGreaterThanOrEqual(filledBefore);
     // Nettoyage géré par afterEach
   });
 

@@ -3,6 +3,14 @@
 
 import { test, expect } from '@playwright/test';
 
+async function allerSurLogin(page: Parameters<Parameters<typeof test>[1]>[0]) {
+  try {
+    await page.goto('/login');
+  } catch {
+    await page.goto('/login');
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Bloc 1 : tests SANS session (formulaire, connexions, accès protégé)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -11,7 +19,7 @@ test.describe('Authentification — sans session', () => {
   test.use({ storageState: { cookies: [], origins: [] } });
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/login');
+    await allerSurLogin(page);
   });
 
   // AUTH-01
@@ -75,7 +83,7 @@ test.describe('Authentification — sans session', () => {
 test.describe('Authentification — avec session', () => {
   // AUTH-06
   test('/login redirige vers / si deja connecte', async ({ page }) => {
-    await page.goto('/login');
+    await allerSurLogin(page);
     await expect(page).toHaveURL('/', { timeout: 5000 });
   });
 });
@@ -92,7 +100,7 @@ test.describe('Authentification — deconnexion', () => {
     const page = await context.newPage();
 
     // Se connecter manuellement dans ce contexte isolé
-    await page.goto('/login');
+    await allerSurLogin(page);
     await page.fill('#email', 'jean.martin@sand.local');
     await page.fill('#password', 'password');
     await page.click('button[type="submit"]');

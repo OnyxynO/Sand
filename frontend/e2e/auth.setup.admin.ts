@@ -11,6 +11,8 @@ const AUTH_FILE = path.join(__dirname, '.auth/admin.json');
 
 setup('authentification admin', async ({ page }) => {
   await page.goto('/login');
+  await page.waitForTimeout(1500);
+  await expect(page.getByText('Services en cours de démarrage')).not.toBeVisible({ timeout: 10000 });
 
   await page.fill('#email', 'admin@sand.local');
   await page.fill('#password', 'password');

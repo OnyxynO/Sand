@@ -3,7 +3,7 @@
 
 import { test, expect } from '@playwright/test';
 
-const URL_HEALTH = 'http://localhost:8080/api/health';
+const URL_HEALTH = '**/api/health';
 
 test.describe('Overlay services', () => {
   // OV-01 : pas d'overlay en conditions normales
