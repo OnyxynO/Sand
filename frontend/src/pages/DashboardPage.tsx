@@ -7,10 +7,10 @@ import {
 } from '@heroicons/react/24/outline';
 import { useAuthStore } from '../stores/authStore';
 import { MES_STATISTIQUES } from '../graphql/operations/statistics';
-import SelecteurPeriode from '../components/dashboard/SelecteurPeriode';
-import CarteResume from '../components/dashboard/CarteResume';
-import GraphiqueRepartitionProjets from '../components/dashboard/GraphiqueRepartitionProjets';
-import GraphiqueJournalier from '../components/dashboard/GraphiqueJournalier';
+import SelecteurPeriode from '../features/dashboard/components/SelecteurPeriode';
+import CarteResume from '../features/dashboard/components/CarteResume';
+import GraphiqueRepartitionProjets from '../features/dashboard/components/GraphiqueRepartitionProjets';
+import GraphiqueJournalier from '../features/dashboard/components/GraphiqueJournalier';
 import { periodeInitiale } from '../hooks/usePeriode';
 
 interface MesStatistiquesData {

@@ -7,11 +7,11 @@ import {
 } from '@heroicons/react/24/outline';
 import { STATS_PROJET } from '../../../graphql/operations/statistics';
 import { PROJETS_ACTIFS } from '../../../graphql/operations/saisie';
-import SelecteurPeriode from '../../../components/dashboard/SelecteurPeriode';
-import CarteResume from '../../../components/dashboard/CarteResume';
-import GraphiqueActivites from '../../../components/dashboard/GraphiqueActivites';
-import GraphiqueUtilisateurs from '../../../components/dashboard/GraphiqueUtilisateurs';
-import GraphiqueEvolution from '../../../components/dashboard/GraphiqueEvolution';
+import SelecteurPeriode from '../../../features/dashboard/components/SelecteurPeriode';
+import CarteResume from '../../../features/dashboard/components/CarteResume';
+import GraphiqueActivites from '../../../features/dashboard/components/GraphiqueActivites';
+import GraphiqueUtilisateurs from '../../../features/dashboard/components/GraphiqueUtilisateurs';
+import GraphiqueEvolution from '../../../features/dashboard/components/GraphiqueEvolution';
 import { SqueletteCarte, SqueletteGraphique } from '../../../components/Squelette';
 
 interface Projet {

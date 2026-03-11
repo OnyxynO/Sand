@@ -9,11 +9,11 @@ import {
 } from '@heroicons/react/24/outline';
 import { STATS_GLOBALES, STATS_PERIODE_PRECEDENTE } from '../../../graphql/operations/statistics';
 import { TEAMS_FULL_QUERY } from '../../../graphql/operations/teams';
-import SelecteurPeriode from '../../../components/dashboard/SelecteurPeriode';
-import GraphiqueRepartitionProjets from '../../../components/dashboard/GraphiqueRepartitionProjets';
-import GraphiqueActivites from '../../../components/dashboard/GraphiqueActivites';
-import GraphiqueUtilisateurs from '../../../components/dashboard/GraphiqueUtilisateurs';
-import GraphiqueEvolution from '../../../components/dashboard/GraphiqueEvolution';
+import SelecteurPeriode from '../../../features/dashboard/components/SelecteurPeriode';
+import GraphiqueRepartitionProjets from '../../../features/dashboard/components/GraphiqueRepartitionProjets';
+import GraphiqueActivites from '../../../features/dashboard/components/GraphiqueActivites';
+import GraphiqueUtilisateurs from '../../../features/dashboard/components/GraphiqueUtilisateurs';
+import GraphiqueEvolution from '../../../features/dashboard/components/GraphiqueEvolution';
 import { SqueletteCarte, SqueletteGraphique } from '../../../components/Squelette';
 import { periodeInitiale, periodePrecedente } from '../../../hooks/usePeriode';
 
