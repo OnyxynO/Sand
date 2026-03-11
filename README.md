@@ -6,9 +6,23 @@
 
 Application web de saisie d'activités professionnelles. Les collaborateurs déclarent leur temps de travail par projet et activité (en ETP). Les modérateurs supervisent leur équipe, les admins configurent le système.
 
-## Démo en ligne
+## Environnements
 
-L'application est déployée et accessible à cette adresse : **http://46.225.221.116**
+### Production
+
+L'application est déployée en production à cette adresse : **https://sand.interstice.work**
+
+### Développement local
+
+L'environnement de développement par défaut est **local/natif** :
+
+- Frontend : `http://localhost:5173`
+- Backend Laravel : `http://localhost:8080`
+- GraphQL : `http://localhost:8080/graphql`
+- GraphiQL : `http://localhost:8080/graphiql`
+- Mock API RH : `http://localhost:3001`
+
+Un environnement **Docker** reste disponible en alternative pour les tests et les workflows conteneurisés.
 
 Des données de démonstration (janvier 2026) sont préchargées. Trois comptes de test sont disponibles :
 
@@ -70,24 +84,61 @@ Configuration de la hiérarchie des activités par codes métier. Seules les feu
 | Frontend | React 19 · TypeScript · Apollo Client 4 · Tailwind CSS · Zustand |
 | Base de données | PostgreSQL 16 (extension ltree) |
 | Cache / Queue | Redis 7 |
-| Conteneurs | Docker · Docker Compose |
+| Conteneurisation | Docker · Docker Compose |
 | Tests | PHPUnit (262 tests) · Vitest (235 tests) · Playwright (E2E) |
 
 ---
 
 ## Prérequis
 
+### Développement local natif
+
+- **PHP 8.4**
+- **Composer**
+- **Node.js ≥ 20**
+- **PostgreSQL 16**
+- **Redis**
+- **Git**
+
+Sur macOS, PostgreSQL et Redis peuvent tourner via Homebrew.
+
+### Alternative Docker
+
 - **Docker Desktop** — [docs.docker.com/get-docker](https://docs.docker.com/get-docker/)
 - **Git**
-- **Node.js ≥ 18** — uniquement pour les tests E2E Playwright (pas nécessaire pour faire tourner l'appli)
-
-PHP, Composer et npm tournent dans Docker — rien à installer sur l'hôte sauf Docker.
+- **Node.js ≥ 18** — uniquement pour les tests E2E Playwright sur l'hôte
 
 > **macOS avec Homebrew** : `brew install --cask docker` pour installer Docker Desktop.
 
 ---
 
 ## Installation
+
+### Développement local natif (recommandé)
+
+```bash
+git clone <url-du-repo>
+cd sand
+
+cp backend/.env.example backend/.env
+
+brew services start redis
+cd backend && php artisan serve --host=0.0.0.0 --port=8080 > /tmp/sand-backend.log 2>&1 &
+cd ../frontend && npm install && npm run dev > /tmp/sand-frontend.log 2>&1 &
+```
+
+Points importants du `backend/.env` local :
+
+```env
+DB_HOST=127.0.0.1
+REDIS_CLIENT=predis
+REDIS_HOST=127.0.0.1
+CACHE_STORE=redis
+```
+
+> `CACHE_STORE=redis` doit rester sur Redis pour que `Cache::tags()` fonctionne.
+
+### Alternative Docker
 
 ```bash
 git clone <url-du-repo>
@@ -96,7 +147,7 @@ cd sand
 bash scripts/install.sh
 ```
 
-Le script gère tout : démarrage Docker, configuration, migrations, données de base.
+Le script gère le démarrage Docker, la configuration, les migrations et les données de base.
 
 Pour charger des données de démonstration réalistes (491 saisies, 3 projets, 30 activités, 3 absences) :
 
@@ -104,7 +155,7 @@ Pour charger des données de démonstration réalistes (491 saisies, 3 projets, 
 bash scripts/install.sh --demo
 ```
 
-### Installation manuelle (si le script ne convient pas)
+### Installation manuelle Docker (si le script ne convient pas)
 
 ```bash
 # 1. Copier la configuration
@@ -136,17 +187,22 @@ docker compose exec app php artisan db:seed --class=DemoSeeder
 Après un `git pull` :
 
 ```bash
-# Reconstruire si les Dockerfiles ont changé
+# Développement local natif
+cd backend && php artisan migrate
+cd ../frontend && npm run generate
+
+# Si le schéma GraphQL a changé
+cd ../backend && php artisan lighthouse:clear-cache
+php artisan config:clear
+```
+
+Alternative Docker :
+
+```bash
 docker compose up -d --build
-
-# Appliquer les nouvelles migrations
 docker compose exec app php artisan migrate
-
-# Vider le cache (obligatoire si le schéma GraphQL a changé)
 docker compose exec app php artisan lighthouse:clear-cache
 docker compose exec app php artisan config:clear
-
-# Régénérer les types TypeScript si le schéma GraphQL a changé
 docker compose exec frontend npm run generate
 ```
 
@@ -191,7 +247,24 @@ Voir `backend/.env.example` pour la documentation complète des options.
 
 ## Commandes de développement
 
-### Conteneurs
+### Dev local natif
+
+```bash
+# Backend
+cd backend
+php artisan serve --host=0.0.0.0 --port=8080
+
+# Frontend
+cd frontend
+npm run dev
+
+# Cache GraphQL
+cd backend
+php artisan lighthouse:clear-cache
+php artisan config:clear
+```
+
+### Docker
 
 ```bash
 docker compose up -d          # Démarrer en arrière-plan
@@ -205,35 +278,39 @@ docker compose exec app bash  # Shell dans le conteneur PHP
 
 ```bash
 # Migrations
-docker compose exec app php artisan migrate
-docker compose exec app php artisan migrate:fresh --seed   # Réinitialiser + seeder
+cd backend && php artisan migrate
+cd backend && php artisan migrate:fresh --seed
 
 # Cache (obligatoire après modification du schéma GraphQL)
-docker compose exec app php artisan lighthouse:clear-cache
-docker compose exec app php artisan config:clear
+cd backend && php artisan lighthouse:clear-cache
+cd backend && php artisan config:clear
 
 # Linting PHP
-docker compose exec app ./vendor/bin/pint
+cd backend && ./vendor/bin/pint
 
 # Analyse statique (niveau 5)
-docker compose exec app ./vendor/bin/phpstan analyse
+cd backend && ./vendor/bin/phpstan analyse
 
 # Tinker (REPL Laravel)
-docker compose exec app php artisan tinker
+cd backend && php artisan tinker
 ```
+
+Alternative Docker : préfixer avec `docker compose exec app`.
 
 ### Frontend
 
 ```bash
 # Régénérer les types TypeScript depuis le schéma GraphQL
-docker compose exec frontend npm run generate
+cd frontend && npm run generate
 
 # Linting TypeScript/React
-docker compose exec frontend npm run lint
+cd frontend && npm run lint
 
 # Build de production
-docker compose exec frontend npm run build
+cd frontend && npm run build
 ```
+
+Alternative Docker : préfixer avec `docker compose exec frontend`.
 
 ---
 
@@ -243,29 +320,29 @@ docker compose exec frontend npm run build
 
 ```bash
 # Tous les tests
-docker compose exec app php artisan test
+cd backend && php artisan test
 
 # Un fichier spécifique
-docker compose exec app php artisan test tests/Feature/AuthGraphQLTest.php
+cd backend && php artisan test tests/Feature/AuthGraphQLTest.php
 
 # Un test par nom
-docker compose exec app php artisan test --filter test_login_avec_identifiants_valides
+cd backend && php artisan test --filter test_login_avec_identifiants_valides
 ```
 
 > La base de test `sand_test` est requise (PostgreSQL — ltree incompatible avec SQLite).
-> Elle est créée automatiquement par le script `scripts/install.sh`.
+> En mode Docker, elle est créée automatiquement par le script `scripts/install.sh`.
 
 ### Frontend (Vitest)
 
 ```bash
 # Mode watch (développement)
-docker compose exec frontend npm run test
+cd frontend && npm run test
 
 # Une seule passe (CI)
-docker compose exec frontend npm run test:run
+cd frontend && npm run test:run
 
 # Un fichier spécifique
-docker compose exec frontend npm run test -- src/hooks/__tests__/useSaisieHebdo.test.ts
+cd frontend && npm run test -- src/hooks/__tests__/useSaisieHebdo.test.ts
 ```
 
 ### E2E (Playwright) — sur l'hôte, pas dans Docker
@@ -287,11 +364,19 @@ npx playwright test e2e/saisie.spec.ts
 npx playwright test --grep "anti-regression"
 ```
 
-> L'application doit être démarrée (`docker compose up -d`) avant de lancer Playwright.
+> L'application doit être démarrée avant de lancer Playwright, soit en local natif, soit via `docker compose up -d`.
 
 ---
 
 ## Troubleshooting
+
+### Services locaux non démarrés
+
+En dev natif, Redis doit tourner et PostgreSQL doit être joignable sur `127.0.0.1`.
+
+```bash
+brew services start redis
+```
 
 ### Conflit de noms de conteneurs à l'installation
 
@@ -324,7 +409,7 @@ docker compose ps          # État de chaque service (doit être "healthy")
 Vider le cache Lighthouse (obligatoire après toute modification du schéma GraphQL) :
 
 ```bash
-docker compose exec app php artisan lighthouse:clear-cache
+cd backend && php artisan lighthouse:clear-cache
 ```
 
 ### Erreur CSRF / 419 sur les mutations
@@ -340,22 +425,24 @@ curl http://localhost:8080/sanctum/csrf-cookie
 La base `sand_test` doit exister dans PostgreSQL :
 
 ```bash
-docker compose exec db psql -U sand -c "CREATE DATABASE sand_test;"
+createdb sand_test
 ```
 
 ### Réinitialiser complètement la base de données
 
 ```bash
-docker compose exec app php artisan migrate:fresh --seed
+cd backend && php artisan migrate:fresh --seed
 
 # Ou avec les données de démo :
-docker compose exec app php artisan migrate:fresh
-docker compose exec app php artisan db:seed --class=DemoSeeder
+cd backend && php artisan migrate:fresh
+cd backend && php artisan db:seed --class=DemoSeeder
 ```
 
 ### Accéder à PostgreSQL ou Redis depuis l'hôte (TablePlus, Redis Insight...)
 
-Le fichier `docker-compose.override.yml` expose les ports 5432 et 6379 en développement — actif automatiquement avec `docker compose up`.
+En dev natif, PostgreSQL et Redis sont déjà accessibles depuis l'hôte.
+
+En mode Docker, `docker-compose.override.yml` expose les ports 5432 et 6379 en développement.
 
 ### Les emails ne sont pas reçus
 
