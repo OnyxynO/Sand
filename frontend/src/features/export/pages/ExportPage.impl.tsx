@@ -1,4 +1,263 @@
-export { default } from '../features/export/pages/ExportPage';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { useMutation, useQuery } from '@apollo/client/react';
+import {
+  ArrowDownTrayIcon,
+  ArrowPathIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  ExclamationTriangleIcon,
+  InformationCircleIcon,
+  MinusCircleIcon,
+  TrashIcon,
+  XCircleIcon,
+} from '@heroicons/react/24/outline';
+import { Popover } from '@headlessui/react';
+import { REQUEST_EXPORT, MES_EXPORTS, DESACTIVER_EXPORT, SUPPRIMER_EXPORT } from '../../../graphql/operations/export';
+import { PROJETS_ACTIFS } from '../../../graphql/operations/saisie';
+import { TEAMS_FULL_QUERY } from '../../../graphql/operations/teams';
+import { useNotificationStore } from '../../../stores/notificationStore';
+import { SqueletteTableau } from '../../../components/Squelette';
+
+function dernierJourDuMois(annee: number, mois: number): number {
+  return new Date(annee, mois + 1, 0).getDate();
+}
+
+function periodeInitiale() {
+  const maintenant = new Date();
+  const a = maintenant.getFullYear();
+  const m = maintenant.getMonth();
+  const debut = `${a}-${String(m + 1).padStart(2, '0')}-01`;
+  const fin = `${a}-${String(m + 1).padStart(2, '0')}-${dernierJourDuMois(a, m)}`;
+  return { debut, fin };
+}
+
+interface ExportJob {
+  id: string;
+  statut: string;
+  filtres: Record<string, string> | null;
+  expireLe: string | null;
+  creeLe: string;
+}
+
+interface Projet {
+  id: string;
+  nom: string;
+  code: string;
+}
+
+interface Equipe {
+  id: string;
+  nom: string;
+  code: string;
+}
+
+function libStatut(statut: string): string {
+  switch (statut) {
+    case 'EN_ATTENTE': return 'En attente';
+    case 'EN_COURS': return 'En cours';
+    case 'TERMINE': return 'Disponible';
+    case 'ECHEC': return 'Echec';
+    case 'DESACTIVE': return 'Désactivé';
+    default: return statut;
+  }
+}
+
+function InfoPopover({ job, projets, equipes }: { job: ExportJob; projets: Projet[]; equipes: Equipe[] }) {
+  const f = job.filtres ?? {};
+  const projet = f.project_id ? projets.find((p) => p.id === f.project_id) : null;
+  const equipe = f.team_id ? equipes.find((e) => e.id === f.team_id) : null;
+
+  const lignes: { label: string; valeur: string }[] = [
+    { label: 'Identifiant', valeur: job.id.slice(0, 8) },
+    { label: 'Demandé le', valeur: formaterDateHeure(job.creeLe) },
+    { label: 'Expire le', valeur: job.expireLe ? formaterDateHeure(job.expireLe) : '—' },
+    { label: 'Statut', valeur: libStatut(job.statut) },
+    { label: 'Format', valeur: 'CSV' },
+    {
+      label: 'Période',
+      valeur: f.date_debut && f.date_fin
+        ? `${formaterDate(f.date_debut)} → ${formaterDate(f.date_fin)}`
+        : 'Toutes les dates',
+    },
+    { label: 'Projet', valeur: projet ? `${projet.code} - ${projet.nom}` : 'Tous les projets' },
+    { label: 'Équipe', valeur: equipe ? equipe.nom : 'Toutes les équipes' },
+  ];
+
+  return (
+    <Popover className="relative">
+      <Popover.Button
+        className="p-1.5 text-gray-400 hover:text-blue-500 transition-colors rounded-lg hover:bg-blue-50"
+        title="Détails de l'export"
+      >
+        <InformationCircleIcon className="w-4 h-4" />
+      </Popover.Button>
+
+      <Popover.Panel className="absolute right-0 bottom-full mb-1 z-10 w-72 bg-white rounded-lg shadow-lg border border-gray-200 p-4 text-sm">
+        <p className="font-semibold text-gray-800 mb-3">Détails de l'export</p>
+        <dl className="space-y-1.5">
+          {lignes.map(({ label, valeur }) => (
+            <div key={label} className="grid grid-cols-2 gap-2">
+              <dt className="text-gray-500">{label}</dt>
+              <dd
+                className="text-gray-900 font-medium truncate"
+                title={label === 'Identifiant' ? job.id : undefined}
+              >
+                {valeur}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </Popover.Panel>
+    </Popover>
+  );
+}
+
+export default function ExportPage() {
+  const initial = useMemo(() => periodeInitiale(), []);
+  const [dateDebut, setDateDebut] = useState(initial.debut);
+  const [dateFin, setDateFin] = useState(initial.fin);
+  const [projetId, setProjetId] = useState('');
+  const [equipeId, setEquipeId] = useState('');
+
+  const { data: dataProjets } = useQuery(PROJETS_ACTIFS, { fetchPolicy: 'cache-and-network' });
+  const { data: dataEquipes } = useQuery(TEAMS_FULL_QUERY, {
+    variables: { actifSeulement: true },
+    fetchPolicy: 'cache-and-network',
+  });
+  const { data: dataExports, loading: loadingExports, refetch: refetchExports } = useQuery(MES_EXPORTS, {
+    fetchPolicy: 'network-only',
+    pollInterval: 10000,
+  });
+
+  const projets: Projet[] = dataProjets?.projets ?? [];
+  const equipes: Equipe[] = dataEquipes?.equipes ?? [];
+
+  // Exports locaux créés dans cette session (affichés immédiatement, avant le refetch)
+  const [exportsLocaux, setExportsLocaux] = useState<ExportJob[]>([]);
+
+  // Délai minimum "En cours" : timestamp jusqu'auquel masquer TERMINE pour chaque export ID
+  const [delaiFin, setDelaiFin] = useState<Record<string, number>>({});
+
+  // Re-render automatique à l'expiration du délai
+  useEffect(() => {
+    const timestamps = Object.values(delaiFin);
+    if (timestamps.length === 0) return;
+    const now = Date.now();
+    const prochains = timestamps.filter((t) => t > now);
+    if (prochains.length === 0) return;
+    const delai = Math.min(...prochains) - now;
+    const timer = setTimeout(() => {
+      setDelaiFin((prev) => {
+        const now2 = Date.now();
+        const next: Record<string, number> = {};
+        for (const [id, t] of Object.entries(prev)) {
+          if (t > now2) next[id] = t;
+        }
+        return next;
+      });
+    }, delai);
+    return () => clearTimeout(timer);
+  }, [delaiFin]);
+
+  // Retourne le statut à afficher : masque TERMINE pendant 3 s après création
+  const statutAffiche = useCallback(
+    (exp: ExportJob): string => {
+      if (exp.statut === 'TERMINE' && delaiFin[exp.id] && Date.now() < delaiFin[exp.id]) {
+        return 'EN_COURS';
+      }
+      return exp.statut;
+    },
+    [delaiFin],
+  );
+
+  const exportsServeur: ExportJob[] = dataExports?.mesExports ?? [];
+
+  // Observer : détecte les transitions vers TERMINE et signale à NotificationBell
+  // de refetch immédiatement, sans attendre le poll de 60 s.
+  const signalRefreshCount = useNotificationStore((s) => s.signalRefreshCount);
+  const statutsPrecedents = useRef<Record<string, string>>({});
+  useEffect(() => {
+    const precedents = statutsPrecedents.current;
+    let nouveauTermine = false;
+    for (const exp of exportsServeur) {
+      const precedent = precedents[exp.id];
+      // Signal si TERMINE et :
+      // - transition depuis un statut connu (precedent !== undefined) : cas normal
+      // - OU export créé dans cette session (dans exportsLocaux) : cas job très rapide
+      //   (TERMINE direct au premier poll, precedent === undefined car jamais vu EN_ATTENTE)
+      const estDeSession = exportsLocaux.some((e) => e.id === exp.id);
+      if (
+        exp.statut === 'TERMINE' &&
+        precedent !== 'TERMINE' &&
+        (precedent !== undefined || estDeSession)
+      ) {
+        nouveauTermine = true;
+      }
+      precedents[exp.id] = exp.statut;
+    }
+    if (nouveauTermine) {
+      signalRefreshCount();
+    }
+  }, [exportsServeur, exportsLocaux, signalRefreshCount]);
+
+  // Merge : les exports serveur ont la priorité, on ajoute les locaux pas encore en BDD
+  const exports = useMemo(() => {
+    const idsServeur = new Set(exportsServeur.map((e) => e.id));
+    const pending = exportsLocaux.filter((e) => !idsServeur.has(e.id));
+    return [...pending, ...exportsServeur];
+  }, [exportsServeur, exportsLocaux]);
+
+  const [requestExport, { loading: exporting }] = useMutation(REQUEST_EXPORT, {
+    onCompleted: (data) => {
+      const id: string = data.requestExport.id;
+      // Garantir 3 s minimum en état "En cours" pour que le badge soit visible
+      setDelaiFin((prev) => ({ ...prev, [id]: Date.now() + 3000 }));
+      // Apparition immédiate de la ligne avec EN_ATTENTE
+      setExportsLocaux((prev) => [data.requestExport, ...prev]);
+      // Puis refetch pour synchroniser avec le serveur
+      refetchExports();
+    },
+  });
+
+  const [desactiverExport] = useMutation(DESACTIVER_EXPORT, {
+    onCompleted: () => refetchExports(),
+  });
+
+  const [supprimerExport] = useMutation(SUPPRIMER_EXPORT, {
+    onCompleted: () => {
+      // Vider le cache local : le refetch serveur fait autorité après suppression
+      setExportsLocaux([]);
+      refetchExports();
+    },
+  });
+
+  const handleExport = () => {
+    const input: Record<string, string> = { format: 'CSV', dateDebut, dateFin };
+    if (projetId) input.projetId = projetId;
+    if (equipeId) input.equipeId = equipeId;
+    requestExport({ variables: { input } });
+  };
+
+  const handleRegenerer = useCallback((exp: ExportJob) => {
+    const filtres = exp.filtres ?? {};
+    const input: Record<string, string> = {
+      format: 'CSV',
+      dateDebut: filtres.date_debut ?? dateDebut,
+      dateFin: filtres.date_fin ?? dateFin,
+    };
+    if (filtres.project_id) input.projetId = filtres.project_id;
+    if (filtres.team_id) input.equipeId = filtres.team_id;
+    requestExport({ variables: { input } });
+  }, [exporting, dateDebut, dateFin, requestExport]);
+
+  const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8080/graphql').replace('/graphql', '');
+
+  const estExpire = (exp: ExportJob) => {
+    if (!exp.expireLe) return false;
+    return new Date(exp.expireLe) < new Date();
+  };
+
+  return (
     <div className="space-y-6">
       {/* Titre */}
       <div className="bg-white rounded-xl shadow-sm p-6">

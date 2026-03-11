@@ -1,1 +1,1 @@
-export { default } from '../../../pages/StatsGlobalesPage';
+export { default } from './StatsGlobalesPage.impl';
