@@ -62,6 +62,8 @@ Demarrage conseille :
   cd backend && php artisan migrate
   cd backend && php artisan serve --host=0.0.0.0 --port=8080
   cd frontend && npm run dev
+  bash scripts/reset-v2-test-db.sh
+  cd backend && php artisan test
 
 Prerequis :
   - PostgreSQL joignable sur 127.0.0.1:5432

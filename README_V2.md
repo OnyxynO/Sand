@@ -33,6 +33,7 @@ php artisan serve --host=0.0.0.0 --port=8080
 
 ```bash
 bash scripts/bootstrap-v2.sh
+bash scripts/reset-v2-test-db.sh
 ```
 
 ## Configuration locale recommandee
@@ -65,6 +66,7 @@ Pre-requis PostgreSQL :
 - la base applicative `sand_v2` doit exister pour le run local
 - la base `sand_v2_test` doit exister pour `php artisan test`
 - dans l'etat actuel, le role `sand` ne cree pas lui-meme les bases; il faut donc les creer une fois avec un role PostgreSQL plus privilege
+- le script `scripts/reset-v2-test-db.sh` recree proprement `sand_v2_test` avec les binaires Homebrew PostgreSQL
 
 Dans `frontend/.env.local` :
 
