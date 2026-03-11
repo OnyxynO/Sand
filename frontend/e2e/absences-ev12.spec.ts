@@ -85,7 +85,7 @@ test.describe('EV-12 — Absences mode manuel (utilisateur)', () => {
 
   // EV-12-01 : le bloc absences est visible en mode manuel avec le prompt "cliquer pour saisir"
   test('EV-12-01 : bloc absences visible avec prompt cliquer pour saisir', async ({ page }) => {
-    await expect(page.getByText('Absences')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('Absences', { exact: true })).toBeVisible({ timeout: 5000 });
     await expect(page.getByText('cliquer pour saisir')).toBeVisible({ timeout: 5000 });
     // La ligne absence est présente (tbody tr dans la première table)
     const ligneAbsence = getLigneAbsences(page);
