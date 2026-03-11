@@ -34,6 +34,12 @@ sur la branche `main` du depot d'origine ni sur le pipeline de production.
 - logique notifications deplacee dans `features/notifications/hooks/`
 - query hebdomadaire backend deplacee dans `backend/app/Services/WeeklyTimeEntryQueryService.php`
 
+### Domaines en cours de migration
+
+- `projets` bascule vers `frontend/src/features/projets/`
+- `admin/activities` recoit une entree v2 sous `frontend/src/features/admin/activities/`
+- les pages historiques restent presentes comme wrappers de compatibilite
+
 ## Garde-fou Git
 
 Dans cette copie, le remote de push a ete desactive (`upstream` fetch only, push URL invalide) pour eviter
