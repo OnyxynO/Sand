@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SAND V2 - Palette</title>
+    <style>
+      :root {
+        --sand-bg: #f3efe6;
+        --sand-surface: rgba(255, 252, 247, 0.8);
+        --sand-surface-strong: #fffdf8;
+        --sand-ink: #1f2937;
+        --sand-muted: #6b7280;
+        --sand-line: rgba(31, 41, 55, 0.12);
+        --sand-accent: #0f766e;
+        --sand-accent-strong: #115e59;
+        --sand-accent-soft: rgba(15, 118, 110, 0.14);
+        --sand-warm: #d97706;
+        --sand-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+        --sand-body: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--sand-ink);
+        font-family: var(--sand-body);
+        background:
+          radial-gradient(circle at top left, rgba(15, 118, 110, 0.12), transparent 32%),
+          radial-gradient(circle at top right, rgba(217, 119, 6, 0.10), transparent 28%),
+          linear-gradient(180deg, #f8f4ec 0%, #f1ebe0 100%);
+      }
+
+      .page {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 40px 24px 64px;
+      }
+
+      .hero,
+      .panel {
+        background: rgba(255, 252, 247, 0.86);
+        backdrop-filter: blur(16px);
+        border: 1px solid var(--sand-line);
+        box-shadow: 0 18px 50px rgba(42, 47, 54, 0.08);
+        border-radius: 28px;
+      }
+
+      .hero {
+        padding: 28px 30px;
+        margin-bottom: 24px;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: var(--sand-muted);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2 {
+        font-family: var(--sand-display);
+        letter-spacing: -0.02em;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: clamp(32px, 4vw, 52px);
+      }
+
+      .lede {
+        margin: 0;
+        max-width: 760px;
+        color: var(--sand-muted);
+        font-size: 16px;
+        line-height: 1.6;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 18px;
+      }
+
+      .swatch {
+        overflow: hidden;
+      }
+
+      .chip {
+        height: 120px;
+        border-bottom: 1px solid var(--sand-line);
+      }
+
+      .meta {
+        padding: 16px 18px 18px;
+      }
+
+      .name {
+        margin: 0 0 6px;
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .value {
+        margin: 0 0 8px;
+        color: var(--sand-muted);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 13px;
+      }
+
+      .usage {
+        margin: 0;
+        color: var(--sand-muted);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .section {
+        margin-top: 24px;
+      }
+
+      .section .panel {
+        padding: 22px;
+      }
+
+      .section h2 {
+        margin: 0 0 16px;
+        font-size: 30px;
+      }
+
+      .tokens {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .token {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 999px;
+        background: var(--sand-surface-strong);
+        border: 1px solid var(--sand-line);
+        font-size: 14px;
+      }
+
+      .dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+      }
+
+      .note {
+        margin-top: 16px;
+        color: var(--sand-muted);
+        font-size: 14px;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <p class="eyebrow">SAND V2</p>
+        <h1>Palette visuelle</h1>
+        <p class="lede">
+          Une palette minerale, sablee et lisible. L’idee de la v2 etait de garder une base calme:
+          fond clair, surfaces laiteuses, encre foncee, accent froid teal et pointe ocre plus chaude.
+        </p>
+      </section>
+
+      <section class="section">
+        <div class="panel">
+          <h2>Couleurs principales</h2>
+          <div class="grid">
+            <article class="swatch panel">
+              <div class="chip" style="background:#f3efe6;"></div>
+              <div class="meta">
+                <p class="name">sand-bg</p>
+                <p class="value">#f3efe6</p>
+                <p class="usage">Fond sable clair, base du theme general.</p>
+              </div>
+            </article>
+            <article class="swatch panel">
+              <div class="chip" style="background:#fffdf8;"></div>
+              <div class="meta">
+                <p class="name">sand-surface-strong</p>
+                <p class="value">#fffdf8</p>
+                <p class="usage">Surfaces fortes, zones de lecture, hover doux.</p>
+              </div>
+            </article>
+            <article class="swatch panel">
+              <div class="chip" style="background:#1f2937;"></div>
+              <div class="meta">
+                <p class="name">sand-ink</p>
+                <p class="value">#1f2937</p>
+                <p class="usage">Texte principal, boutons pleins, contrastes forts.</p>
+              </div>
+            </article>
+            <article class="swatch panel">
+              <div class="chip" style="background:#6b7280;"></div>
+              <div class="meta">
+                <p class="name">sand-muted</p>
+                <p class="value">#6b7280</p>
+                <p class="usage">Texte secondaire, metadata, descriptions.</p>
+              </div>
+            </article>
+            <article class="swatch panel">
+              <div class="chip" style="background:#0f766e;"></div>
+              <div class="meta">
+                <p class="name">sand-accent</p>
+                <p class="value">#0f766e</p>
+                <p class="usage">Accent principal, liens, focus, toggles.</p>
+              </div>
+            </article>
+            <article class="swatch panel">
+              <div class="chip" style="background:#115e59;"></div>
+              <div class="meta">
+                <p class="name">sand-accent-strong</p>
+                <p class="value">#115e59</p>
+                <p class="usage">Hover accentue, boutons actifs, emphasis forte.</p>
+              </div>
+            </article>
+            <article class="swatch panel">
+              <div class="chip" style="background:#d97706;"></div>
+              <div class="meta">
+                <p class="name">sand-warm</p>
+                <p class="value">#d97706</p>
+                <p class="usage">Note chaude ocre, tension visuelle, halos.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="panel">
+          <h2>Transparences et structure</h2>
+          <div class="grid">
+            <article class="swatch panel">
+              <div class="chip" style="background:rgba(255,252,247,0.8);"></div>
+              <div class="meta">
+                <p class="name">sand-surface</p>
+                <p class="value">rgba(255, 252, 247, 0.8)</p>
+                <p class="usage">Cartes translucides, panneaux flottants.</p>
+              </div>
+            </article>
+            <article class="swatch panel">
+              <div class="chip" style="background:rgba(31,41,55,0.12);"></div>
+              <div class="meta">
+                <p class="name">sand-line</p>
+                <p class="value">rgba(31, 41, 55, 0.12)</p>
+                <p class="usage">Bordures, separations, structure legere.</p>
+              </div>
+            </article>
+            <article class="swatch panel">
+              <div class="chip" style="background:rgba(15,118,110,0.14);"></div>
+              <div class="meta">
+                <p class="name">sand-accent-soft</p>
+                <p class="value">rgba(15, 118, 110, 0.14)</p>
+                <p class="usage">Badges, fonds d’accent, emphasis douce.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="panel">
+          <h2>Ou on les voit</h2>
+          <div class="tokens">
+            <span class="token"><span class="dot" style="background:#f3efe6;"></span> fond global</span>
+            <span class="token"><span class="dot" style="background:#fffdf8;"></span> cartes et tableaux</span>
+            <span class="token"><span class="dot" style="background:#1f2937;"></span> boutons principaux</span>
+            <span class="token"><span class="dot" style="background:#0f766e;"></span> accents et liens</span>
+            <span class="token"><span class="dot" style="background:#115e59;"></span> hover et etats forts</span>
+            <span class="token"><span class="dot" style="background:#d97706;"></span> halos ocres</span>
+          </div>
+          <p class="note">
+            Note: les graphiques dashboard gardent encore une palette dataviz plus standard, distincte du theme sable.
+            Si on veut pousser l’identite visuelle encore plus loin, ce sera le prochain chantier naturel.
+          </p>
+        </div>
+      </section>
+    </main>
+  </body>
+  </html>

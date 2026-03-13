@@ -11,6 +11,8 @@ const AUTH_FILE = path.join(__dirname, '.auth/utilisateur.json');
 
 setup('authentification utilisateur', async ({ page }) => {
   await page.goto('/login');
+  await page.waitForTimeout(1500);
+  await expect(page.getByText('Services en cours de démarrage')).not.toBeVisible({ timeout: 10000 });
 
   // Remplir le formulaire de connexion
   await page.fill('#email', 'jean.martin@sand.local');

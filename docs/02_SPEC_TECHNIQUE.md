@@ -29,7 +29,7 @@
 
 | Outil | Usage |
 |-------|-------|
-| Docker | Environnement local conteneurisé |
+| Docker | Conteneurisation, CI et alternative au dev natif |
 | Postman / Insomnia | Tests API GraphQL |
 | PHPUnit | Tests unitaires et feature backend |
 | Vitest | Tests composants et hooks frontend |
@@ -245,9 +245,45 @@ public function update(User $user, TimeEntry $entry): bool
 
 ---
 
-## 5. Environnement Docker
+## 5. Environnements d'exécution
 
-### 5.1 Services
+### 5.1 Développement local natif
+
+Depuis mars 2026, le mode de développement local par défaut n'utilise plus Docker pour l'application.
+
+Stack locale attendue :
+
+```bash
+brew services start redis
+cd backend && php artisan serve --host=0.0.0.0 --port=8080
+cd frontend && npm run dev
+```
+
+Configuration spécifique du `.env` backend en local :
+
+```bash
+APP_URL=http://localhost:8080
+FRONTEND_URL=http://localhost:5173
+SANCTUM_STATEFUL_DOMAINS=localhost:5173
+
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=sand
+DB_USERNAME=sand
+DB_PASSWORD=secret
+
+REDIS_CLIENT=predis
+REDIS_HOST=127.0.0.1
+CACHE_STORE=redis
+QUEUE_CONNECTION=redis
+```
+
+### 5.2 Environnement Docker
+
+Docker reste utilisé pour les workflows conteneurisés, la reproductibilité et certains tests.
+
+#### Services
 
 ```yaml
 # docker-compose.yml (noms réels des services)
@@ -298,11 +334,12 @@ volumes:
   postgres_data:
 ```
 
-### 5.2 Configuration locale
+#### Configuration backend en mode Docker
 
 ```bash
 # .env (backend)
 APP_URL=http://localhost:8080
+FRONTEND_URL=http://localhost:5173
 SANCTUM_STATEFUL_DOMAINS=localhost:5173
 
 DB_CONNECTION=pgsql
@@ -315,6 +352,26 @@ DB_PASSWORD=secret
 QUEUE_CONNECTION=sync   # sync en dev — redis en prod avec worker
 CACHE_STORE=redis
 REDIS_HOST=redis
+```
+
+### 5.3 Production
+
+L'environnement de production est déployé sur :
+
+- URL applicative : `https://sand.interstice.work`
+- Domaine : `interstice.work`
+- Reverse proxy : Caddy
+- Base de données : PostgreSQL
+- Cache / queue : Redis
+
+Points de configuration critiques :
+
+```bash
+APP_URL=https://sand.interstice.work
+SESSION_DOMAIN=sand.interstice.work
+SANCTUM_STATEFUL_DOMAINS=sand.interstice.work
+SESSION_SECURE_COOKIE=true
+QUEUE_CONNECTION=redis
 ```
 
 ---
@@ -346,5 +403,5 @@ REDIS_HOST=redis
 
 ---
 
-*Document v1.2 - Février 2026*
-*Mise à jour : services Docker corrigés, Playwright ajouté, AbsenceService documenté*
+*Document v1.3 - Mars 2026*
+*Mise à jour : clarification dev natif local, Docker en alternative, URL de production interstice.work*

@@ -3,6 +3,11 @@
 import { create } from 'zustand';
 import type { LigneSaisie, CelluleSaisieData, SaisieAPI } from '../types';
 import { getSemaineActuelle, getJoursSemaine, type JourSemaine } from '../utils/semaineUtils';
+import {
+  construireLignesDepuisApi,
+  creerLigneId,
+  initialiserCellules,
+} from '../features/saisie/lib/saisieMapping';
 
 interface SaisieState {
   // Semaine affichee
@@ -51,23 +56,6 @@ interface SaisieState {
     modifiees: { ligneId: string; dateStr: string; data: CelluleSaisieData }[];
     supprimees: { id: string }[];
   };
-}
-
-// Cree un ID unique pour une ligne (couple projet+activite)
-function creerLigneId(projetId: string, activiteId: string): string {
-  return `${projetId}_${activiteId}`;
-}
-
-// Initialise les cellules vides pour une ligne
-function initialiserCellules(jours: JourSemaine[]): Record<string, CelluleSaisieData> {
-  const cellules: Record<string, CelluleSaisieData> = {};
-  for (const jour of jours) {
-    cellules[jour.dateStr] = {
-      duree: null,
-      estModifiee: false,
-    };
-  }
-  return cellules;
 }
 
 export const useSaisieStore = create<SaisieState>((set, get) => ({
@@ -145,35 +133,7 @@ export const useSaisieStore = create<SaisieState>((set, get) => ({
   chargerSaisies: (saisiesAPI) => {
     const { jours } = get();
 
-    // Grouper par projet+activite
-    const lignesMap = new Map<string, LigneSaisie>();
-
-    for (const saisie of saisiesAPI) {
-      const ligneId = creerLigneId(saisie.projet.id, saisie.activite.id);
-
-      if (!lignesMap.has(ligneId)) {
-        lignesMap.set(ligneId, {
-          id: ligneId,
-          projetId: saisie.projet.id,
-          projetNom: saisie.projet.nom,
-          projetCode: saisie.projet.code,
-          activiteId: saisie.activite.id,
-          activiteNom: saisie.activite.nom,
-          activiteChemin: saisie.activite.cheminComplet || saisie.activite.chemin,
-          saisies: initialiserCellules(jours),
-        });
-      }
-
-      const ligne = lignesMap.get(ligneId)!;
-      ligne.saisies[saisie.date] = {
-        id: saisie.id,
-        duree: saisie.duree,
-        commentaire: saisie.commentaire,
-        estModifiee: false,
-      };
-    }
-
-    set({ lignes: Array.from(lignesMap.values()) });
+    set({ lignes: construireLignesDepuisApi(saisiesAPI, jours) });
   },
 
   // Ajouter une nouvelle ligne

@@ -3,6 +3,20 @@
 
 import { test, expect } from '@playwright/test';
 
+async function allerSurUtilisateurs(page: Parameters<Parameters<typeof test>[1]>[0]) {
+  await page.goto('/admin/utilisateurs');
+  try {
+    await expect(page.getByRole('heading', { name: 'Utilisateurs' })).toBeVisible({
+      timeout: 8000,
+    });
+  } catch {
+    await page.goto('/admin/utilisateurs');
+    await expect(page.getByRole('heading', { name: 'Utilisateurs' })).toBeVisible({
+      timeout: 12000,
+    });
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Bloc 1 : page Utilisateurs
 // ─────────────────────────────────────────────────────────────────────────────
@@ -10,27 +24,18 @@ import { test, expect } from '@playwright/test';
 test.describe('Admin — Utilisateurs', () => {
   // A-U01
   test('page utilisateurs affiche la liste', async ({ page }) => {
-    await page.goto('/admin/utilisateurs');
-    await expect(page.getByRole('heading', { name: 'Utilisateurs' })).toBeVisible({
-      timeout: 8000,
-    });
+    await allerSurUtilisateurs(page);
   });
 
   // A-U02
   test('bouton Nouvel utilisateur present', async ({ page }) => {
-    await page.goto('/admin/utilisateurs');
-    await expect(page.getByRole('heading', { name: 'Utilisateurs' })).toBeVisible({
-      timeout: 8000,
-    });
+    await allerSurUtilisateurs(page);
     await expect(page.getByRole('button', { name: 'Nouvel utilisateur' })).toBeVisible();
   });
 
   // A-U03 — régression EV-08 : la liste ne doit pas être vide
   test('liste contient au moins un utilisateur', async ({ page }) => {
-    await page.goto('/admin/utilisateurs');
-    await expect(page.getByRole('heading', { name: 'Utilisateurs' })).toBeVisible({
-      timeout: 8000,
-    });
+    await allerSurUtilisateurs(page);
     // Attendre que le chargement soit terminé (spinner disparaît ou tableau apparaît)
     await expect(page.locator('tbody tr').first()).toBeVisible({ timeout: 10000 });
     // Vérifier qu'il n'y a pas le message "vide"
@@ -44,10 +49,7 @@ test.describe('Admin — Utilisateurs', () => {
     await expect(page.getByRole('heading', { name: 'Saisie' })).toBeVisible({ timeout: 8000 });
 
     // Naviguer vers la page utilisateurs
-    await page.goto('/admin/utilisateurs');
-    await expect(page.getByRole('heading', { name: 'Utilisateurs' })).toBeVisible({
-      timeout: 8000,
-    });
+    await allerSurUtilisateurs(page);
     await expect(page.locator('tbody tr').first()).toBeVisible({ timeout: 10000 });
     await expect(page.getByText('Aucun utilisateur trouve')).not.toBeVisible();
   });

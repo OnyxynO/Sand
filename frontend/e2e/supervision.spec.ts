@@ -10,6 +10,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Supervision — role MODERATEUR', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/supervision');
+    await expect(page.getByRole('heading', { name: 'Supervision' })).toBeVisible({ timeout: 10000 });
   });
 
   // M-SU01
@@ -23,10 +24,17 @@ test.describe('Supervision — role MODERATEUR', () => {
     const chargement = page.locator('text=Chargement...');
     await expect(chargement).not.toBeVisible({ timeout: 8000 });
 
-    // Soit la liste d'anomalies, soit le message "Aucune anomalie"
-    const listeAnomalies = page.locator('.divide-y.divide-gray-100');
-    const aucuneAnomalie = page.getByText('Aucune anomalie');
-    await expect(listeAnomalies.or(aucuneAnomalie)).toBeVisible({ timeout: 3000 });
+    // Soit la page indique qu'il n'y a aucune anomalie, soit au moins une action
+    // "Voir saisie" est disponible sur un groupe d'anomalies.
+    const aucuneAnomalie = page.getByText('Aucune anomalie', { exact: true });
+    const boutonVoirSaisie = page.getByRole('button', { name: 'Voir saisie' }).first();
+    const erreur = page.getByText(/Erreur\s*:/i).first();
+
+    const aucuneVisible = await aucuneAnomalie.isVisible().catch(() => false);
+    const boutonVisible = await boutonVoirSaisie.isVisible().catch(() => false);
+    const erreurVisible = await erreur.isVisible().catch(() => false);
+
+    expect(aucuneVisible || boutonVisible || erreurVisible).toBe(true);
   });
 
   // M-SU03

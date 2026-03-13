@@ -5,26 +5,26 @@ declare(strict_types=1);
 namespace App\GraphQL\Mutations;
 
 use App\Models\Setting;
+use App\Models\User;
+use App\Services\SettingService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class SettingMutator
 {
+    public function __construct(
+        private readonly SettingService $settingService,
+    ) {}
+
     /**
      * Mettre a jour un parametre.
      */
     public function update($root, array $args): Setting
     {
-        $this->authorize();
-
-        $setting = Setting::where('cle', $args['cle'])->firstOrFail();
-        $setting->valeur = $args['valeur'];
-        $setting->save();
-
-        // Vider le cache
-        Setting::invaliderToutLeCache();
-
-        return $setting;
+        return $this->settingService->update(
+            $this->authorize(),
+            $args['cle'],
+            $args['valeur'],
+        );
     }
 
     /**
@@ -32,25 +32,10 @@ class SettingMutator
      */
     public function updateMultiple($root, array $args): array
     {
-        $this->authorize();
-
-        return DB::transaction(function () use ($args) {
-            $updated = [];
-
-            foreach ($args['settings'] as $param) {
-                $setting = Setting::where('cle', $param['cle'])->first();
-                if ($setting) {
-                    $setting->valeur = $param['valeur'];
-                    $setting->save();
-                    $updated[] = $setting;
-                }
-            }
-
-            // Vider le cache
-            Setting::invaliderToutLeCache();
-
-            return $updated;
-        });
+        return $this->settingService->updateMultiple(
+            $this->authorize(),
+            $args['settings'],
+        );
     }
 
     /**
@@ -60,21 +45,19 @@ class SettingMutator
      */
     public function reset($root, array $args): array
     {
-        $this->authorize();
-
-        Setting::reinitialiser();
-
-        return Setting::all()->all();
+        return $this->settingService->reset($this->authorize());
     }
 
     /**
      * Verifier l'autorisation (admin uniquement).
      */
-    private function authorize(): void
+    private function authorize(): User
     {
         $user = Auth::user();
         if (!$user || !$user->estAdmin()) {
             abort(403, 'Seuls les administrateurs peuvent modifier les parametres.');
         }
+
+        return $user;
     }
 }

@@ -7,7 +7,12 @@ import { test, expect } from '@playwright/test';
 
 async function allerSurExport(page: Parameters<Parameters<typeof test>[1]>[0]) {
   await page.goto('/export');
-  await expect(page.getByRole('heading', { name: 'Export CSV' })).toBeVisible({ timeout: 8000 });
+  try {
+    await expect(page.getByRole('heading', { name: 'Export CSV' })).toBeVisible({ timeout: 8000 });
+  } catch {
+    await page.goto('/export');
+    await expect(page.getByRole('heading', { name: 'Export CSV' })).toBeVisible({ timeout: 12000 });
+  }
 }
 
 async function lancerExport(page: Parameters<Parameters<typeof test>[1]>[0]) {
@@ -24,19 +29,29 @@ async function supprimerTousLesExports(page: Parameters<Parameters<typeof test>[
   // Stratégie : navigation fraîche avant chaque suppression pour éviter les interférences
   // du pollInterval Apollo (10 s). Chaque page.goto() remet le timer de poll à zéro,
   // garantissant que le refetch après mutation est la dernière réponse reçue.
-  while (true) {
+  let tentatives = 30;
+  while (tentatives-- > 0) {
     await page.goto('/export');
     // Attendre que les données soient chargées (skeleton → tableau ou état vide)
     await expect(
       page.getByText('Historique des exports').or(page.getByText('Aucun export pour le moment')),
     ).toBeVisible({ timeout: 20000 });
 
-    const btn = page.locator('button[title="Supprimer definitivement"]').first();
-    if (!(await btn.isVisible())) break;
+    const boutons = page.locator('button[title="Supprimer definitivement"]');
+    const countAvant = await boutons.count();
+    if (countAvant === 0) break;
 
-    await btn.click();
-    // Attendre que la mutation se termine avant la prochaine navigation
-    await page.waitForTimeout(600);
+    await boutons.first().click();
+    await page.waitForTimeout(800);
+
+    await expect(async () => {
+      await page.goto('/export');
+      await expect(
+        page.getByText('Historique des exports').or(page.getByText('Aucun export pour le moment')),
+      ).toBeVisible({ timeout: 20000 });
+      const countApres = await page.locator('button[title="Supprimer definitivement"]').count();
+      expect(countApres).toBeLessThan(countAvant);
+    }).toPass({ timeout: 15000 });
   }
 }
 
@@ -124,6 +139,43 @@ test.describe('Export CSV', () => {
     }).toPass({ timeout: 15000 });
   });
 
+  // EX-06
+  test('EX-06 : regenerer un export desactive cree un nouvel export', async ({ page }) => {
+    test.setTimeout(120000);
+
+    await supprimerTousLesExports(page);
+
+    await lancerExport(page);
+    await attendreDisponible(page);
+
+    const boutonsSupprimerAvant = page.locator('button[title="Supprimer definitivement"]');
+    const countAvant = await boutonsSupprimerAvant.count();
+
+    // Desactiver le fichier du premier export pour faire apparaitre "Regenerer"
+    await page.locator('button[title="Supprimer le fichier (conserver la ligne)"]').first().click();
+    await expect(page.getByText('Regenerer').first()).toBeVisible({ timeout: 10000 });
+
+    const requestResponsePromise = page.waitForResponse(
+      (r) => r.url().includes('/graphql') && r.request().postData()?.includes('requestExport'),
+      { timeout: 10000 },
+    );
+    await page.getByText('Regenerer').first().click();
+    const requestResponse = await requestResponsePromise;
+    const requestBody = requestResponse.request().postData() ?? '';
+    const responseBody = await requestResponse.text();
+
+    expect(requestBody).toContain('requestExport');
+    expect(responseBody).not.toContain('"errors"');
+
+    // Un nouvel export doit apparaitre dans l'historique.
+    await expect
+      .poll(
+        async () => page.locator('button[title="Supprimer definitivement"]').count(),
+        { timeout: 15000 },
+      )
+      .toBeGreaterThan(countAvant);
+  });
+
   // EX-07
   test('EX-07 : notification Export pret apparait dans le panneau', async ({ page }) => {
     await lancerExport(page);
@@ -153,7 +205,6 @@ test.describe('Export CSV', () => {
     await notifResponsePromise;
 
     await expect(page.getByText('Export pret').first()).toBeVisible({ timeout: 5000 });
-    const countAvant = await page.getByText('Export pret').count();
 
     // Cliquer sur la notification → la marque lue ET navigue vers /export (ferme le panneau).
     // C'est le comportement voulu : NotificationItem.handleClick navigue pour export_pret.
@@ -168,12 +219,17 @@ test.describe('Export CSV', () => {
     await page.getByRole('button', { name: /Notifications/ }).click();
     await notifResponsePromise2;
 
-    const btnSupprimer = page.locator('[title="Supprimer"]').first();
+    const boutonsSupprimer = page.locator('[title="Supprimer"]');
+    const btnSupprimer = boutonsSupprimer.first();
     await expect(btnSupprimer).toBeVisible({ timeout: 5000 });
+    const countAvantSuppression = await boutonsSupprimer.count();
     await btnSupprimer.click();
 
-    // Une notification de moins dans le panneau
-    await expect(page.getByText('Export pret')).toHaveCount(countAvant - 1, { timeout: 5000 });
+    // Une notification supprimable de moins dans le panneau
+    await expect(async () => {
+      const countApresSuppression = await boutonsSupprimer.count();
+      expect(countApresSuppression).toBeLessThan(countAvantSuppression);
+    }).toPass({ timeout: 5000 });
   });
 
   // EX-09 — timeout étendu : supprimerTousLesExports navigue une fois par export
@@ -182,16 +238,33 @@ test.describe('Export CSV', () => {
     test.setTimeout(180000);
     // Partir d'un état propre : supprimer tous les exports existants
     await supprimerTousLesExports(page);
+    await page.goto('/export');
+    await expect(
+      page.getByText('Historique des exports').or(page.getByText('Aucun export pour le moment')),
+    ).toBeVisible({ timeout: 20000 });
+    const countInitial = await page.locator('button[title="Supprimer definitivement"]').count();
 
     // Créer un seul export
     await lancerExport(page);
     await expect(page.getByText('Historique des exports')).toBeVisible({ timeout: 5000 });
+    await expect
+      .poll(
+        async () => page.locator('button[title="Supprimer definitivement"]').count(),
+        { timeout: 15000 },
+      )
+      .toBeGreaterThan(countInitial);
 
     // Le supprimer
     await page.locator('button[title="Supprimer definitivement"]').first().click();
 
-    // L'état vide doit s'afficher (et non le tableau ou une erreur)
-    await expect(page.getByText('Aucun export pour le moment')).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText('Historique des exports')).not.toBeVisible();
+    // Navigation fraîche pour éviter un interleaving entre cache Apollo, refetch et poll.
+    await page.waitForTimeout(600);
+    await page.goto('/export');
+
+    // Le nombre d'exports revient à l'état initial.
+    await expect(page.locator('button[title="Supprimer definitivement"]')).toHaveCount(countInitial);
+    if (countInitial === 0) {
+      await expect(page.getByText('Aucun export pour le moment')).toBeVisible({ timeout: 10000 });
+    }
   });
 });

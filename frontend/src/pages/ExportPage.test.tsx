@@ -1,4 +1,4 @@
-import { screen, render, act } from '@testing-library/react';
+import { screen, render, act, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import ExportPage from './ExportPage';
@@ -142,6 +142,56 @@ describe('ExportPage', () => {
 
     expect(screen.getByText('Regenerer')).toBeInTheDocument();
     expect(screen.queryByText('Telecharger')).not.toBeInTheDocument();
+  });
+
+  it('clique sur Regenerer relance un export avec les filtres existants', () => {
+    const requestExportMock = vi.fn();
+
+    mockUseQuery.mockImplementation((query: unknown) => {
+      if (query === PROJETS_ACTIFS) return { data: { projets }, loading: false };
+      if (query === TEAMS_FULL_QUERY) return { data: { equipes }, loading: false };
+      if (query === MES_EXPORTS) {
+        return {
+          data: {
+            mesExports: [{
+              id: 'uuid-regen',
+              statut: 'DESACTIVE',
+              filtres: {
+                date_debut: '2026-01-01',
+                date_fin: '2026-01-31',
+                project_id: '1',
+                team_id: '2',
+              },
+              expireLe: null,
+              creeLe: new Date().toISOString(),
+            }],
+          },
+          loading: false,
+          refetch: vi.fn(),
+        };
+      }
+      return { data: undefined, loading: false };
+    });
+
+    mockUseMutation.mockImplementation((mutation: unknown) => {
+      if (mutation === REQUEST_EXPORT) return [requestExportMock, { loading: false }];
+      return [vi.fn(), { loading: false }];
+    });
+
+    renderPage();
+    fireEvent.click(screen.getByText('Regenerer'));
+
+    expect(requestExportMock).toHaveBeenCalledWith({
+      variables: {
+        input: {
+          format: 'CSV',
+          dateDebut: '2026-01-01',
+          dateFin: '2026-01-31',
+          projetId: '1',
+          equipeId: '2',
+        },
+      },
+    });
   });
 
   it('affiche le badge Expire et le bouton Regenerer pour un export TERMINE expire', () => {

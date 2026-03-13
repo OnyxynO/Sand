@@ -8,6 +8,7 @@ export interface ActiviteDnd {
   id: string;
   nom: string;
   code?: string;
+  chemin: string;
   niveau: number;
   ordre: number;
   estFeuille: boolean;
@@ -98,19 +99,6 @@ function trouverParentId(id: string, activites: ActiviteDnd[]): string | null {
     }
   }
   return null;
-}
-
-// Trouve les freres d'une activite (les enfants du meme parent)
-function trouverFreres(id: string, activites: ActiviteDnd[]): ActiviteDnd[] {
-  for (const a of activites) {
-    if (a.enfants?.some((e) => e.id === id)) return a.enfants;
-    if (a.enfants) {
-      const result = trouverFreres(id, a.enfants);
-      if (result.length > 0) return result;
-    }
-  }
-  if (activites.some((a) => a.id === id)) return activites;
-  return [];
 }
 
 // Valide si un drop est autorise

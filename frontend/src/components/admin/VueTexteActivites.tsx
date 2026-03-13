@@ -60,20 +60,6 @@ function trouverIdParNom(nom: string, activites: Activite[]): string | null {
   return null;
 }
 
-// Trouver l'ID du parent d'une activite par nom dans l'arbre
-function trouverParentIdParNom(nom: string, activites: Activite[], parentId: string | null = null): string | null {
-  for (const a of activites) {
-    if (a.nom === nom) return parentId;
-    if (a.enfants) {
-      const id = trouverParentIdParNom(nom, a.enfants, a.id);
-      if (id !== null || a.enfants.some((e) => e.nom === nom)) {
-        return id !== null ? id : a.id;
-      }
-    }
-  }
-  return null;
-}
-
 export default function VueTexteActivites({ activites, onAppliquer }: Props) {
   const texteInitial = useMemo(() => arbreVersTexte(activites), [activites]);
   const [texte, setTexte] = useState(texteInitial);

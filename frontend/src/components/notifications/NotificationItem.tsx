@@ -65,6 +65,14 @@ export default function NotificationItem({
   const IconComponent = config.icon;
   const navigate = useNavigate();
   const { fermerPanneau } = useNotificationStore();
+  const exportId =
+    notification.type === 'export_pret' &&
+    notification.donnees &&
+    typeof notification.donnees === 'object' &&
+    'export_id' in notification.donnees &&
+    typeof notification.donnees.export_id === 'string'
+      ? notification.donnees.export_id
+      : null;
 
   const handleClick = () => {
     if (!notification.estLu) {
@@ -88,8 +96,6 @@ export default function NotificationItem({
 
   const handleTelecharger = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const donnees = notification.donnees as Record<string, unknown> | undefined;
-    const exportId = donnees?.export_id;
     if (exportId) {
       const baseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8080/graphql').replace('/graphql', '');
       window.open(`${baseUrl}/exports/${exportId}/download`, '_blank');
@@ -145,7 +151,7 @@ export default function NotificationItem({
               </button>
             )}
 
-            {notification.type === 'export_pret' && (notification.donnees as Record<string, unknown>)?.export_id && (
+            {notification.type === 'export_pret' && exportId && (
               <button
                 onClick={handleTelecharger}
                 className="text-xs font-medium text-green-600 hover:text-green-800 transition-colors"

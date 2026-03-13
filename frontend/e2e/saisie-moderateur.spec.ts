@@ -4,10 +4,13 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Saisie — role MODERATEUR', () => {
+  const getTableauSaisie = (page: Parameters<typeof test>[1]['page']) =>
+    page.locator('table').last();
+
   test.beforeEach(async ({ page }) => {
     await page.goto('/saisie');
     // Attendre que la grille soit chargée
-    await expect(page.locator('table')).toBeVisible({ timeout: 10000 });
+    await expect(getTableauSaisie(page)).toBeVisible({ timeout: 10000 });
   });
 
   // M-S01
@@ -33,10 +36,10 @@ test.describe('Saisie — role MODERATEUR', () => {
     await select.selectOption({ index: 1 });
 
     // Le badge "Mode moderation" doit apparaître
-    await expect(page.getByText('Mode moderation')).toBeVisible({ timeout: 3000 });
+    await expect(page.getByText('Mode moderation', { exact: true })).toBeVisible({ timeout: 3000 });
 
     // La grille reste visible (rechargement des saisies de l'utilisateur sélectionné)
-    await expect(page.locator('table')).toBeVisible();
+    await expect(getTableauSaisie(page)).toBeVisible();
   });
 
   // M-S03
@@ -49,7 +52,7 @@ test.describe('Saisie — role MODERATEUR', () => {
 
     // Sélectionner le premier utilisateur
     await select.selectOption({ index: 1 });
-    await expect(page.getByText('Mode moderation')).toBeVisible({ timeout: 3000 });
+    await expect(page.getByText('Mode moderation', { exact: true })).toBeVisible({ timeout: 3000 });
 
     // Ouvrir la modale d'ajout de ligne
     await page.locator('button:has-text("Ajouter une ligne")').click();
@@ -57,6 +60,6 @@ test.describe('Saisie — role MODERATEUR', () => {
 
     // Fermer la modale (Echap) — on vérifie juste que la sauvegarde est possible
     await page.keyboard.press('Escape');
-    await expect(page.locator('table')).toBeVisible();
+    await expect(getTableauSaisie(page)).toBeVisible();
   });
 });

@@ -4,9 +4,23 @@
 
 import { test, expect } from '@playwright/test';
 
-test.describe('Page de saisie', () => {
-  test.beforeEach(async ({ page }) => {
+async function allerSurSaisie(page: Parameters<Parameters<typeof test>[1]>[0]) {
+  try {
     await page.goto('/saisie');
+  } catch {
+    await page.goto('/saisie');
+  }
+}
+
+test.describe('Page de saisie', () => {
+  const getTableauSaisie = (page: Parameters<typeof test>[1]['page']) =>
+    page.locator('table').last();
+
+  const getNavigationSemaine = (page: Parameters<typeof test>[1]['page']) =>
+    page.locator('h2').filter({ hasText: /\d{4}/ }).first().locator('..');
+
+  test.beforeEach(async ({ page }) => {
+    await allerSurSaisie(page);
     // Attendre que React soit completement rendu avant chaque test
     // (evite les races sur page.goto apres une navigation precedente)
     await expect(page.getByRole('heading', { name: 'Saisie hebdomadaire' })).toBeVisible({
@@ -40,7 +54,7 @@ test.describe('Page de saisie', () => {
 
   test('la grille affiche 7 colonnes jour (Lun. au Dim.)', async ({ page }) => {
     // Attendre que la grille soit chargée
-    const tableau = page.locator('table');
+    const tableau = getTableauSaisie(page);
     await expect(tableau).toBeVisible({ timeout: 10000 });
 
     // Vérifier les en-têtes de colonnes (7 jours + colonne Projet/Activité + Total = 9 colonnes)
@@ -57,11 +71,11 @@ test.describe('Page de saisie', () => {
 
   test('le titre affiche la semaine courante', async ({ page }) => {
     // La navigation semaine est visible
-    const navigation = page.locator('.bg-white.rounded-lg.p-4.shadow-sm');
+    const navigation = getNavigationSemaine(page);
     await expect(navigation).toBeVisible({ timeout: 10000 });
 
     // Le titre de semaine contient une année (format "Du X au Y MOIS AAAA")
-    const titreSemaine = navigation.locator('h2');
+    const titreSemaine = page.locator('h2').filter({ hasText: /\d{4}/ }).first();
     await expect(titreSemaine).toBeVisible();
     const texte = await titreSemaine.textContent();
     expect(texte).toMatch(/\d{4}/); // contient une année
@@ -69,7 +83,7 @@ test.describe('Page de saisie', () => {
 
   test('navigation semaine precedente - le titre est mis a jour', async ({ page }) => {
     // Attendre le titre initial
-    const titreSemaine = page.locator('.bg-white.rounded-lg.p-4.shadow-sm h2');
+    const titreSemaine = page.locator('h2').filter({ hasText: /\d{4}/ }).first();
     await expect(titreSemaine).toBeVisible({ timeout: 10000 });
     const titreInitial = await titreSemaine.textContent();
 
@@ -84,7 +98,7 @@ test.describe('Page de saisie', () => {
   });
 
   test('navigation semaine suivante - retour a la semaine initiale', async ({ page }) => {
-    const titreSemaine = page.locator('.bg-white.rounded-lg.p-4.shadow-sm h2');
+    const titreSemaine = page.locator('h2').filter({ hasText: /\d{4}/ }).first();
     await expect(titreSemaine).toBeVisible({ timeout: 10000 });
     const titreInitial = await titreSemaine.textContent();
 
@@ -101,7 +115,7 @@ test.describe('Page de saisie', () => {
 
   test('bouton Ajouter une ligne present et cliquable', async ({ page }) => {
     // Attendre que la grille soit chargée
-    await expect(page.locator('table')).toBeVisible({ timeout: 10000 });
+    await expect(getTableauSaisie(page)).toBeVisible({ timeout: 10000 });
 
     // Trouver le bouton d'ajout de ligne
     const boutonAjouter = page.locator('button:has-text("Ajouter une ligne")');
@@ -116,17 +130,17 @@ test.describe('Page de saisie', () => {
 
   // U-S10
   test('selecteur utilisateur absent (reserve moderateur+)', async ({ page }) => {
-    await expect(page.locator('table')).toBeVisible({ timeout: 10000 });
+    await expect(getTableauSaisie(page)).toBeVisible({ timeout: 10000 });
     await expect(page.getByText('Saisir pour :')).not.toBeVisible();
   });
 
   // U-S07 : semaine future → cellules en lecture seule
   test('U-S07 : semaine future - cellules en lecture seule', async ({ page }) => {
-    await expect(page.locator('table')).toBeVisible({ timeout: 10000 });
+    await expect(getTableauSaisie(page)).toBeVisible({ timeout: 10000 });
 
     // Aller a la semaine suivante (entierement dans le futur)
     await page.click('button[aria-label="Semaine suivante"]');
-    await expect(page.locator('table')).toBeVisible({ timeout: 10000 });
+    await expect(getTableauSaisie(page)).toBeVisible({ timeout: 10000 });
 
     // Ajouter une ligne via la modale (premier projet/activite disponibles)
     // Ne pas hardcoder "SAND" car le projet peut avoir une date de fin avant la semaine future.
@@ -152,14 +166,15 @@ test.describe('Page de saisie', () => {
 
   // U-S08 : EV-01 modale de confirmation pour modifications non sauvegardees
   test('U-S08 : navigation bloquee avec modifications non sauvegardees', async ({ page }) => {
-    await expect(page.locator('table')).toBeVisible({ timeout: 10000 });
+    await expect(getTableauSaisie(page)).toBeVisible({ timeout: 10000 });
 
     // Ajouter une ligne sur la semaine courante (qui a des jours passes)
     await page.locator('button:has-text("Ajouter une ligne")').click();
     await expect(page.getByText('Choisir un projet')).toBeVisible({ timeout: 5000 });
     await page.locator('ul li button:has-text("SAND")').first().click();
     await expect(page.getByText('Choisir une activite')).toBeVisible({ timeout: 5000 });
-    await page.locator('ul li button:has-text("API REST")').first().click();
+    await expect(page.locator('ul li button').first()).toBeVisible({ timeout: 10000 });
+    await page.locator('ul li button').first().click();
 
     // Attendre l'apparition de la ligne
     await expect(page.locator('tbody tr').first()).toBeVisible({ timeout: 3000 });
@@ -194,7 +209,7 @@ test.describe('Page de saisie', () => {
 
   // U-S09 : EV-07 ligne d'absence visible dans la grille
   test("U-S09 : ligne d'absence visible pour la semaine avec absences", async ({ page }) => {
-    const titreSemaine = page.locator('.bg-white.rounded-lg.p-4.shadow-sm h2');
+    const titreSemaine = page.locator('h2').filter({ hasText: /\d{4}/ }).first();
     await expect(titreSemaine).toBeVisible({ timeout: 10000 });
 
     // Reculer 5 semaines pour atteindre W03 (Jan 12-18, 2026)
@@ -206,7 +221,7 @@ test.describe('Page de saisie', () => {
     }
 
     // Attendre le chargement de la grille
-    await expect(page.locator('table')).toBeVisible({ timeout: 10000 });
+    await expect(getTableauSaisie(page)).toBeVisible({ timeout: 10000 });
 
     // La ligne d'absence necessite que le DemoSeeder ait ete execute.
     // Si absent (env vierge), le test est passe (skip) plutot qu'en echec.

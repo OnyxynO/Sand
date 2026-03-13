@@ -3,8 +3,13 @@
 > Généré depuis le schéma Lighthouse réel (`php artisan lighthouse:print-schema`).
 > Dernière mise à jour : 2026-02-27.
 
-**Endpoint** : `POST http://localhost:8080/graphql`
-**Playground** : `http://localhost:8080/graphiql`
+**Développement local** :
+- Endpoint : `POST http://localhost:8080/graphql`
+- Playground : `http://localhost:8080/graphiql`
+
+**Production** :
+- Endpoint : `POST https://sand.interstice.work/graphql`
+- Playground : non exposé publiquement
 
 ---
 
@@ -16,6 +21,12 @@ Avant tout appel, récupérer le cookie CSRF :
 
 ```
 GET http://localhost:8080/sanctum/csrf-cookie
+```
+
+En production, le même flux passe par :
+
+```text
+GET https://sand.interstice.work/sanctum/csrf-cookie
 ```
 
 Puis inclure le header `X-XSRF-TOKEN` à chaque mutation, et envoyer les requêtes avec `credentials: 'include'`.

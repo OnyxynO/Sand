@@ -1,6 +1,6 @@
 // Tests pour SupervisionPage - verifie le rendu des anomalies et tous les types
 
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 
