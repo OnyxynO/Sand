@@ -25,7 +25,7 @@ describe('LoginPage', () => {
   it('affiche le formulaire de connexion', () => {
     renderAvecApollo(<LoginPage />);
 
-    expect(screen.getByText('SAND')).toBeInTheDocument();
+    expect(screen.getByText('SAND v2')).toBeInTheDocument();
     expect(screen.getByText('Connexion')).toBeInTheDocument();
     expect(screen.getByLabelText('Adresse email')).toBeInTheDocument();
     expect(screen.getByLabelText('Mot de passe')).toBeInTheDocument();
