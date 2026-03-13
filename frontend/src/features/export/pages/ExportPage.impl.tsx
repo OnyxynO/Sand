@@ -290,11 +290,15 @@ export default function ExportPage() {
     const filtres = exp.filtres ?? {};
     const input: Record<string, string> = {
       format: 'CSV',
-      dateDebut: filtres.date_debut ?? dateDebut,
-      dateFin: filtres.date_fin ?? dateFin,
+      dateDebut: filtres.date_debut ?? filtres.dateDebut ?? dateDebut,
+      dateFin: filtres.date_fin ?? filtres.dateFin ?? dateFin,
     };
-    if (filtres.project_id) input.projetId = filtres.project_id;
-    if (filtres.team_id) input.equipeId = filtres.team_id;
+    if (filtres.project_id ?? filtres.projetId ?? filtres.projectId) {
+      input.projetId = filtres.project_id ?? filtres.projetId ?? filtres.projectId;
+    }
+    if (filtres.team_id ?? filtres.equipeId ?? filtres.teamId) {
+      input.equipeId = filtres.team_id ?? filtres.equipeId ?? filtres.teamId;
+    }
     requestExport({ variables: { input } });
   }, [dateDebut, dateFin, requestExport]);
 
