@@ -1,20 +1,14 @@
-# CLAUDE.md - SAND v2
+# CLAUDE.md - SAND
 
 @../GUIDELINES_PROJETS.md
 
-Ce fichier est le point d'entree pour Claude Code sur la copie de travail sand-v2.
+Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte necessaire pour travailler sur ce projet.
 
 ## Projet
 
-**SAND v2** — copie de travail isolee de SAND, dediee a un refactoring structurel.
-Meme produit, meme stack, memes regles metier que sand, mais organisation interne revisee.
-Aucun push vers le depot de production n'est possible (remote push desactive).
-
-Voir `docs/08_SAND_V2.md` et `docs/09_SAND_V2_VS_V1.md` pour le contexte complet.
+**SAND** (Saisie d'Activite Numerique Declarative) - Application web de saisie d'activites professionnelles. Inspire de SAEL (ancienne appli interne), refait entierement from scratch avec une stack moderne.
 
 ## Stack technique
-
-Identique a sand :
 
 | Couche | Technologies |
 |--------|--------------|
@@ -22,158 +16,173 @@ Identique a sand :
 | Frontend | React 19, TypeScript, Apollo Client 4, Tailwind CSS, Zustand |
 | Base de donnees | PostgreSQL 16 (extension ltree) |
 | Cache/Queue | Redis |
+| Conteneurisation | Docker, Docker Compose |
 | Tests | PHPUnit 262 tests + Vitest 238 tests + Playwright 100 specs |
 
-## Etat du projet (mars 2026)
+## Etat du projet
 
-### Migration feature-sliced : terminee
+**Toutes les phases du backlog sont terminees** (Phases 1 a 5).
+**Migration feature-sliced terminee** (mars 2026) — voir section Architecture.
 
-Toutes les pages sont migrees dans `frontend/src/features/`. Les anciens `pages/` sont
-des facades 1-ligne (`export { default } from '../features/...'`).
+### Evolutions implementees
 
-**Domaines implementes dans `features/` :**
-- `features/app/` — router centralisé, navigation
-- `features/auth/` — LoginPage, ForgotPasswordPage, ResetPasswordPage, hooks auth
-- `features/saisie/` — SaisiePage, useSaisieHebdo, lib absences/mapping
-- `features/dashboard/` — DashboardPage, composants graphiques
-- `features/supervision/` — SupervisionPage
-- `features/stats/` — StatsGlobalesPage, StatsProjetPage
-- `features/export/` — ExportPage
-- `features/projets/` — ProjetsPage, composants modale
-- `features/notifications/` — hooks notification
-- `features/admin/activities/` — ActivitesPage + LigneActiviteDnd, DragPreview, FormulaireActivite, types
-- `features/admin/users/` — UtilisateursPage
-- `features/admin/teams/` — EquipesPage
-- `features/admin/configuration/` — ConfigurationPage
-- `features/admin/rgpd/` — RgpdPage
+- EV-01 a EV-12 : toutes terminees (voir `docs/06_EVOLUTIONS.md`)
+- Refactoring v2 : architecture feature-sliced, design system --sand-*, services backend
 
-**Backend — services extraits des mutators :**
-- `TimeEntryService` — logique bulkUpdate
-- `WeeklyTimeEntryQueryService` — query saisies semaine
-- `ExportService` — logique export CSV
-- `SettingService` — lecture/ecriture parametres
+### Production
 
-**Design system v2 :**
-Variables CSS `--sand-*`, police Fraunces serif, `rounded-[1.8rem]`, `.sand-card`, `.sand-display`.
-Voir `frontend/src/index.css` pour le detail complet.
+L'application est deployee en production sur un VPS Hetzner CX23.
+- **URL** : https://sand.interstice.work
+- **Domaine** : interstice.work (Cloudflare)
+- **Reverse proxy** : Caddy 2.11.1 (HTTPS automatique Let's Encrypt)
+- **Firewall** : ufw actif (ports 22, 80, 443)
+- **Backups** : PostgreSQL quotidien a 2h (`/var/backups/sand/`, retention 7 jours)
 
-### Tests (resultats validates 2026-03-13)
-
-| Suite | Resultat |
-|-------|----------|
-| PHPUnit | 262/262 ✓ |
-| Vitest | 238/238 ✓ |
-| Playwright | 98/100 ✓ (2 faux positifs timing sur admin-projets) |
+Voir `../infra/DEPLOY_PROD_SAND.md` (hors repo) pour le detail complet.
 
 ## Commandes essentielles
 
-### Dev natif (stack Homebrew)
+### Dev natif (sans Docker — stack locale depuis mars 2026)
 
-Backend sur **8081** (pas 8080 — Docker occupe 8080), frontend sur **5173**.
+Postgres et Redis tournent en Homebrew natif. Demarrage rapide :
 
 ```bash
-# Verifier que les services tournent
-brew services list | grep -E "postgresql|redis"
-
-# Lancer backend (si pas deja demarre)
-cd backend && php artisan serve --host=0.0.0.0 --port=8081 > /tmp/sand-v2-backend.log 2>&1 &
-
-# Lancer frontend (si pas deja demarre)
-cd frontend && npm run dev > /tmp/sand-v2-frontend.log 2>&1 &
+brew services start redis
+cd backend && php artisan serve --host=0.0.0.0 --port=8080 > /tmp/sand-backend.log 2>&1 &
+cd frontend && npm run dev > /tmp/sand-frontend.log 2>&1 &
 ```
 
 Points specifiques du `.env` local :
-- `APP_URL=http://localhost:8081`
-- `DB_DATABASE=sand_v2` / `DB_HOST=127.0.0.1`
-- `SANCTUM_STATEFUL_DOMAINS=localhost:5173,127.0.0.1:5173`
-- `REDIS_CLIENT=predis` / `REDIS_HOST=127.0.0.1` / `CACHE_STORE=redis`
-- Frontend `.env.local` : `VITE_API_URL=http://localhost:8081/graphql`
+- `REDIS_CLIENT=predis` / `REDIS_HOST=127.0.0.1` / `DB_HOST=127.0.0.1`
+- `CACHE_STORE=redis` (Cache::tags() incompatible avec le driver file)
 
-### Bootstrap depuis zero
+### Via Docker
 
 ```bash
-bash scripts/bootstrap-v2.sh        # cree les .env, installe dependances
-bash scripts/reset-v2-test-db.sh    # recrée sand_v2_test proprement
-```
-
-### Tests
-
-```bash
-# PHPUnit (natif, base sand_v2_test)
-cd backend && php artisan test
-
-# Vitest
-cd frontend && npm run test -- --run
-
-# Playwright (app doit tourner)
+docker compose up -d
+docker compose exec app php artisan test
+docker compose exec frontend npm run test
 cd frontend && npm run e2e
 
-# Sous-ensembles Playwright
-cd frontend && npm run e2e:auth-core
-cd frontend && npm run e2e:saisie-user
+# Apres modification du schema GraphQL
+docker compose exec app php artisan lighthouse:clear-cache
+
+# Donnees de demo (30 activites, 3 projets, 491 saisies, 3 absences)
+docker compose exec app php artisan db:seed --class=DemoSeeder
 ```
+
+## Tests
+
+| Couche | Outil | Commande |
+|--------|-------|----------|
+| Backend (PHP) | PHPUnit | `docker compose exec app php artisan test` |
+| Frontend (composants) | Vitest | `docker compose exec frontend npm run test` |
+| E2E (navigateur) | Playwright | `cd frontend && npm run e2e` |
+
+Resultats valides (2026-03-13) : PHPUnit 262/262, Vitest 238/238, Playwright 98/100.
+
+### Playwright E2E
+
+Pieges specifiques :
+- `__dirname` invalide en ESM → `fileURLToPath(import.meta.url)`
+- `getByRole('dialog')` retourne hidden avec Headless UI → tester le texte visible
+- `locator('h1')` ambigu → `getByRole('heading', { name: '...' })`
+- Cellules saisie : `aria-label="Saisir pour lundi"` — minuscule (date-fns locale fr)
+- Mock heroicons dans `src/test/setup.ts` : liste explicite — ajouter toute nouvelle icone
 
 ## Acces
 
+### Developpement (local)
 - **Frontend** : http://localhost:5173
-- **API Backend** : http://localhost:8081
-- **GraphQL Playground** : http://localhost:8081/graphiql
+- **API Backend** : http://localhost:8080
+- **GraphQL Playground** : http://localhost:8080/graphiql
+
+### Production
+- **Application** : https://sand.interstice.work
 
 ### Comptes de test (mot de passe : `password`)
 - Admin : admin@sand.local
 - Moderateur : marie.dupont@sand.local
 - Utilisateur : jean.martin@sand.local
 
-## Architecture frontend v2
+## Architecture
 
 ```
+backend/
+├── app/
+│   ├── Models/              # Eloquent (User, Project, Activity, TimeEntry, Absence...)
+│   ├── GraphQL/             # Resolvers Lighthouse (Queries/, Mutations/)
+│   ├── Policies/            # Autorisations Laravel
+│   ├── Jobs/                # Export CSV asynchrone
+│   └── Services/            # Logique metier (TimeEntryService, ExportService...)
+└── database/
+    ├── migrations/
+    └── seeders/
+
 frontend/src/
-├── features/                  # Organisation par domaine metier (v2)
-│   ├── app/                   # Router + navigation
-│   ├── auth/                  # Pages auth + hooks session
-│   ├── saisie/                # Page + hooks + lib (absences, mapping)
-│   ├── dashboard/             # Page + composants graphiques
-│   ├── supervision/           # Page supervision anomalies
-│   ├── stats/                 # Pages stats globales et projet
-│   ├── export/                # Page export CSV
-│   ├── projets/               # Page + composants modales
-│   ├── notifications/         # Hooks notification
-│   └── admin/
-│       ├── activities/        # Page + composants (LigneActiviteDnd, etc.) + types
-│       ├── users/             # Page utilisateurs
-│       ├── teams/             # Page equipes
-│       ├── configuration/     # Page configuration
-│       └── rgpd/              # Page RGPD
-├── pages/                     # Facades 1-ligne → features/ (compatibilite)
-├── components/                # Composants partages (saisie, admin, dashboard...)
-├── hooks/                     # Hooks partagés
-├── stores/                    # Zustand (auth, saisie, notification)
-├── graphql/                   # Queries et mutations Apollo
-└── test/                      # Setup Vitest + helpers (renderAvecApollo)
+├── features/                # Organisation par domaine metier
+│   ├── app/                 # Router + navigation
+│   ├── auth/                # Pages auth + hooks session
+│   ├── saisie/              # Page + hooks + lib
+│   ├── dashboard/           # Page + composants graphiques
+│   ├── supervision/         # Page supervision anomalies
+│   ├── stats/               # Pages statistiques
+│   ├── export/              # Page export CSV
+│   ├── projets/             # Page + composants
+│   ├── notifications/       # Hooks notification
+│   └── admin/               # activities, users, teams, configuration, rgpd
+├── pages/                   # Facades 1-ligne → features/
+├── components/              # Composants partages
+├── hooks/                   # Hooks partages
+├── stores/                  # Zustand (auth, saisie, notification)
+└── graphql/                 # Queries et mutations Apollo
 ```
 
-## Pieges connus (v2)
+## Concepts metier cles
 
-- **Port backend** : 8081 (pas 8080 — Docker occupe 8080 en permanence sur ce poste)
-- **Bases PostgreSQL** : `sand_v2` (dev) et `sand_v2_test` (tests) — pas `sand` ni `sand_test`
-- **Mock heroicons dans setup.ts** : liste explicite — ajouter toute nouvelle icone utilisee dans une page testee
-  (`src/test/setup.ts`, section `vi.mock('@heroicons/react/24/outline', ...)`)
-- **Test LoginPage** : cherche `SAND v2` (pas `SAND`) — texte du badge d'identite v2
-- **Playwright admin-projets** : faux positif de timing en run complet, passe en relance isolee
-- **Remote git** : push desactive vers upstream — pousser uniquement sur un remote perso si besoin
+- **Activites** : Arborescence ltree PostgreSQL. Seules les feuilles (`est_feuille = true`) sont saisissables.
+- **Projets** : Activent/desactivent des activites via systeme tri-state.
+- **Saisies** : Par jour, en ETP (0.01 a 1.00). Warning si total jour != 1.0.
+- **Roles** : Utilisateur / Moderateur / Admin.
+- **Absences** : API RH externe (mock en dev), table `absences` dediee.
 
-Pièges hérités de sand (toujours valables) :
-- **Cache Lighthouse** : `php artisan lighthouse:clear-cache` apres modif schema GraphQL
-- **Apollo Client 4** : imports depuis `@apollo/client/react`
-- **Playwright Headless UI** : `getByRole('dialog')` → tester le texte visible
-- **Playwright h1 ambigu** : utiliser `getByRole('heading', { name: '...' })`
+## Decisions techniques
 
-## Git
+- **Auth** : Sanctum SPA (cookies HttpOnly + CSRF)
+- **ltree** : Operateurs `<@` (descendants), `@>` (ancetres), index GiST
+- **Soft delete** : users, projects, activities, time_entries, absences
+- **Export CSV** : Job queue Redis asynchrone
+- **Design system** : variables CSS `--sand-*`, police Fraunces (Google Fonts), `.sand-card`
+- **Tests** : PostgreSQL obligatoire (ltree incompatible SQLite), base `sand_test`
 
-Branche de travail : `codex/sand-v2`
-Remote `upstream` : fetch only (protection anti-push prod)
+## Infrastructure production
 
+```
+docker-compose.prod.yml           # Overlay prod
+docker/nginx/Dockerfile.prod      # Multi-stage : node build → nginx serve
+frontend/.env.production          # VITE_API_URL=/graphql
+```
+
+Commandes de mise a jour :
 ```bash
-# Voir l'historique v2
-git log --oneline upstream/codex/architecture-review..HEAD
+cd /var/www/sand
+git pull
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
+
+## Pieges connus
+
+- **Cache Lighthouse** : vider apres modification du schema GraphQL
+- **Apollo Client 4** : imports depuis `@apollo/client/react`
+- **Mock heroicons** : liste explicite dans `src/test/setup.ts` — ajouter toute nouvelle icone
+- **Prod — SANCTUM_STATEFUL_DOMAINS** : domaine reel, jamais l'IP
+- **Prod — SESSION_SECURE_COOKIE** : `true` obligatoire sur HTTPS
+- **Prod — codegen** : types generes dans `src/gql/` commites, build utilise `build:docker`
+- **JSON scalar double encodage** : fix dans `app/GraphQL/Scalars/JsonScalar.php`
+- **Setting.valeur cast 'array'** : utiliser `Setting::get()` ou l'accesseur Eloquent
+
+## Audit technique
+
+**P1/P2/P3/P4 : 100% termines** (voir `docs/07_AUDIT_TECHNIQUE.md`).
+
+Agent auditeur : `.claude/agents/auditeur-sand.md` — a interroger en debut et fin de chaque implementation.
