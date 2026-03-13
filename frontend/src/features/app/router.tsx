@@ -6,12 +6,12 @@ import ServiceWaitingPage from '../../components/ServiceWaitingPage';
 import { useAuthStore } from '../../stores/authStore';
 import { useAuthSessionBootstrap } from '../auth/hooks/useAuthSessionBootstrap';
 
-const LoginPage = lazy(() => import('../../pages/LoginPage'));
-const ForgotPasswordPage = lazy(() => import('../../pages/ForgotPasswordPage'));
-const ResetPasswordPage = lazy(() => import('../../pages/ResetPasswordPage'));
-const DashboardPage = lazy(() => import('../../pages/DashboardPage'));
-const SaisiePage = lazy(() => import('../../pages/SaisiePage'));
-const SupervisionPage = lazy(() => import('../../pages/SupervisionPage'));
+const LoginPage = lazy(() => import('../auth/pages/LoginPage'));
+const ForgotPasswordPage = lazy(() => import('../auth/pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('../auth/pages/ResetPasswordPage'));
+const DashboardPage = lazy(() => import('../dashboard/pages/DashboardPage'));
+const SaisiePage = lazy(() => import('../saisie/pages/SaisiePage'));
+const SupervisionPage = lazy(() => import('../supervision/pages/SupervisionPage'));
 const StatsProjetPage = lazy(() => import('../stats/pages/StatsProjetPage'));
 const StatsGlobalesPage = lazy(() => import('../stats/pages/StatsGlobalesPage'));
 const ExportPage = lazy(() => import('../export/pages/ExportPage'));
