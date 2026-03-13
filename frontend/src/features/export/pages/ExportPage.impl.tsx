@@ -31,6 +31,11 @@ function periodeInitiale() {
   return { debut, fin };
 }
 
+function normaliserDateExport(value: unknown, fallback: string): string {
+  if (typeof value !== 'string' || value.length === 0) return fallback;
+  return value.includes('T') ? value.slice(0, 10) : value;
+}
+
 interface ExportJob {
   id: string;
   statut: string;
@@ -290,8 +295,8 @@ export default function ExportPage() {
     const filtres = exp.filtres ?? {};
     const input: Record<string, string> = {
       format: 'CSV',
-      dateDebut: filtres.date_debut ?? filtres.dateDebut ?? dateDebut,
-      dateFin: filtres.date_fin ?? filtres.dateFin ?? dateFin,
+      dateDebut: normaliserDateExport(filtres.date_debut ?? filtres.dateDebut, dateDebut),
+      dateFin: normaliserDateExport(filtres.date_fin ?? filtres.dateFin, dateFin),
     };
     if (filtres.project_id ?? filtres.projetId ?? filtres.projectId) {
       input.projetId = filtres.project_id ?? filtres.projetId ?? filtres.projectId;

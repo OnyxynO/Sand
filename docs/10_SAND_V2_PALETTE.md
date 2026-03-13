@@ -20,6 +20,26 @@ Ce document recense la palette principale utilisee par la V2, avec l'intention d
 
 Source : [`/Users/seb/Documents/Claude projet/sand-v2/frontend/src/index.css`](/Users/seb/Documents/Claude%20projet/sand-v2/frontend/src/index.css)
 
+## Apercu visuel
+
+| Variable | Apercu | Valeur |
+|----------|--------|--------|
+| `--sand-bg` | <span style="display:inline-block;width:36px;height:20px;border-radius:6px;border:1px solid #d1d5db;background:#f3efe6;"></span> | `#f3efe6` |
+| `--sand-surface-strong` | <span style="display:inline-block;width:36px;height:20px;border-radius:6px;border:1px solid #d1d5db;background:#fffdf8;"></span> | `#fffdf8` |
+| `--sand-ink` | <span style="display:inline-block;width:36px;height:20px;border-radius:6px;border:1px solid #d1d5db;background:#1f2937;"></span> | `#1f2937` |
+| `--sand-muted` | <span style="display:inline-block;width:36px;height:20px;border-radius:6px;border:1px solid #d1d5db;background:#6b7280;"></span> | `#6b7280` |
+| `--sand-accent` | <span style="display:inline-block;width:36px;height:20px;border-radius:6px;border:1px solid #d1d5db;background:#0f766e;"></span> | `#0f766e` |
+| `--sand-accent-strong` | <span style="display:inline-block;width:36px;height:20px;border-radius:6px;border:1px solid #d1d5db;background:#115e59;"></span> | `#115e59` |
+| `--sand-warm` | <span style="display:inline-block;width:36px;height:20px;border-radius:6px;border:1px solid #d1d5db;background:#d97706;"></span> | `#d97706` |
+
+### Fonds et transparences
+
+| Variable | Apercu | Valeur |
+|----------|--------|--------|
+| `--sand-surface` | <span style="display:inline-block;width:36px;height:20px;border-radius:6px;border:1px solid #d1d5db;background:rgba(255,252,247,0.8);"></span> | `rgba(255, 252, 247, 0.8)` |
+| `--sand-line` | <span style="display:inline-block;width:36px;height:20px;border-radius:6px;border:1px solid #d1d5db;background:rgba(31,41,55,0.12);"></span> | `rgba(31, 41, 55, 0.12)` |
+| `--sand-accent-soft` | <span style="display:inline-block;width:36px;height:20px;border-radius:6px;border:1px solid #d1d5db;background:rgba(15,118,110,0.14);"></span> | `rgba(15, 118, 110, 0.14)` |
+
 ## Fonds et gradients
 
 | Valeur | Usage |

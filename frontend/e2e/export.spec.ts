@@ -139,6 +139,43 @@ test.describe('Export CSV', () => {
     }).toPass({ timeout: 15000 });
   });
 
+  // EX-06
+  test('EX-06 : regenerer un export desactive cree un nouvel export', async ({ page }) => {
+    test.setTimeout(120000);
+
+    await supprimerTousLesExports(page);
+
+    await lancerExport(page);
+    await attendreDisponible(page);
+
+    const boutonsSupprimerAvant = page.locator('button[title="Supprimer definitivement"]');
+    const countAvant = await boutonsSupprimerAvant.count();
+
+    // Desactiver le fichier du premier export pour faire apparaitre "Regenerer"
+    await page.locator('button[title="Supprimer le fichier (conserver la ligne)"]').first().click();
+    await expect(page.getByText('Regenerer').first()).toBeVisible({ timeout: 10000 });
+
+    const requestResponsePromise = page.waitForResponse(
+      (r) => r.url().includes('/graphql') && r.request().postData()?.includes('requestExport'),
+      { timeout: 10000 },
+    );
+    await page.getByText('Regenerer').first().click();
+    const requestResponse = await requestResponsePromise;
+    const requestBody = requestResponse.request().postData() ?? '';
+    const responseBody = await requestResponse.text();
+
+    expect(requestBody).toContain('requestExport');
+    expect(responseBody).not.toContain('"errors"');
+
+    // Un nouvel export doit apparaitre dans l'historique.
+    await expect
+      .poll(
+        async () => page.locator('button[title="Supprimer definitivement"]').count(),
+        { timeout: 15000 },
+      )
+      .toBeGreaterThan(countAvant);
+  });
+
   // EX-07
   test('EX-07 : notification Export pret apparait dans le panneau', async ({ page }) => {
     await lancerExport(page);
