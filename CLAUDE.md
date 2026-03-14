@@ -153,7 +153,7 @@ frontend/src/
 - **Soft delete** : users, projects, activities, time_entries, absences
 - **Export CSV** : Job queue Redis asynchrone
 - **Design system** : variables CSS `--sand-*`, police Fraunces (Google Fonts), `.sand-card`
-- **Tests** : PostgreSQL obligatoire (ltree incompatible SQLite), base `sand_test`
+- **Tests** : PostgreSQL obligatoire (ltree incompatible SQLite), base `sand_v2_test`
 
 ## Infrastructure production
 
