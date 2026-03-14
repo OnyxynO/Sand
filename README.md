@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/screenshots/logo.png" alt="SAND" width="160">
+  <img src="docs/screenshots/logov2.png" alt="SAND" width="160">
 </div>
 
 # SAND — Saisie d'Activité Numérique Déclarative
