@@ -18,7 +18,7 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_DB: sand_test
+          POSTGRES_DB: sand_v2_test
           POSTGRES_USER: sand
           POSTGRES_PASSWORD: secret
         options: >-
@@ -51,7 +51,7 @@ jobs:
         run: composer install --optimize-autoloader
 
       - name: Activer l'extension ltree sur la base de test
-        run: PGPASSWORD=secret psql -h 127.0.0.1 -U sand -d sand_test -c "CREATE EXTENSION IF NOT EXISTS ltree;"
+        run: PGPASSWORD=secret psql -h 127.0.0.1 -U sand -d sand_v2_test -c "CREATE EXTENSION IF NOT EXISTS ltree;"
 
       - name: Configurer le .env CI
         working-directory: backend
@@ -68,7 +68,7 @@ jobs:
         working-directory: backend
         env:
           DB_HOST: 127.0.0.1
-          DB_DATABASE: sand_test
+          DB_DATABASE: sand_v2_test
           DB_USERNAME: sand
           DB_PASSWORD: secret
         run: php artisan migrate --env=testing --force
