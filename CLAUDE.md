@@ -154,6 +154,8 @@ frontend/src/
 - **Export CSV** : Job queue Redis asynchrone
 - **Design system** : variables CSS `--sand-*`, police Fraunces (Google Fonts), `.sand-card`
 - **Tests** : PostgreSQL obligatoire (ltree incompatible SQLite), base `sand_v2_test`
+- **Monitoring** : Sentry (sentry/sentry-laravel + @sentry/react) — erreurs + contexte utilisateur. DSN dans `backend/.env` (SENTRY_LARAVEL_DSN) et `frontend/.env.production` (VITE_SENTRY_DSN). Desactive en dev frontend (`enabled: import.meta.env.PROD`).
+- **Easter egg** : Konami Code (haut haut bas bas gauche droite gauche droite B A) → renard anime sur un `.sand-card` aleatoire. Hook `useKonamiCode`, composant `FoxEasterEgg`.
 
 ## Infrastructure production
 
@@ -180,6 +182,8 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 - **Prod — codegen** : types generes dans `src/gql/` commites, build utilise `build:docker`
 - **JSON scalar double encodage** : fix dans `app/GraphQL/Scalars/JsonScalar.php`
 - **Setting.valeur cast 'array'** : utiliser `Setting::get()` ou l'accesseur Eloquent
+- **Sentry prod — nouveau package composer** : apres ajout d'un package dans composer.json, le VPS a besoin d'un `composer install --no-dev --optimize-autoloader` manuel la premiere fois (le CI/CD le fait via `docker compose up --build` mais le vendor/ est dans le container, pas sur l'hote)
+- **Animation WebP/GIF — redemarrage** : `key` React ne suffit pas, le navigateur restaure l'etat depuis le cache memoire. Solution : `src={url + '?t=' + Date.now()}` pour forcer une URL unique a chaque affichage.
 
 ## Audit technique
 
