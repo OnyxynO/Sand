@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import foxWebp from '../assets/fox.webp';
 
 const FOX_LARGEUR = 224; // w-56 = 14rem
@@ -36,19 +36,12 @@ function choisirPosition(): Position {
 export default function FoxEasterEgg({ actif, onTermine }: Props) {
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState<Position | null>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     if (!actif) return;
 
     setPosition(choisirPosition());
     setVisible(true);
-
-    // Redémarrer l'animation WebP : vider src puis le réassigner
-    if (imgRef.current) {
-      imgRef.current.src = '';
-      imgRef.current.src = foxWebp;
-    }
 
     const timer = setTimeout(() => {
       setVisible(false);
@@ -62,7 +55,6 @@ export default function FoxEasterEgg({ actif, onTermine }: Props) {
 
   return (
     <img
-      ref={imgRef}
       src={foxWebp}
       alt=""
       aria-hidden="true"

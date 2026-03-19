@@ -165,7 +165,7 @@ export default function Layout() {
       <NotificationPanel />
 
       {/* Easter egg Konami Code */}
-      <FoxEasterEgg actif={foxActif} onTermine={() => setFoxActif(false)} />
+      <FoxEasterEgg key={konamiActif} actif={foxActif} onTermine={() => setFoxActif(false)} />
     </div>
   );
 }
