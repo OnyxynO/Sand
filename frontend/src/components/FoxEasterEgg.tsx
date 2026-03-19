@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import foxWebp from '../assets/fox.webp';
 
 const FOX_LARGEUR = 224; // w-56 = 14rem
@@ -17,36 +17,38 @@ function choisirPosition(): Position {
   const panneaux = Array.from(document.querySelectorAll('.sand-card'));
   const visibles = panneaux.filter((el) => {
     const r = el.getBoundingClientRect();
-    // Panneau assez large, visible à l'écran, pas trop haut (laisser de la place au renard)
     return r.width > FOX_LARGEUR && r.top > 80 && r.top < window.innerHeight - 50;
   });
 
   if (visibles.length > 0) {
     const panneau = visibles[Math.floor(Math.random() * visibles.length)];
     const r = panneau.getBoundingClientRect();
-    // Position horizontale aléatoire à l'intérieur du panneau
     const left = r.left + Math.random() * Math.max(0, r.width - FOX_LARGEUR);
     return {
-      bottom: window.innerHeight - r.top, // bas de l'image = haut du panneau
+      bottom: window.innerHeight - r.top,
       left: Math.round(left),
     };
   }
 
-  // Fallback : coin bas droit de l'écran
   return { bottom: 0, left: window.innerWidth - FOX_LARGEUR - 80 };
 }
 
 export default function FoxEasterEgg({ actif, onTermine }: Props) {
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState<Position | null>(null);
-  const [cle, setCle] = useState(0);
+  const imgRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
     if (!actif) return;
 
     setPosition(choisirPosition());
-    setCle((n) => n + 1); // force le remontage de l'img → animation repart de zéro
     setVisible(true);
+
+    // Redémarrer l'animation WebP : vider src puis le réassigner
+    if (imgRef.current) {
+      imgRef.current.src = '';
+      imgRef.current.src = foxWebp;
+    }
 
     const timer = setTimeout(() => {
       setVisible(false);
@@ -60,7 +62,7 @@ export default function FoxEasterEgg({ actif, onTermine }: Props) {
 
   return (
     <img
-      key={cle}
+      ref={imgRef}
       src={foxWebp}
       alt=""
       aria-hidden="true"
