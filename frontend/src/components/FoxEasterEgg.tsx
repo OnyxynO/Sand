@@ -39,11 +39,13 @@ function choisirPosition(): Position {
 export default function FoxEasterEgg({ actif, onTermine }: Props) {
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState<Position | null>(null);
+  const [cle, setCle] = useState(0);
 
   useEffect(() => {
     if (!actif) return;
 
     setPosition(choisirPosition());
+    setCle((n) => n + 1); // force le remontage de l'img → animation repart de zéro
     setVisible(true);
 
     const timer = setTimeout(() => {
@@ -58,6 +60,7 @@ export default function FoxEasterEgg({ actif, onTermine }: Props) {
 
   return (
     <img
+      key={cle}
       src={foxWebp}
       alt=""
       aria-hidden="true"
