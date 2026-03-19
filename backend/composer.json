@@ -12,7 +12,8 @@
         "laravel/tinker": "^2.10.1",
         "mll-lab/graphql-php-scalars": "^6.4",
         "nuwave/lighthouse": "^6.64",
-        "predis/predis": "^3.4"
+        "predis/predis": "^3.4",
+        "sentry/sentry-laravel": "^4.23"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
