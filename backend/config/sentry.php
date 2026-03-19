@@ -26,6 +26,19 @@ return [
     // Override the organization ID used for trace continuation checks.
     'org_id' => env('SENTRY_ORG_ID') === null ? null : (int) env('SENTRY_ORG_ID'),
 
+    // Injecter l'utilisateur connecté dans chaque événement Sentry
+    'before_send' => function (\Sentry\Event $event, ?\Sentry\EventHint $hint): ?\Sentry\Event {
+        if (auth()->check()) {
+            $user = auth()->user();
+            $event->setUser(new \Sentry\UserDataBag(
+                id: (string) $user->id,
+                email: $user->email,
+                username: $user->prenom . ' ' . $user->nom,
+            ));
+        }
+        return $event;
+    },
+
     // @see: https://docs.sentry.io/platforms/php/guides/laravel/configuration/options/#sample_rate
     'sample_rate' => env('SENTRY_SAMPLE_RATE') === null ? 1.0 : (float) env('SENTRY_SAMPLE_RATE'),
 
