@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useMutation } from '@apollo/client/react';
 import {
@@ -11,12 +11,20 @@ import { LOGOUT_MUTATION } from '../graphql/operations/auth';
 import { apolloClient } from '../graphql/client';
 import NotificationBell from './notifications/NotificationBell';
 import NotificationPanel from './notifications/NotificationPanel';
+import FoxEasterEgg from './FoxEasterEgg';
+import { useKonamiCode } from '../hooks/useKonamiCode';
 import { construireNavigation } from '../features/app/navigation';
 
 export default function Layout() {
   const navigate = useNavigate();
   const { utilisateur, deconnecter } = useAuthStore();
   const [menuOuvert, setMenuOuvert] = useState(false);
+  const konamiActif = useKonamiCode();
+  const [foxActif, setFoxActif] = useState(false);
+
+  useEffect(() => {
+    if (konamiActif > 0) setFoxActif(true);
+  }, [konamiActif]);
 
   const [logout] = useMutation(LOGOUT_MUTATION, {
     onCompleted: () => {
@@ -155,6 +163,9 @@ export default function Layout() {
 
       {/* Panneau notifications (slide-over) */}
       <NotificationPanel />
+
+      {/* Easter egg Konami Code */}
+      <FoxEasterEgg actif={foxActif} onTermine={() => setFoxActif(false)} />
     </div>
   );
 }
