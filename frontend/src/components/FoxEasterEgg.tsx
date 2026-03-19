@@ -36,11 +36,13 @@ function choisirPosition(): Position {
 export default function FoxEasterEgg({ actif, onTermine }: Props) {
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState<Position | null>(null);
+  const [src, setSrc] = useState(foxWebp);
 
   useEffect(() => {
     if (!actif) return;
 
     setPosition(choisirPosition());
+    setSrc(`${foxWebp}?t=${Date.now()}`); // cache-busting → animation repart frame 0
     setVisible(true);
 
     const timer = setTimeout(() => {
@@ -55,7 +57,7 @@ export default function FoxEasterEgg({ actif, onTermine }: Props) {
 
   return (
     <img
-      src={foxWebp}
+      src={src}
       alt=""
       aria-hidden="true"
       onClick={() => { setVisible(false); onTermine(); }}
