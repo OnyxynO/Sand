@@ -12,6 +12,8 @@ Application web de saisie d'activités professionnelles. Les collaborateurs déc
 
 L'application est déployée en production à cette adresse : **https://sand.interstice.work**
 
+> **Note :** l'instance publique est une **démo** alimentée par des données fictives. Les comptes ci-dessous sont des comptes de démonstration, sans lien avec des utilisateurs réels.
+
 ### Développement local
 
 L'environnement de développement par défaut est **local/natif** :
