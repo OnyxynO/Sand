@@ -81,39 +81,39 @@ cd frontend && npm run dev &
 ### Frontend
 ```
 frontend/src/
-├── pages/
-│   ├── LoginPage.tsx
-│   ├── DashboardPage.tsx
-│   ├── SaisiePage.tsx
-│   ├── ProjetsPage.tsx
-│   └── admin/
-│       ├── UtilisateursPage.tsx
-│       ├── EquipesPage.tsx
-│       └── ActivitesPage.tsx
-├── components/
-│   ├── saisie/           # Composants grille saisie
-│   ├── admin/            # FormulaireUtilisateur, NavAdmin
-│   └── ui/               # ToastAnnulation
-├── graphql/operations/   # Queries et mutations
-├── stores/               # Zustand (authStore, saisieStore)
-├── hooks/                # useAuthInit, useSaisieHebdo
-└── utils/                # semaineUtils
++-- pages/
+|   +-- LoginPage.tsx
+|   +-- DashboardPage.tsx
+|   +-- SaisiePage.tsx
+|   +-- ProjetsPage.tsx
+|   +-- admin/
+|       +-- UtilisateursPage.tsx
+|       +-- EquipesPage.tsx
+|       +-- ActivitesPage.tsx
++-- components/
+|   +-- saisie/           # Composants grille saisie
+|   +-- admin/            # FormulaireUtilisateur, NavAdmin
+|   +-- ui/               # ToastAnnulation
++-- graphql/operations/   # Queries et mutations
++-- stores/               # Zustand (authStore, saisieStore)
++-- hooks/                # useAuthInit, useSaisieHebdo
++-- utils/                # semaineUtils
 ```
 
 ### Backend
 ```
 backend/
-├── app/GraphQL/          # Resolvers
-│   └── Mutations/
-│       └── AbsenceMutator.php  # syncAbsences, create, resolveConflict
-├── app/Services/
-│   └── RhApiClient.php         # Client API RH (getAbsences, healthCheck)
-├── app/Exceptions/
-│   └── RhApiException.php      # Exceptions API RH
-├── graphql/              # Schema GraphQL (types/, inputs/, mutations/)
-├── app/Models/           # Eloquent
-├── config/services.php   # Config API RH (rh_api.url, rh_api.key)
-└── database/migrations/  # Tables
++-- app/GraphQL/          # Resolvers
+|   +-- Mutations/
+|       +-- AbsenceMutator.php  # syncAbsences, create, resolveConflict
++-- app/Services/
+|   +-- RhApiClient.php         # Client API RH (getAbsences, healthCheck)
++-- app/Exceptions/
+|   +-- RhApiException.php      # Exceptions API RH
++-- graphql/              # Schema GraphQL (types/, inputs/, mutations/)
++-- app/Models/           # Eloquent
++-- config/services.php   # Config API RH (rh_api.url, rh_api.key)
++-- database/migrations/  # Tables
 ```
 
 ---

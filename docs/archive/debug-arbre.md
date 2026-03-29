@@ -661,32 +661,32 @@ FONCTION reparerArborescence():
 ## 8. Diagramme des etats
 
 ```
-                    ┌─────────────┐
-                    │   RACINE    │
-                    │ parent=NULL │
-                    │ niveau=0    │
-                    │ chemin="5"  │
-                    └──────┬──────┘
-                           │
-           ┌───────────────┼───────────────┐
-           │               │               │
+                    +-------------+
+                    |   RACINE    |
+                    | parent=NULL |
+                    | niveau=0    |
+                    | chemin="5"  |
+                    +------+------+
+                           |
+           +---------------+---------------+
+           |               |               |
            ▼               ▼               ▼
-    ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
-    │  ENFANT 1   │ │  ENFANT 2   │ │  ENFANT 3   │
-    │ parent=5    │ │ parent=5    │ │ parent=5    │
-    │ niveau=1    │ │ niveau=1    │ │ niveau=1    │
-    │ chemin="5.6"│ │ chemin="5.7"│ │ chemin="5.8"│
-    │ ordre=0     │ │ ordre=1     │ │ ordre=2     │
-    └─────────────┘ └──────┬──────┘ └─────────────┘
-                           │
+    +-------------+ +-------------+ +-------------+
+    |  ENFANT 1   | |  ENFANT 2   | |  ENFANT 3   |
+    | parent=5    | | parent=5    | | parent=5    |
+    | niveau=1    | | niveau=1    | | niveau=1    |
+    | chemin="5.6"| | chemin="5.7"| | chemin="5.8"|
+    | ordre=0     | | ordre=1     | | ordre=2     |
+    +-------------+ +------+------+ +-------------+
+                           |
                            ▼
-                    ┌─────────────┐
-                    │ PETIT-ENFANT│
-                    │ parent=7    │
-                    │ niveau=2    │
-                    │chemin="5.7.9"│
-                    │ ordre=0     │
-                    └─────────────┘
+                    +-------------+
+                    | PETIT-ENFANT|
+                    | parent=7    |
+                    | niveau=2    |
+                    |chemin="5.7.9"|
+                    | ordre=0     |
+                    +-------------+
 ```
 
 ### Regles de transition

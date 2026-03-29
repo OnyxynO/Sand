@@ -65,22 +65,22 @@ Les activités sont organisées en **arborescence hiérarchique globale**, parta
 
 ```
 Activités (arbre global)
-├── Développement
-│   ├── Backend
-│   │   ├── API
-│   │   └── Base de données
-│   ├── Frontend
-│   │   ├── Intégration
-│   │   └── Composants
-│   └── Tests
-├── Gestion de projet
-│   ├── Réunion
-│   ├── Planification
-│   └── Reporting
-├── Support
-│   ├── Tickets
-│   └── Documentation
-└── 🔒 Absence (système, toujours activé)
++-- Développement
+|   +-- Backend
+|   |   +-- API
+|   |   +-- Base de données
+|   +-- Frontend
+|   |   +-- Intégration
+|   |   +-- Composants
+|   +-- Tests
++-- Gestion de projet
+|   +-- Réunion
+|   +-- Planification
+|   +-- Reporting
++-- Support
+|   +-- Tickets
+|   +-- Documentation
++-- 🔒 Absence (système, toujours activé)
 ```
 
 ### 4.2 Caractéristiques d'une activité
@@ -105,10 +105,10 @@ Chaque projet **active/désactive** les activités avec un système de **checkbo
 **Comportement au clic :**
 
 ```
-Vide ──────► Tout activé ──────► Vide
-                 ▲                  │
-                 │                  │
-                 └── Indéterminé ◄──┘
+Vide ------► Tout activé ------► Vide
+                 ▲                  |
+                 |                  |
+                 +-- Indéterminé ◄--+
 ```
 
 **Protection contre les erreurs :**

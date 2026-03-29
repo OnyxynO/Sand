@@ -11,31 +11,31 @@ Référence pour l'implémentation des tests. Chaque cas liste le type d'outil r
 
 ```
 frontend/e2e/
-├── auth.setup.ts              ✅ existant (utilisateur)
-├── auth.setup.moderateur.ts   ✅ créé
-├── auth.setup.admin.ts        ✅ créé
-├── login.spec.ts              ✅ existant
-├── saisie.spec.ts             ✅ existant (utilisateur)
-├── saisie-moderateur.spec.ts  ✅ créé
-├── dashboard.spec.ts          ✅ créé (commun)
-├── supervision.spec.ts        ✅ créé (modérateur + admin)
-├── admin-activites.spec.ts    ✅ créé (admin)
-├── admin-utilisateurs.spec.ts ✅ créé (admin)
-├── admin-projets.spec.ts      ✅ créé (admin)
-├── admin-equipes.spec.ts      ✅ créé (admin)
-├── admin-configuration.spec.ts ✅ créé (admin — test connexion API RH)
-├── absences-ev12.spec.ts      ✅ créé (déclaration manuelle + notifications)
-└── acces-refuses.spec.ts      ✅ créé (tous rôles)
++-- auth.setup.ts              ✅ existant (utilisateur)
++-- auth.setup.moderateur.ts   ✅ créé
++-- auth.setup.admin.ts        ✅ créé
++-- login.spec.ts              ✅ existant
++-- saisie.spec.ts             ✅ existant (utilisateur)
++-- saisie-moderateur.spec.ts  ✅ créé
++-- dashboard.spec.ts          ✅ créé (commun)
++-- supervision.spec.ts        ✅ créé (modérateur + admin)
++-- admin-activites.spec.ts    ✅ créé (admin)
++-- admin-utilisateurs.spec.ts ✅ créé (admin)
++-- admin-projets.spec.ts      ✅ créé (admin)
++-- admin-equipes.spec.ts      ✅ créé (admin)
++-- admin-configuration.spec.ts ✅ créé (admin — test connexion API RH)
++-- absences-ev12.spec.ts      ✅ créé (déclaration manuelle + notifications)
++-- acces-refuses.spec.ts      ✅ créé (tous rôles)
 
 backend/tests/Feature/
-├── Policies/                  ✅ complets
-│   ├── TimeEntryPolicyTest.php
-│   ├── ProjectPolicyTest.php
-│   ├── UserPolicyTest.php
-│   └── ActivityPolicyTest.php
-└── GraphQL/                   ✅ complets
-    ├── SupervisionTest.php
-    └── ExportMutatorGraphQLTest.php
++-- Policies/                  ✅ complets
+|   +-- TimeEntryPolicyTest.php
+|   +-- ProjectPolicyTest.php
+|   +-- UserPolicyTest.php
+|   +-- ActivityPolicyTest.php
++-- GraphQL/                   ✅ complets
+    +-- SupervisionTest.php
+    +-- ExportMutatorGraphQLTest.php
 ```
 
 ---
@@ -355,9 +355,9 @@ Checklist à réaliser avant de considérer le projet production-ready.
 
 ```
 e2e/.auth/
-├── utilisateur.json    # jean.martin@sand.local  ✅
-├── moderateur.json     # marie.dupont@sand.local ✅
-└── admin.json          # admin@sand.local        ✅
++-- utilisateur.json    # jean.martin@sand.local  ✅
++-- moderateur.json     # marie.dupont@sand.local ✅
++-- admin.json          # admin@sand.local        ✅
 ```
 
 Tout est implémenté et enregistré dans `playwright.config.ts`.

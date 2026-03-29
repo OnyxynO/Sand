@@ -109,33 +109,33 @@ Pieges specifiques :
 
 ```
 backend/
-├── app/
-│   ├── Models/              # Eloquent (User, Project, Activity, TimeEntry, Absence...)
-│   ├── GraphQL/             # Resolvers Lighthouse (Queries/, Mutations/)
-│   ├── Policies/            # Autorisations Laravel
-│   ├── Jobs/                # Export CSV asynchrone
-│   └── Services/            # Logique metier (TimeEntryService, ExportService...)
-└── database/
-    ├── migrations/
-    └── seeders/
++-- app/
+|   +-- Models/              # Eloquent (User, Project, Activity, TimeEntry, Absence...)
+|   +-- GraphQL/             # Resolvers Lighthouse (Queries/, Mutations/)
+|   +-- Policies/            # Autorisations Laravel
+|   +-- Jobs/                # Export CSV asynchrone
+|   +-- Services/            # Logique metier (TimeEntryService, ExportService...)
++-- database/
+    +-- migrations/
+    +-- seeders/
 
 frontend/src/
-├── features/                # Organisation par domaine metier
-│   ├── app/                 # Router + navigation
-│   ├── auth/                # Pages auth + hooks session
-│   ├── saisie/              # Page + hooks + lib
-│   ├── dashboard/           # Page + composants graphiques
-│   ├── supervision/         # Page supervision anomalies
-│   ├── stats/               # Pages statistiques
-│   ├── export/              # Page export CSV
-│   ├── projets/             # Page + composants
-│   ├── notifications/       # Hooks notification
-│   └── admin/               # activities, users, teams, configuration, rgpd
-├── pages/                   # Facades 1-ligne → features/
-├── components/              # Composants partages
-├── hooks/                   # Hooks partages
-├── stores/                  # Zustand (auth, saisie, notification)
-└── graphql/                 # Queries et mutations Apollo
++-- features/                # Organisation par domaine metier
+|   +-- app/                 # Router + navigation
+|   +-- auth/                # Pages auth + hooks session
+|   +-- saisie/              # Page + hooks + lib
+|   +-- dashboard/           # Page + composants graphiques
+|   +-- supervision/         # Page supervision anomalies
+|   +-- stats/               # Pages statistiques
+|   +-- export/              # Page export CSV
+|   +-- projets/             # Page + composants
+|   +-- notifications/       # Hooks notification
+|   +-- admin/               # activities, users, teams, configuration, rgpd
++-- pages/                   # Facades 1-ligne → features/
++-- components/              # Composants partages
++-- hooks/                   # Hooks partages
++-- stores/                  # Zustand (auth, saisie, notification)
++-- graphql/                 # Queries et mutations Apollo
 ```
 
 ## Concepts metier cles
