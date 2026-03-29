@@ -31,14 +31,10 @@ Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte 
 
 ### Production
 
-L'application est deployee en production sur un VPS Hetzner CX23.
 - **URL** : https://sand.interstice.work
 - **Domaine** : interstice.work (Cloudflare)
-- **Reverse proxy** : Caddy 2.11.1 (HTTPS automatique Let's Encrypt)
-- **Firewall** : ufw actif (ports 22, 80, 443)
-- **Backups** : PostgreSQL quotidien a 2h (`/var/backups/sand/`, retention 7 jours)
 
-Voir `../infra/DEPLOY_PROD_SAND.md` (hors repo) pour le detail complet.
+Detail complet de l'infra (provider, reverse proxy, firewall, chemins, backups) : `../infra/DEPLOY_PROD_SAND.md` (repo prive).
 
 ## Commandes essentielles
 
@@ -154,7 +150,7 @@ frontend/src/
 - **Export CSV** : Job queue Redis asynchrone
 - **Design system** : variables CSS `--sand-*`, police Fraunces (Google Fonts), `.sand-card`
 - **Tests** : PostgreSQL obligatoire (ltree incompatible SQLite), base `sand_v2_test`
-- **Monitoring** : Sentry (sentry/sentry-laravel + @sentry/react) — erreurs + contexte utilisateur. DSN dans `backend/.env` (SENTRY_LARAVEL_DSN) et `frontend/.env.production` (VITE_SENTRY_DSN). Desactive en dev frontend (`enabled: import.meta.env.PROD`).
+- **Monitoring** : Sentry (sentry/sentry-laravel + @sentry/react) — erreurs + contexte utilisateur. DSN dans `backend/.env` (SENTRY_LARAVEL_DSN) et `frontend/.env.production.local` (VITE_SENTRY_DSN, non commite). Desactive en dev frontend (`enabled: import.meta.env.PROD`).
 - **Easter egg** : Konami Code (haut haut bas bas gauche droite gauche droite B A) → renard anime sur un `.sand-card` aleatoire. Hook `useKonamiCode`, composant `FoxEasterEgg`.
 
 ## Infrastructure production
@@ -162,15 +158,10 @@ frontend/src/
 ```
 docker-compose.prod.yml           # Overlay prod
 docker/nginx/Dockerfile.prod      # Multi-stage : node build → nginx serve
-frontend/.env.production          # VITE_API_URL=/graphql
+frontend/.env.production.local    # VITE_API_URL=/graphql + secrets (non commite)
 ```
 
-Commandes de mise a jour :
-```bash
-cd /var/www/sand
-git pull
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
-```
+Commandes de deploiement : voir `../infra/DEPLOY_PROD_SAND.md` (repo prive).
 
 ## Pieges connus
 
