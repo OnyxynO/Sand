@@ -123,6 +123,6 @@ jobs:
             cd /var/www/sand
             git fetch origin
             git reset --hard origin/main
-            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build --remove-orphans
             docker compose -f docker-compose.yml -f docker-compose.prod.yml exec -T app \
               php artisan migrate --force
