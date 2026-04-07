@@ -158,8 +158,15 @@ frontend/src/
 ```
 docker-compose.prod.yml           # Overlay prod
 docker/nginx/Dockerfile.prod      # Multi-stage : node build → nginx serve
-frontend/.env.production.local    # VITE_API_URL=/graphql + secrets (non commite)
+frontend/.env.production.local    # VITE_API_URL=/graphql + VITE_SENTRY_DSN + VITE_WAKE_TOKEN (non commite)
+watcher/wake-server.ts            # Serveur Bun de réveil (port 8082, hors Docker)
+watcher/sand-watcher.service      # Template service systemd (installe sur le VPS)
 ```
+
+**sand-watcher (avril 2026) :** service systemd Bun tourne en permanence sur le VPS (hors Docker, port 8082).
+Quand les containers sont arretes, le frontend detecte l'indisponibilite (~30s de polling), appelle automatiquement
+`GET /api/wake` (header `X-Wake-Token`), Caddy route vers sand-watcher qui relance `docker compose up -d`.
+Route Caddy : `handle /api/wake { rewrite * /wake; reverse_proxy 127.0.0.1:8082 }`.
 
 Commandes de deploiement : voir `../infra/DEPLOY_PROD_SAND.md` (repo prive).
 
@@ -175,6 +182,9 @@ Commandes de deploiement : voir `../infra/DEPLOY_PROD_SAND.md` (repo prive).
 - **Setting.valeur cast 'array'** : utiliser `Setting::get()` ou l'accesseur Eloquent
 - **Sentry prod — nouveau package composer** : apres ajout d'un package dans composer.json, le VPS a besoin d'un `composer install --no-dev --optimize-autoloader` manuel la premiere fois (le CI/CD le fait via `docker compose up --build` mais le vendor/ est dans le container, pas sur l'hote)
 - **Animation WebP/GIF — redemarrage** : `key` React ne suffit pas, le navigateur restaure l'etat depuis le cache memoire. Solution : `src={url + '?t=' + Date.now()}` pour forcer une URL unique a chaque affichage.
+- **Prod — container stale Docker Compose** : si `docker compose up --build` echoue avec "container name already in use", un container arrete avec le meme nom bloque la recreation. Fix : `docker rm -f <id>` ou ajouter `--remove-orphans` (desormais dans ci-cd.yml).
+- **sand-watcher — VITE_WAKE_TOKEN** : doit etre dans `frontend/.env.production.local` sur le VPS AVANT le build Docker (Vite integre les vars au build time). Si oublie, rebuilder apres avoir ajoute le token.
+- **Caddy — rewrite obligatoire pour sand-watcher** : Caddy transmet le chemin complet (`/api/wake`) au backend. Le wake-server ecoute sur `/wake`. Sans `rewrite * /wake` dans le bloc Caddy, le endpoint retourne 404.
 
 ## Audit technique
 
