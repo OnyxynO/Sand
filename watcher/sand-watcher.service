@@ -1,0 +1,25 @@
+[Unit]
+Description=SAND Wake Server — réveil automatique du backend Docker
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/var/www/sand/watcher
+
+# Remplacer REMPLACER_PAR_LE_TOKEN par la valeur de openssl rand -hex 32
+Environment="WAKE_TOKEN=REMPLACER_PAR_LE_TOKEN"
+Environment="WAKE_PORT=8082"
+Environment="COMPOSE_FILE=/var/www/sand/docker-compose.yml"
+Environment="COMPOSE_PROD_FILE=/var/www/sand/docker-compose.prod.yml"
+
+ExecStart=/root/.bun/bin/bun run /var/www/sand/watcher/wake-server.ts
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=sand-watcher
+
+[Install]
+WantedBy=multi-user.target

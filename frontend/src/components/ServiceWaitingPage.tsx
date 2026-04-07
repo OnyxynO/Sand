@@ -26,18 +26,21 @@ function BadgeStatut({ statut }: { statut: EtatService['statut'] }) {
 }
 
 export default function ServiceWaitingPage() {
-  const { services, tousOk, premierCheckFait } = useServiceHealth();
+  const { services, tousOk, premierCheckFait, reveilEnCours, echec, relancer } = useServiceHealth();
 
   // Ne rien afficher tant que le premier check n'est pas fait, ou si tout est OK
   if (!premierCheckFait || tousOk) return null;
+
+  const iconColor = echec ? 'text-red-600' : 'text-yellow-600 animate-spin';
+  const iconBg = echec ? 'bg-red-100' : 'bg-yellow-100';
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/80 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4">
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-yellow-100 mb-4">
+          <div className={`inline-flex items-center justify-center w-14 h-14 rounded-full mb-4 ${iconBg}`}>
             <svg
-              className="w-7 h-7 text-yellow-600 animate-spin"
+              className={`w-7 h-7 ${iconColor}`}
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -50,10 +53,29 @@ export default function ServiceWaitingPage() {
               />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-gray-900">Services en cours de démarrage</h2>
-          <p className="mt-1 text-sm text-gray-500">
-            L'application sera disponible dès que tous les services seront prêts.
-          </p>
+
+          {echec ? (
+            <>
+              <h2 className="text-xl font-semibold text-gray-900">Services indisponibles</h2>
+              <p className="mt-1 text-sm text-gray-500">
+                L'application n'a pas pu démarrer. Veuillez réessayer dans quelques instants.
+              </p>
+            </>
+          ) : reveilEnCours ? (
+            <>
+              <h2 className="text-xl font-semibold text-gray-900">Réveil en cours…</h2>
+              <p className="mt-1 text-sm text-gray-500">
+                Démarrage des services, cela peut prendre 20 à 30 secondes.
+              </p>
+            </>
+          ) : (
+            <>
+              <h2 className="text-xl font-semibold text-gray-900">Services en cours de démarrage</h2>
+              <p className="mt-1 text-sm text-gray-500">
+                L'application sera disponible dès que tous les services seront prêts.
+              </p>
+            </>
+          )}
         </div>
 
         <ul className="space-y-3">
@@ -65,9 +87,22 @@ export default function ServiceWaitingPage() {
           ))}
         </ul>
 
-        <p className="mt-5 text-center text-xs text-gray-400">
-          Vérification automatique toutes les 3 secondes
-        </p>
+        {echec ? (
+          <button
+            onClick={relancer}
+            className="mt-5 w-full py-2.5 px-4 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-700 transition-colors"
+          >
+            Réessayer
+          </button>
+        ) : reveilEnCours ? (
+          <p className="mt-5 text-center text-xs text-gray-400">
+            Réveil automatique en cours — vérification toutes les 5 secondes
+          </p>
+        ) : (
+          <p className="mt-5 text-center text-xs text-gray-400">
+            Vérification automatique toutes les 3 secondes
+          </p>
+        )}
       </div>
     </div>
   );
