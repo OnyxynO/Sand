@@ -24,7 +24,8 @@ export function useForgotPassword(): UseForgotPasswordResult {
     try {
       await mutation({ variables: { input: { email } } });
       setSucces(true);
-    } catch {
+    } catch (err) {
+      console.error('[useForgotPassword] Erreur mutation:', err);
       setErreur('Une erreur est survenue. Veuillez réessayer.');
     }
   };

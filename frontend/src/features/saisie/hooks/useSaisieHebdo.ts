@@ -124,8 +124,9 @@ export function useSaisieHebdo(userId?: string | null): UseSaisieHebdoResult {
 
     if (modeAbsence === 'api') {
       syncAbsences({ variables: variablesAbsences })
-        .catch(() => {
+        .catch((err: unknown) => {
           // Best effort: la synchronisation RH n'est pas bloquante pour l'affichage.
+          console.error('[useSaisieHebdo] Erreur syncAbsences (non bloquante):', err);
         })
         .finally(() => {
           fetchAbsences({ variables: variablesAbsences });

@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Connexion rapide par rôle — mode démo uniquement.
@@ -43,7 +44,8 @@ class LoginRapideController extends Controller
         // Si Redis est lent au démarrage, on retourne le mode désactivé (dégradé propre).
         try {
             $activee = (bool) Setting::get(Setting::CLE_CONNEXION_RAPIDE_ACTIVEE, 0);
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            Log::warning('configPublique: Redis/Cache indisponible au démarrage', ['erreur' => $e->getMessage()]);
             return response()->json([
                 'connexion_rapide' => ['activee' => false, 'roles' => []],
             ]);
