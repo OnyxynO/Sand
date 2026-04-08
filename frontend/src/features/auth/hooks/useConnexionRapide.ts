@@ -88,12 +88,21 @@ export function useConnexionRapide(
       // Récupérer le cookie CSRF avant le POST (requis par Sanctum)
       await fetch(`${API_BASE}/sanctum/csrf-cookie`, { credentials: 'include' });
 
+      // Sanctum exige que la valeur du cookie XSRF-TOKEN soit renvoyée dans X-XSRF-TOKEN.
+      // Axios le fait automatiquement ; avec fetch natif il faut le lire manuellement.
+      const xsrfCookie = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1];
+      const xsrfToken = xsrfCookie ? decodeURIComponent(xsrfCookie) : '';
+
       const reponse = await fetch(`${API_BASE}/api/login-rapide`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
+          'X-XSRF-TOKEN': xsrfToken,
         },
         credentials: 'include',
         body: JSON.stringify({ role }),
