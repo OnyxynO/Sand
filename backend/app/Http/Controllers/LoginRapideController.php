@@ -39,7 +39,15 @@ class LoginRapideController extends Controller
             ]);
         }
 
-        $activee = (bool) Setting::get(Setting::CLE_CONNEXION_RAPIDE_ACTIVEE, 0);
+        // Setting::get() utilise Cache::tags('settings') → Redis requis.
+        // Si Redis est lent au démarrage, on retourne le mode désactivé (dégradé propre).
+        try {
+            $activee = (bool) Setting::get(Setting::CLE_CONNEXION_RAPIDE_ACTIVEE, 0);
+        } catch (\Throwable) {
+            return response()->json([
+                'connexion_rapide' => ['activee' => false, 'roles' => []],
+            ]);
+        }
 
         if (! $activee) {
             return response()->json([

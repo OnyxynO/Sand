@@ -185,6 +185,7 @@ Commandes de deploiement : voir `../infra/DEPLOY_PROD_SAND.md` (repo prive).
 - **Prod — container stale Docker Compose** : si `docker compose up --build` echoue avec "container name already in use", un container arrete avec le meme nom bloque la recreation. Fix : `docker rm -f <id>` ou ajouter `--remove-orphans` (desormais dans ci-cd.yml).
 - **sand-watcher — VITE_WAKE_TOKEN** : doit etre dans `frontend/.env.production.local` sur le VPS AVANT le build Docker (Vite integre les vars au build time). Si oublie, rebuilder apres avoir ajoute le token.
 - **Caddy — rewrite obligatoire pour sand-watcher** : Caddy transmet le chemin complet (`/api/wake`) au backend. Le wake-server ecoute sur `/wake`. Sans `rewrite * /wake` dans le bloc Caddy, le endpoint retourne 404.
+- **Health check — StartSession bloque avant le handler** : toute route dans `web.php` herite du middleware `web` (inclut `StartSession`). Si Redis est lent au demarrage, `StartSession` echoue avant d'atteindre le handler → 500 HTML au lieu de JSON. `curl` reussit (pas de session) mais le navigateur echoue silencieusement. Fix : `Route::withoutMiddleware([...])->get('/api/health', ...)` pour exclure le middleware session.
 
 ## Audit technique
 

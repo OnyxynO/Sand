@@ -50,9 +50,22 @@ export function useServiceHealth(): EtatSante {
 
   async function verifier(): Promise<boolean> {
     try {
-      const reponse = await fetch(URL_HEALTH, { signal: AbortSignal.timeout(4000) });
+      const reponse = await fetch(URL_HEALTH, {
+        signal: AbortSignal.timeout(4000),
+        redirect: 'error', // Ne pas suivre les redirections (ex: 302 → index.html HTML)
+      });
 
       if (!reponse.ok) {
+        console.warn(`[health] HTTP ${reponse.status} sur ${URL_HEALTH}`);
+        setServices(SERVICES_ERREUR);
+        return false;
+      }
+
+      // Vérifier le Content-Type avant de parser : évite un crash silencieux si nginx
+      // retourne du HTML (ex: SPA fallback) au lieu du JSON du backend.
+      const contentType = reponse.headers.get('content-type') ?? '';
+      if (!contentType.includes('application/json')) {
+        console.error(`[health] Réponse non-JSON (${contentType}) — nginx a peut-être retourné index.html`);
         setServices(SERVICES_ERREUR);
         return false;
       }
@@ -69,7 +82,8 @@ export function useServiceHealth(): EtatSante {
       ]);
 
       return dbOk && redisOk;
-    } catch {
+    } catch (err) {
+      console.error(`[health] Erreur fetch ${URL_HEALTH} :`, err);
       setServices(SERVICES_ERREUR);
       return false;
     } finally {
