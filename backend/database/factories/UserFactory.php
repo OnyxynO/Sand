@@ -24,7 +24,7 @@ class UserFactory extends Factory
             'prenom' => fake()->firstName(),
             'email' => fake()->unique()->safeEmail(),
             'password' => static::$password ??= Hash::make('password'),
-            'matricule' => fake()->optional()->numerify('MAT####'),
+            'matricule' => 'MAT' . strtoupper(Str::random(8)),
             'equipe_id' => Team::factory(),
             'role' => 'utilisateur',
             'est_actif' => true,
