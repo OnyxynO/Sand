@@ -125,4 +125,8 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    // Désactivation d'urgence de la connexion rapide (indépendante de la BDD).
+    // Compatible avec config:cache — lire via config('app.connexion_rapide_disabled').
+    'connexion_rapide_disabled' => env('CONNEXION_RAPIDE_DISABLED', false),
+
 ];

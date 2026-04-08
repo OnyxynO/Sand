@@ -3,12 +3,20 @@ import { useMutation } from '@apollo/client/react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   ArrowRightIcon,
+  BoltIcon,
   ShieldCheckIcon,
   SparklesIcon,
 } from '@heroicons/react/24/outline';
 import { LOGIN_MUTATION } from '../../../graphql/operations/auth';
 import { useAuthStore } from '../../../stores/authStore';
 import type { AuthPayload, LoginInput } from '../../../types';
+import { useConnexionRapide } from '../hooks/useConnexionRapide';
+
+const LABELS_ROLES: Record<string, string> = {
+  admin: 'Admin',
+  moderateur: 'Modérateur',
+  utilisateur: 'Utilisateur',
+};
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -17,6 +25,13 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [erreur, setErreur] = useState('');
+
+  const { activee, roles, erreurLogin, loginEnCours, loginRapide } = useConnexionRapide(
+    (user) => {
+      connecter(user);
+      navigate('/');
+    },
+  );
 
   const [login, { loading }] = useMutation<
     { login: AuthPayload },
@@ -197,6 +212,42 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+
+          {/* Connexion rapide (mode démo) */}
+          {activee && roles.length > 0 && (
+            <div className="mt-6 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-px flex-1 bg-[color:var(--sand-line)]" />
+                <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--sand-muted)]">
+                  <BoltIcon className="h-3.5 w-3.5 text-[color:var(--sand-accent)]" />
+                  Accès démo
+                </span>
+                <div className="h-px flex-1 bg-[color:var(--sand-line)]" />
+              </div>
+
+              <div aria-live="polite" aria-atomic="true">
+                {erreurLogin && (
+                  <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+                    {erreurLogin}
+                  </div>
+                )}
+              </div>
+
+              <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${roles.length}, 1fr)` }}>
+                {roles.map((role) => (
+                  <button
+                    key={role}
+                    type="button"
+                    onClick={() => loginRapide(role)}
+                    disabled={loginEnCours || loading}
+                    className="rounded-2xl border border-[color:var(--sand-line)] bg-white/80 px-3 py-2.5 text-sm font-medium text-[color:var(--sand-ink)] transition hover:border-[color:var(--sand-accent)] hover:bg-[color:var(--sand-surface-strong)] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {loginEnCours ? '…' : (LABELS_ROLES[role] ?? role)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           </div>
 
           {import.meta.env.DEV && (

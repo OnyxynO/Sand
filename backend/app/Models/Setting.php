@@ -30,6 +30,8 @@ class Setting extends Model
     public const CLE_ABSENCE_MODE = 'absence_mode';
     public const CLE_ABSENCE_API_URL = 'absence_api_url';
     public const CLE_ABSENCE_API_TOKEN = 'absence_api_token';
+    public const CLE_CONNEXION_RAPIDE_ACTIVEE = 'connexion_rapide_activee';
+    public const CLE_CONNEXION_RAPIDE_ROLES = 'connexion_rapide_roles';
 
     // Valeurs par defaut
     public const VALEURS_PAR_DEFAUT = [
@@ -42,6 +44,8 @@ class Setting extends Model
         self::CLE_ABSENCE_MODE => ['valeur' => 'manuel', 'description' => 'Mode de gestion des absences (manuel ou api)'],
         self::CLE_ABSENCE_API_URL => ['valeur' => '', 'description' => "URL de l'API RH externe"],
         self::CLE_ABSENCE_API_TOKEN => ['valeur' => '', 'description' => "Token d'authentification API RH"],
+        self::CLE_CONNEXION_RAPIDE_ACTIVEE => ['valeur' => 0, 'description' => 'Activer la connexion rapide par role (mode demo)'],
+        self::CLE_CONNEXION_RAPIDE_ROLES => ['valeur' => [], 'description' => 'Correspondance role => user_id pour la connexion rapide'],
     ];
 
     /**

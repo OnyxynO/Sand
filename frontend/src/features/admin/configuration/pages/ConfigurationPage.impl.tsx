@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import {
-  Cog6ToothIcon,
+  BoltIcon,
+  CalendarDaysIcon,
   CheckIcon,
+  Cog6ToothIcon,
   ArrowPathIcon,
   WifiIcon,
-  CalendarDaysIcon,
 } from '@heroicons/react/24/outline';
 import { PARAMETRES_QUERY, UPDATE_SETTINGS, RESET_SETTINGS, TESTER_CONNEXION_RH_API } from '../../../../graphql/operations/settings';
+import { USERS_QUERY } from '../../../../graphql/operations/users';
 import NavAdmin from '../../../../components/admin/NavAdmin';
 
 interface Parametre {
@@ -36,6 +38,22 @@ interface ResetSettingsMutationData {
 interface TesterConnexionRhApiMutationData {
   testerConnexionRhApi: string | null;
 }
+
+interface UserActif {
+  id: string;
+  nomComplet: string;
+  role: string;
+}
+
+interface UsersQueryData {
+  users: { data: UserActif[] };
+}
+
+const ROLES_CONNEXION_RAPIDE = [
+  { cle: 'admin', label: 'Admin' },
+  { cle: 'moderateur', label: 'Modérateur' },
+  { cle: 'utilisateur', label: 'Utilisateur' },
+] as const;
 
 // Configuration des champs du formulaire
 const CHAMPS_CONFIG = [
@@ -100,6 +118,12 @@ export default function ConfigurationPage() {
   const { data, loading, error } = useQuery<ParametresQueryData>(PARAMETRES_QUERY, {
     fetchPolicy: 'network-only',
   });
+
+  const { data: dataUsers } = useQuery<UsersQueryData>(USERS_QUERY, {
+    variables: { actifSeulement: true },
+    fetchPolicy: 'cache-first',
+  });
+  const usersActifs = dataUsers?.users?.data ?? [];
 
   const [updateSettings, { loading: saving, error: saveError }] = useMutation<
     UpdateSettingsMutationData,
@@ -382,6 +406,88 @@ export default function ConfigurationPage() {
                 </div>
               )}
             </>
+          )}
+        </div>
+      )}
+
+      {/* Section Connexion rapide (mode démo) */}
+      {!loading && data && (
+        <div className="sand-card overflow-hidden rounded-[1.8rem]">
+          <div className="flex items-center gap-2 border-b border-[color:var(--sand-line)] px-6 py-4">
+            <BoltIcon className="w-5 h-5 text-[color:var(--sand-accent-strong)]" />
+            <div className="flex-1">
+              <h2 className="text-base font-semibold text-[color:var(--sand-ink)]">Connexion rapide (mode démo)</h2>
+              <p className="text-xs text-[color:var(--sand-muted)] mt-0.5">
+                Permet de se connecter en un clic depuis la page login. À n'activer que sur des instances de démonstration.
+              </p>
+            </div>
+            {/* Toggle activer/désactiver */}
+            <button
+              type="button"
+              onClick={() => handleChange('connexion_rapide_activee', valeurs['connexion_rapide_activee'] ? 0 : 1)}
+              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[color:var(--sand-accent)] focus:ring-offset-2 ${
+                valeurs['connexion_rapide_activee'] ? 'bg-[color:var(--sand-accent-strong)]' : 'bg-[color:var(--sand-line)]'
+              }`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                  valeurs['connexion_rapide_activee'] ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </div>
+
+          {valeurs['connexion_rapide_activee'] ? (
+            <div className="divide-y divide-[color:var(--sand-line)]">
+              {ROLES_CONNEXION_RAPIDE.map(({ cle, label }) => {
+                const rolesActuels = (valeurs['connexion_rapide_roles'] as Record<string, string | null> | null) ?? {};
+                const userIdSelectionne = rolesActuels[cle] ?? '';
+
+                return (
+                  <div key={cle} className="flex items-center justify-between gap-8 p-6">
+                    <div className="flex-1">
+                      <label className="text-sm font-medium text-[color:var(--sand-ink)]">
+                        Utilisateur — {label}
+                      </label>
+                      <p className="mt-0.5 text-xs text-[color:var(--sand-muted)]">
+                        Compte qui sera connecté lors du clic sur le bouton "{label}"
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0 w-64">
+                      <select
+                        value={String(userIdSelectionne)}
+                        onChange={(e) => {
+                          const rolesConnus = (valeurs['connexion_rapide_roles'] as Record<string, string | null> | null) ?? {};
+                          handleChange('connexion_rapide_roles', {
+                            ...rolesConnus,
+                            [cle]: e.target.value || null,
+                          });
+                        }}
+                        className="block w-full rounded-2xl border border-[color:var(--sand-line)] bg-white/90 text-sm text-[color:var(--sand-ink)] shadow-sm focus:border-[color:var(--sand-accent)] focus:ring-[color:var(--sand-accent)]/20"
+                      >
+                        <option value="">— Non configuré —</option>
+                        {usersActifs.map((u) => (
+                          <option key={u.id} value={u.id}>
+                            {u.nomComplet}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                );
+              })}
+
+              <div className="bg-amber-50/80 px-6 py-4">
+                <p className="text-xs text-amber-800">
+                  <strong>Attention :</strong> tout visiteur connaissant l'URL peut se connecter avec les comptes configurés.
+                  Utiliser uniquement avec des données de démonstration (comptes du DemoSeeder).
+                </p>
+              </div>
+            </div>
+          ) : (
+            <p className="px-6 py-4 text-sm text-[color:var(--sand-muted)]">
+              Activez la connexion rapide pour configurer les comptes par rôle.
+            </p>
           )}
         </div>
       )}

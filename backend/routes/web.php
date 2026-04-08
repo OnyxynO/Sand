@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LoginRapideController;
 use App\Models\Export;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
@@ -38,6 +39,15 @@ Route::get('/api/health', function () {
 
     $httpStatus = $health['status'] === 'ok' ? 200 : 503;
     return response()->json($health, $httpStatus);
+});
+
+// Connexion rapide par role (mode demo) — endpoints publics
+// GET : retourne les roles disponibles sans IDs utilisateurs
+// POST : crée la session Sanctum pour le role demandé, rate limité 10 req/min par IP
+Route::middleware('web')->group(function (): void {
+    Route::get('/api/config/publique', [LoginRapideController::class, 'configPublique']);
+    Route::post('/api/login-rapide', [LoginRapideController::class, 'login'])
+        ->middleware('throttle:10,1');
 });
 
 // Telechargement d'export (authentification Sanctum via cookie)

@@ -20,6 +20,7 @@ vi.mock('@heroicons/react/24/outline', () => ({
   ArrowTrendingUpIcon: creerIconeMock('ArrowTrendingUpIcon'),
   ArrowUpIcon: creerIconeMock('ArrowUpIcon'),
   Bars3Icon: creerIconeMock('Bars3Icon'),
+  BoltIcon: creerIconeMock('BoltIcon'),
   BellIcon: creerIconeMock('BellIcon'),
   BellSlashIcon: creerIconeMock('BellSlashIcon'),
   CalendarDaysIcon: creerIconeMock('CalendarDaysIcon'),
