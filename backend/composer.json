@@ -13,7 +13,8 @@
         "mll-lab/graphql-php-scalars": "^6.4",
         "nuwave/lighthouse": "^6.64",
         "predis/predis": "^3.4",
-        "sentry/sentry-laravel": "^4.23"
+        "sentry/sentry-laravel": "^4.23",
+        "webonyx/graphql-php": "^15.31.5"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
