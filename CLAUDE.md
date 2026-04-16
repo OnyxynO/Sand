@@ -1,6 +1,6 @@
 # CLAUDE.md - SAND
 
-@../GUIDELINES_PROJETS.md
+@../../GUIDELINES_PROJETS.md
 
 Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte necessaire pour travailler sur ce projet.
 
@@ -187,6 +187,47 @@ Commandes de deploiement : voir `../infra/DEPLOY_PROD_SAND.md` (repo prive).
 - **Prod — VITE_API_URL manquant → ServiceWaitingPage bloquee** : `frontend/.env.production` est dans `.gitignore` et absent du VPS. Sans `VITE_API_URL=/graphql` dans `frontend/.env.production.local`, Vite utilise le fallback `http://localhost:8080/graphql` (valeur du `.env` dev). La CSP nginx (`default-src 'self'`) bloque alors toutes les requetes vers `localhost:8080` → health check toujours en echec → ServiceWaitingPage jamais resolue. **Variables obligatoires dans `frontend/.env.production.local` sur le VPS :** `VITE_API_URL=/graphql`, `VITE_WAKE_TOKEN`, `VITE_SENTRY_DSN`.
 - **Caddy — rewrite obligatoire pour sand-watcher** : Caddy transmet le chemin complet (`/api/wake`) au backend. Le wake-server ecoute sur `/wake`. Sans `rewrite * /wake` dans le bloc Caddy, le endpoint retourne 404.
 - **Health check — StartSession bloque avant le handler** : toute route dans `web.php` herite du middleware `web` (inclut `StartSession`). Si Redis est lent au demarrage, `StartSession` echoue avant d'atteindre le handler → 500 HTML au lieu de JSON. `curl` reussit (pas de session) mais le navigateur echoue silencieusement. Fix : `Route::withoutMiddleware([...])->get('/api/health', ...)` pour exclure le middleware session.
+
+## Outils qualite et securite
+
+### LaReview — review PR structuree (local-first)
+
+CLI qui transforme un diff GitHub en review structuree avec diagrammes d'impact. Pas de serveur intermediaire : utilise `gh` CLI en local.
+
+```bash
+# Installer (une fois)
+npm install -g lareview   # ou via brew / pip selon la doc
+
+# Utilisation avant de pousser une PR
+lareview --pr <numero-pr>
+# ou sur un diff local
+lareview --diff
+```
+
+Flux recommande pour SAND :
+1. Faire la PR locale (commits OK, tests OK)
+2. `lareview --diff` pour voir l'analyse avant de pousser
+3. Corriger les points critiques signales
+4. Pousser → CI prend le relais
+
+### Strix — audit securite dynamique (CI manuel)
+
+Agents IA autonomes de pentesting (style "hacker") : testent les endpoints, valident les exploits en proof-of-concept. Tournent dans Docker contre une URL cible.
+
+Workflow GitHub Actions : `.github/workflows/security.yml` (declenchement manuel uniquement).
+
+**Secrets a configurer sur GitHub** (`Settings > Secrets and variables > Actions`) :
+- `STRIX_LLM` : ex. `openai/gpt-4o` ou `anthropic/claude-sonnet-4-6`
+- `LLM_API_KEY` : cle API correspondante
+
+**Lancement local** :
+```bash
+export STRIX_LLM="anthropic/claude-sonnet-4-6"
+export LLM_API_KEY="..."
+strix --target https://sand.interstice.work --mode standard
+```
+
+Points d'attention SAND a couvrir : auth Sanctum (CSRF/session), endpoints GraphQL, export CSV, RGPD.
 
 ## Audit technique
 
