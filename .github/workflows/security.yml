@@ -1,0 +1,36 @@
+name: Audit securite (Strix)
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: "URL cible de l'app SAND"
+        required: false
+        default: 'https://sand.interstice.work'
+      scan_mode:
+        description: 'Mode de scan (quick / standard / deep)'
+        required: false
+        default: 'standard'
+
+jobs:
+  strix-audit:
+    name: Scan securite Strix
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Installer Strix
+        run: curl -sSL https://strix.ai/install | bash
+
+      - name: Lancer l'audit de securite
+        env:
+          STRIX_LLM: ${{ secrets.STRIX_LLM }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          TARGET_URL: ${{ github.event.inputs.target_url }}
+          SCAN_MODE: ${{ github.event.inputs.scan_mode }}
+        run: strix --target "$TARGET_URL" --mode "$SCAN_MODE"
+
+      # Secrets a configurer dans Settings > Secrets and variables > Actions :
+      #   STRIX_LLM    : identifiant du modele LLM (ex: openai/gpt-4o, anthropic/claude-sonnet-4-6)
+      #   LLM_API_KEY  : cle API correspondante
