@@ -12,6 +12,12 @@ dist
 dist-ssr
 *.local
 
+# sniff-qa
+.sniff/
+sniff-baselines/
+sniff-reports/
+sniff-tests/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
