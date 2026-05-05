@@ -43,6 +43,9 @@ frontend/test-results/
 # Docker
 docker/data/
 
+# Runs d'agents
+backend/strix_runs/
+
 # Logs
 *.log
 npm-debug.log*

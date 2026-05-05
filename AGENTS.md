@@ -1,6 +1,6 @@
 # AGENTS.md - SAND
 
-@../GUIDELINES_PROJETS.md
+@../PRINCIPES.md
 
 Ce fichier est le point d'entree pour Codex. Il contient tout le contexte necessaire pour travailler sur ce projet.
 
