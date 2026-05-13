@@ -1,0 +1,15 @@
+{
+  "commit_patterns": [
+    "migrer",
+    "remplacer .+ par",
+    "upgrade|upgrader",
+    "intégrer",
+    "architecture",
+    "sans .+(",
+    "forcer .+ via",
+    "postgres|redis|sentry|docker|ltree",
+    "supprimer .+ utiliser",
+    "adopter",
+    "exclure"
+  ]
+}
