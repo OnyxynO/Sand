@@ -144,13 +144,17 @@ frontend/src/
 
 ## Decisions techniques
 
-- **Auth** : Sanctum SPA (cookies HttpOnly + CSRF)
-- **ltree** : Operateurs `<@` (descendants), `@>` (ancetres), index GiST
+Les decisions architecturales sont documentees dans `.decisions/` (15 ADR, format TeamBrain).
+Resumes des decisions cles :
+
+- **Auth** : Sanctum SPA (cookies HttpOnly + CSRF) — ADR #002
+- **ltree** : Operateurs `<@` (descendants), `@>` (ancetres), index GiST — ADR #001
+- **Architecture frontend** : Feature-Sliced Design (features/, entities/, pages/ facades) — ADR #008, #009
+- **Monitoring** : Sentry (sentry/sentry-laravel + @sentry/react) — ADR #010. DSN dans `backend/.env` (SENTRY_LARAVEL_DSN) et `frontend/.env.production.local` (VITE_SENTRY_DSN, non commite). Desactive en dev frontend (`enabled: import.meta.env.PROD`).
 - **Soft delete** : users, projects, activities, time_entries, absences
 - **Export CSV** : Job queue Redis asynchrone
 - **Design system** : variables CSS `--sand-*`, police Fraunces (Google Fonts), `.sand-card`
 - **Tests** : PostgreSQL obligatoire (ltree incompatible SQLite), base `sand_v2_test`
-- **Monitoring** : Sentry (sentry/sentry-laravel + @sentry/react) — erreurs + contexte utilisateur. DSN dans `backend/.env` (SENTRY_LARAVEL_DSN) et `frontend/.env.production.local` (VITE_SENTRY_DSN, non commite). Desactive en dev frontend (`enabled: import.meta.env.PROD`).
 - **Easter egg** : Konami Code (haut haut bas bas gauche droite gauche droite B A) → renard anime sur un `.sand-card` aleatoire. Hook `useKonamiCode`, composant `FoxEasterEgg`.
 
 ## Infrastructure production
@@ -228,6 +232,28 @@ strix --target https://sand.interstice.work --mode standard
 ```
 
 Points d'attention SAND a couvrir : auth Sanctum (CSRF/session), endpoints GraphQL, export CSV, RGPD.
+
+## Memoire decisionnelle (TeamBrain)
+
+`.decisions/` contient 15 ADR au format TeamBrain (git-natif, markdown + frontmatter).
+
+```bash
+# Lister les ADR
+teambrain list
+
+# Rechercher dans les ADR
+teambrain search "redis"
+
+# Ajouter un nouvel ADR
+teambrain add "description de la decision"
+
+# Scanner les nouveaux commits pour detecter des decisions
+teambrain scan-commits --depuis 1m --confiance 0.7
+```
+
+Les patterns de detection sont configures dans `.decisions/.teambrain.json` pour le style Conventional Commits de ce repo (`migrer`, `remplacer .+ par`, `intégrer`, `architecture`, etc.).
+
+Le serveur MCP est disponible via `teambrain serve` pour exposer les ADR aux AI agents (Claude Code, Cursor).
 
 ## Audit technique
 
