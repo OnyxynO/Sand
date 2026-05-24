@@ -28,3 +28,4 @@ sniff-tests/
 *.njsproj
 *.sln
 *.sw?
+package-lock.json

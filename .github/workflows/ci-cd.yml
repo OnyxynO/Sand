@@ -87,20 +87,18 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Setup Node 24
-        uses: actions/setup-node@v5
+      - name: Installer Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: '24'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
+          bun-version: latest
 
-      - name: Installer les dependances npm
+      - name: Installer les dependances
         working-directory: frontend
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Lancer Vitest
         working-directory: frontend
-        run: npm run test:run
+        run: bun run test:run
 
   # ─────────────────────────────────────────────
   # Deploiement VPS (uniquement sur push main)
