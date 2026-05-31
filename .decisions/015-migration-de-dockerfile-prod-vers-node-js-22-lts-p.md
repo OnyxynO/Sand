@@ -7,7 +7,7 @@ modules:
 - des
 - modules
 - concernés
-statut: accepte
+statut: remplace
 titre: Migration de Dockerfile.prod vers Node.js 22 LTS pour compatibilité avec Vite
   8
 ---
