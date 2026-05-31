@@ -121,7 +121,7 @@ services:
       - frontend-node-modules:/app/node_modules
     networks:
       - sand-network
-    command: npm run dev -- --host
+    command: bun run dev -- --host
     depends_on:
       - nginx
 

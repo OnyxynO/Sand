@@ -1,7 +1,4 @@
-FROM node:20-alpine
-
-# Installer pnpm (optionnel, npm fonctionne aussi)
-RUN npm install -g pnpm
+FROM oven/bun:1-alpine
 
 WORKDIR /app
 
