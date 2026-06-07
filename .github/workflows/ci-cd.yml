@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: sand-deploy-prod
+  cancel-in-progress: false
+
 jobs:
   # ─────────────────────────────────────────────
   # Tests backend PHP (Laravel + PostgreSQL ltree)
