@@ -45,7 +45,7 @@ Postgres et Redis tournent en Homebrew natif. Demarrage rapide :
 ```bash
 brew services start redis
 cd backend && php artisan serve --host=0.0.0.0 --port=8080 > /tmp/sand-backend.log 2>&1 &
-cd frontend && npm run dev > /tmp/sand-frontend.log 2>&1 &
+cd frontend && bun run dev > /tmp/sand-frontend.log 2>&1 &
 ```
 
 Points specifiques du `.env` local :
