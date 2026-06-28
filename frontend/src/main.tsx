@@ -12,6 +12,9 @@ Sentry.init({
   enabled: import.meta.env.PROD,
   integrations: [Sentry.browserTracingIntegration()],
   tracesSampleRate: 0.1,
+  // Bruit reseau benin : requetes coupees (onglet ferme, polling health-check
+  // interrompu, crawlers headless). Aucun utilisateur impacte — voir SAND-4.
+  ignoreErrors: ['Failed to fetch', 'NetworkError when attempting to fetch resource', 'AbortError'],
 })
 
 createRoot(document.getElementById('root')!).render(
