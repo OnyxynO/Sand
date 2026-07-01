@@ -21,14 +21,22 @@ type Documents = {
     "\n  \n  mutation UpdateActivity($id: ID!, $input: UpdateActivityInput!) {\n    updateActivity(id: $id, input: $input) {\n      ...ActivityFields\n    }\n  }\n": typeof types.UpdateActivityDocument,
     "\n  mutation DeleteActivity($id: ID!) {\n    deleteActivity(id: $id)\n  }\n": typeof types.DeleteActivityDocument,
     "\n  \n  mutation MoveActivity($id: ID!, $parentId: ID, $ordre: Int!) {\n    moveActivity(id: $id, parentId: $parentId, ordre: $ordre) {\n      ...ActivityFields\n    }\n  }\n": typeof types.MoveActivityDocument,
-    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      user {\n        id\n        nom\n        prenom\n        email\n        role\n        equipe {\n          id\n          nom\n          code\n        }\n      }\n      token\n    }\n  }\n": typeof types.LoginDocument,
+    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      user {\n        id\n        nom\n        prenom\n        email\n        role\n        equipe {\n          id\n          nom\n          code\n        }\n      }\n    }\n  }\n": typeof types.LoginDocument,
     "\n  mutation Logout {\n    logout\n  }\n": typeof types.LogoutDocument,
+    "\n  mutation DemanderReinitialisationMdp($input: DemanderReinitialisationMdpInput!) {\n    demanderReinitialisationMdp(input: $input)\n  }\n": typeof types.DemanderReinitialisationMdpDocument,
+    "\n  mutation ReinitialiserMdp($input: ReinitialisationMdpInput!) {\n    reinitialiserMdp(input: $input)\n  }\n": typeof types.ReinitialiserMdpDocument,
     "\n  query Me {\n    me {\n      id\n      nom\n      prenom\n      email\n      role\n      equipe {\n        id\n        nom\n        code\n      }\n    }\n  }\n": typeof types.MeDocument,
+    "\n  mutation RequestExport($input: ExportInput!) {\n    requestExport(input: $input) {\n      id\n      statut\n      filtres\n      expireLe\n      creeLe\n    }\n  }\n": typeof types.RequestExportDocument,
+    "\n  query MesExports {\n    mesExports {\n      id\n      statut\n      filtres\n      expireLe\n      creeLe\n    }\n  }\n": typeof types.MesExportsDocument,
+    "\n  mutation DesactiverExport($id: ID!) {\n    desactiverExport(id: $id) {\n      id\n      statut\n      filtres\n      expireLe\n      creeLe\n    }\n  }\n": typeof types.DesactiverExportDocument,
+    "\n  mutation SupprimerExport($id: ID!) {\n    supprimerExport(id: $id)\n  }\n": typeof types.SupprimerExportDocument,
     "\n  fragment NotificationFields on Notification {\n    id\n    type\n    titre\n    message\n    donnees\n    estLu\n    luLe\n    createdAt\n  }\n": typeof types.NotificationFieldsFragmentDoc,
     "\n  \n  query MesNotifications($nonLuSeulement: Boolean, $limite: Int) {\n    mesNotifications(nonLuSeulement: $nonLuSeulement, limite: $limite) {\n      ...NotificationFields\n    }\n  }\n": typeof types.MesNotificationsDocument,
     "\n  query NombreNotificationsNonLues {\n    nombreNotificationsNonLues\n  }\n": typeof types.NombreNotificationsNonLuesDocument,
     "\n  \n  mutation MarkNotificationRead($id: ID!) {\n    markNotificationRead(id: $id) {\n      ...NotificationFields\n    }\n  }\n": typeof types.MarkNotificationReadDocument,
     "\n  mutation MarkAllNotificationsRead {\n    markAllNotificationsRead\n  }\n": typeof types.MarkAllNotificationsReadDocument,
+    "\n  mutation DeleteNotification($id: ID!) {\n    deleteNotification(id: $id)\n  }\n": typeof types.DeleteNotificationDocument,
+    "\n  mutation DeleteAllNotifications {\n    deleteAllNotifications\n  }\n": typeof types.DeleteAllNotificationsDocument,
     "\n  mutation ResolveAbsenceConflict($absenceId: ID!, $resolution: ConflictResolution!) {\n    resolveAbsenceConflict(absenceId: $absenceId, resolution: $resolution)\n  }\n": typeof types.ResolveAbsenceConflictDocument,
     "\n  fragment ProjectFields on Project {\n    id\n    nom\n    code\n    description\n    dateDebut\n    dateFin\n    estActif\n    createdAt\n  }\n": typeof types.ProjectFieldsFragmentDoc,
     "\n  fragment ProjectFullFields on Project {\n    id\n    nom\n    code\n    description\n    dateDebut\n    dateFin\n    estActif\n    createdAt\n    moderateurs {\n      id\n      nomComplet\n      email\n    }\n    utilisateurs {\n      id\n      nomComplet\n      email\n    }\n    activitesActives {\n      id\n      nom\n      chemin\n    }\n  }\n": typeof types.ProjectFullFieldsFragmentDoc,
@@ -40,17 +48,33 @@ type Documents = {
     "\n  \n  mutation SetProjectActivities($projetId: ID!, $activiteIds: [ID!]!) {\n    setProjectActivities(projetId: $projetId, activiteIds: $activiteIds) {\n      ...ProjectFullFields\n    }\n  }\n": typeof types.SetProjectActivitiesDocument,
     "\n  mutation AddProjectModerator($projetId: ID!, $userId: ID!) {\n    addProjectModerator(projetId: $projetId, userId: $userId) {\n      id\n      moderateurs {\n        id\n        nomComplet\n      }\n    }\n  }\n": typeof types.AddProjectModeratorDocument,
     "\n  mutation RemoveProjectModerator($projetId: ID!, $userId: ID!) {\n    removeProjectModerator(projetId: $projetId, userId: $userId) {\n      id\n      moderateurs {\n        id\n        nomComplet\n      }\n    }\n  }\n": typeof types.RemoveProjectModeratorDocument,
+    "\n  mutation SupprimerDonneesUtilisateur($userId: ID!, $confirmationNom: String!) {\n    supprimerDonneesUtilisateur(userId: $userId, confirmationNom: $confirmationNom) {\n      saisiesSupprimees\n      absencesSupprimees\n      notificationsSupprimees\n      exportsSupprimees\n      logsAnonymises\n    }\n  }\n": typeof types.SupprimerDonneesUtilisateurDocument,
+    "\n  mutation PurgerToutesDonnees($confirmationPhrase: String!) {\n    purgerToutesDonnees(confirmationPhrase: $confirmationPhrase) {\n      saisiesSupprimees\n      logsSupprimees\n      absencesSupprimees\n      notificationsSupprimees\n      exportsSupprimees\n    }\n  }\n": typeof types.PurgerToutesDonneesDocument,
     "\n  fragment SaisieFields on TimeEntry {\n    id\n    date\n    duree\n    commentaire\n    projet {\n      id\n      nom\n      code\n    }\n    activite {\n      id\n      nom\n      chemin\n      cheminComplet\n    }\n  }\n": typeof types.SaisieFieldsFragmentDoc,
     "\n  fragment ProjetFields on Project {\n    id\n    nom\n    code\n    estActif\n  }\n": typeof types.ProjetFieldsFragmentDoc,
     "\n  fragment ActiviteFields on Activity {\n    id\n    nom\n    chemin\n    cheminComplet\n    estFeuille\n    estActif\n  }\n": typeof types.ActiviteFieldsFragmentDoc,
-    "\n  \n  query MesSaisiesSemaine($semaine: String!) {\n    mesSaisiesSemaine(semaine: $semaine) {\n      ...SaisieFields\n    }\n  }\n": typeof types.MesSaisiesSemaineDocument,
+    "\n  \n  query MesSaisiesSemaine($semaine: String!, $userId: ID) {\n    mesSaisiesSemaine(semaine: $semaine, userId: $userId) {\n      ...SaisieFields\n    }\n  }\n": typeof types.MesSaisiesSemaineDocument,
+    "\n  query UtilisateursModerables {\n    utilisateursModerables {\n      id\n      nom\n      prenom\n      nomComplet\n    }\n  }\n": typeof types.UtilisateursModerablesDocument,
     "\n  \n  query ProjetsActifs {\n    projets(actif: true) {\n      ...ProjetFields\n    }\n  }\n": typeof types.ProjetsActifsDocument,
     "\n  \n  query ActivitesDisponibles($projetId: ID!) {\n    activitesDisponibles(projetId: $projetId) {\n      ...ActiviteFields\n    }\n  }\n": typeof types.ActivitesDisponiblesDocument,
+    "\n  query AbsencesSemaine($dateDebut: Date!, $dateFin: Date!, $userId: ID) {\n    absences(dateDebut: $dateDebut, dateFin: $dateFin, userId: $userId) {\n      id\n      type\n      typeLibelle\n      dateDebut\n      dateFin\n      dureeJournaliere\n    }\n  }\n": typeof types.AbsencesSemaineDocument,
+    "\n  mutation SyncAbsences($dateDebut: Date!, $dateFin: Date!, $userId: ID) {\n    syncAbsences(dateDebut: $dateDebut, dateFin: $dateFin, userId: $userId) {\n      importes\n      conflits\n      erreurs\n    }\n  }\n": typeof types.SyncAbsencesDocument,
+    "\n  query HistoriqueSaisie($semaineISO: String!, $userId: ID) {\n    mesSaisiesSemaine(semaine: $semaineISO, userId: $userId) {\n      id\n      date\n      duree\n      projet {\n        id\n        code\n      }\n      activite {\n        id\n        nom\n      }\n      historique {\n        id\n        action\n        ancienneDuree\n        nouvelleDuree\n        ancienCommentaire\n        nouveauCommentaire\n        createdAt\n        auteur {\n          nomComplet\n        }\n      }\n    }\n  }\n": typeof types.HistoriqueSaisieDocument,
     "\n  \n  mutation CreateTimeEntry($input: TimeEntryInput!) {\n    createTimeEntry(input: $input) {\n      ...SaisieFields\n    }\n  }\n": typeof types.CreateTimeEntryDocument,
     "\n  \n  mutation UpdateTimeEntry($id: ID!, $input: TimeEntryInput!) {\n    updateTimeEntry(id: $id, input: $input) {\n      ...SaisieFields\n    }\n  }\n": typeof types.UpdateTimeEntryDocument,
     "\n  mutation DeleteTimeEntry($id: ID!) {\n    deleteTimeEntry(id: $id)\n  }\n": typeof types.DeleteTimeEntryDocument,
     "\n  \n  mutation BulkCreateTimeEntries($inputs: [TimeEntryInput!]!) {\n    bulkCreateTimeEntries(inputs: $inputs) {\n      ...SaisieFields\n    }\n  }\n": typeof types.BulkCreateTimeEntriesDocument,
     "\n  \n  mutation BulkUpdateTimeEntries($entries: [BulkUpdateEntry!]!) {\n    bulkUpdateTimeEntries(entries: $entries) {\n      ...SaisieFields\n    }\n  }\n": typeof types.BulkUpdateTimeEntriesDocument,
+    "\n  mutation DeclarerAbsence($date: Date!, $duree: Float, $type: String, $userId: ID) {\n    declarerAbsence(date: $date, duree: $duree, type: $type, userId: $userId)\n  }\n": typeof types.DeclarerAbsenceDocument,
+    "\n  query Parametres {\n    parametres {\n      id\n      cle\n      valeur\n      description\n    }\n  }\n": typeof types.ParametresDocument,
+    "\n  mutation UpdateSettings($settings: [SettingInput!]!) {\n    updateSettings(settings: $settings) {\n      id\n      cle\n      valeur\n      description\n    }\n  }\n": typeof types.UpdateSettingsDocument,
+    "\n  mutation ResetSettings {\n    resetSettings {\n      id\n      cle\n      valeur\n      description\n    }\n  }\n": typeof types.ResetSettingsDocument,
+    "\n  query ParametreAbsenceMode {\n    parametre(cle: \"absence_mode\") {\n      id\n      valeur\n    }\n  }\n": typeof types.ParametreAbsenceModeDocument,
+    "\n  mutation TesterConnexionRhApi {\n    testerConnexionRhApi\n  }\n": typeof types.TesterConnexionRhApiDocument,
+    "\n  query MesStatistiques($dateDebut: Date!, $dateFin: Date!) {\n    statistiques(dateDebut: $dateDebut, dateFin: $dateFin) {\n      tempsTotal\n      parProjet {\n        projet {\n          id\n          nom\n          code\n        }\n        tempsTotal\n        pourcentage\n      }\n      parActivite {\n        activite {\n          id\n          nom\n        }\n        tempsTotal\n        pourcentage\n      }\n      parJour {\n        date\n        tempsTotal\n        estComplet\n      }\n    }\n  }\n": typeof types.MesStatistiquesDocument,
+    "\n  query StatsGlobales($dateDebut: Date!, $dateFin: Date!, $equipeId: ID) {\n    statistiques(dateDebut: $dateDebut, dateFin: $dateFin, equipeId: $equipeId) {\n      tempsTotal\n      parProjet {\n        projet {\n          id\n          nom\n          code\n        }\n        tempsTotal\n        pourcentage\n      }\n      parActivite {\n        activite {\n          id\n          nom\n        }\n        tempsTotal\n        pourcentage\n      }\n      parUtilisateur {\n        utilisateur {\n          id\n          nomComplet\n        }\n        tempsTotal\n        tauxCompletion\n      }\n      parJour {\n        date\n        tempsTotal\n        estComplet\n      }\n    }\n  }\n": typeof types.StatsGlobalesDocument,
+    "\n  query StatsPeriodePrecedente($dateDebut: Date!, $dateFin: Date!, $equipeId: ID) {\n    statistiques(dateDebut: $dateDebut, dateFin: $dateFin, equipeId: $equipeId) {\n      tempsTotal\n      parUtilisateur {\n        utilisateur {\n          id\n          nomComplet\n        }\n        tempsTotal\n        tauxCompletion\n      }\n    }\n  }\n": typeof types.StatsPeriodePrecedenteDocument,
+    "\n  query StatsProjet($dateDebut: Date!, $dateFin: Date!, $projetId: ID!) {\n    statistiques(dateDebut: $dateDebut, dateFin: $dateFin, projetId: $projetId) {\n      tempsTotal\n      parActivite {\n        activite {\n          id\n          nom\n        }\n        tempsTotal\n        pourcentage\n      }\n      parUtilisateur {\n        utilisateur {\n          id\n          nomComplet\n        }\n        tempsTotal\n        tauxCompletion\n      }\n      parJour {\n        date\n        tempsTotal\n        estComplet\n      }\n    }\n  }\n": typeof types.StatsProjetDocument,
     "\n  query Anomalies(\n    $projetId: ID\n    $equipeId: ID\n    $userId: ID\n    $dateDebut: Date!\n    $dateFin: Date!\n    $types: [AnomalyType!]\n  ) {\n    anomalies(\n      projetId: $projetId\n      equipeId: $equipeId\n      userId: $userId\n      dateDebut: $dateDebut\n      dateFin: $dateFin\n      types: $types\n    ) {\n      id\n      type\n      date\n      semaine\n      detail\n      utilisateur {\n        id\n        nomComplet\n        email\n        equipe {\n          id\n          nom\n        }\n      }\n      projet {\n        id\n        nom\n        code\n      }\n    }\n  }\n": typeof types.AnomaliesDocument,
     "\n  fragment TeamFullFields on Team {\n    id\n    nom\n    code\n    description\n    estActif\n    createdAt\n    membres {\n      id\n      nomComplet\n    }\n  }\n": typeof types.TeamFullFieldsFragmentDoc,
     "\n  \n  query EquipesFull($actifSeulement: Boolean) {\n    equipes(actifSeulement: $actifSeulement) {\n      ...TeamFullFields\n    }\n  }\n": typeof types.EquipesFullDocument,
@@ -60,7 +84,7 @@ type Documents = {
     "\n  mutation DeleteTeam($id: ID!) {\n    deleteTeam(id: $id)\n  }\n": typeof types.DeleteTeamDocument,
     "\n  fragment UserFields on User {\n    id\n    matricule\n    nom\n    prenom\n    email\n    nomComplet\n    role\n    estActif\n    equipe {\n      id\n      nom\n      code\n    }\n    createdAt\n  }\n": typeof types.UserFieldsFragmentDoc,
     "\n  fragment TeamFields on Team {\n    id\n    nom\n    code\n    estActif\n  }\n": typeof types.TeamFieldsFragmentDoc,
-    "\n  \n  query Users($equipeId: ID, $role: UserRole, $search: String, $actifSeulement: Boolean) {\n    users(equipeId: $equipeId, role: $role, search: $search, actifSeulement: $actifSeulement) {\n      data {\n        ...UserFields\n      }\n      paginatorInfo {\n        currentPage\n        lastPage\n        total\n      }\n    }\n  }\n": typeof types.UsersDocument,
+    "\n  \n  query Users($equipeId: ID, $role: UserRole, $search: String, $actifSeulement: Boolean, $page: Int, $first: Int = 20) {\n    users(equipeId: $equipeId, role: $role, search: $search, actifSeulement: $actifSeulement, page: $page, first: $first) {\n      data {\n        ...UserFields\n      }\n      paginatorInfo {\n        currentPage\n        lastPage\n        total\n        hasMorePages\n      }\n    }\n  }\n": typeof types.UsersDocument,
     "\n  \n  query User($id: ID!) {\n    user(id: $id) {\n      ...UserFields\n    }\n  }\n": typeof types.UserDocument,
     "\n  \n  query Equipes($actifSeulement: Boolean) {\n    equipes(actifSeulement: $actifSeulement) {\n      ...TeamFields\n    }\n  }\n": typeof types.EquipesDocument,
     "\n  \n  mutation CreateUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n      ...UserFields\n    }\n  }\n": typeof types.CreateUserDocument,
@@ -79,14 +103,22 @@ const documents: Documents = {
     "\n  \n  mutation UpdateActivity($id: ID!, $input: UpdateActivityInput!) {\n    updateActivity(id: $id, input: $input) {\n      ...ActivityFields\n    }\n  }\n": types.UpdateActivityDocument,
     "\n  mutation DeleteActivity($id: ID!) {\n    deleteActivity(id: $id)\n  }\n": types.DeleteActivityDocument,
     "\n  \n  mutation MoveActivity($id: ID!, $parentId: ID, $ordre: Int!) {\n    moveActivity(id: $id, parentId: $parentId, ordre: $ordre) {\n      ...ActivityFields\n    }\n  }\n": types.MoveActivityDocument,
-    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      user {\n        id\n        nom\n        prenom\n        email\n        role\n        equipe {\n          id\n          nom\n          code\n        }\n      }\n      token\n    }\n  }\n": types.LoginDocument,
+    "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      user {\n        id\n        nom\n        prenom\n        email\n        role\n        equipe {\n          id\n          nom\n          code\n        }\n      }\n    }\n  }\n": types.LoginDocument,
     "\n  mutation Logout {\n    logout\n  }\n": types.LogoutDocument,
+    "\n  mutation DemanderReinitialisationMdp($input: DemanderReinitialisationMdpInput!) {\n    demanderReinitialisationMdp(input: $input)\n  }\n": types.DemanderReinitialisationMdpDocument,
+    "\n  mutation ReinitialiserMdp($input: ReinitialisationMdpInput!) {\n    reinitialiserMdp(input: $input)\n  }\n": types.ReinitialiserMdpDocument,
     "\n  query Me {\n    me {\n      id\n      nom\n      prenom\n      email\n      role\n      equipe {\n        id\n        nom\n        code\n      }\n    }\n  }\n": types.MeDocument,
+    "\n  mutation RequestExport($input: ExportInput!) {\n    requestExport(input: $input) {\n      id\n      statut\n      filtres\n      expireLe\n      creeLe\n    }\n  }\n": types.RequestExportDocument,
+    "\n  query MesExports {\n    mesExports {\n      id\n      statut\n      filtres\n      expireLe\n      creeLe\n    }\n  }\n": types.MesExportsDocument,
+    "\n  mutation DesactiverExport($id: ID!) {\n    desactiverExport(id: $id) {\n      id\n      statut\n      filtres\n      expireLe\n      creeLe\n    }\n  }\n": types.DesactiverExportDocument,
+    "\n  mutation SupprimerExport($id: ID!) {\n    supprimerExport(id: $id)\n  }\n": types.SupprimerExportDocument,
     "\n  fragment NotificationFields on Notification {\n    id\n    type\n    titre\n    message\n    donnees\n    estLu\n    luLe\n    createdAt\n  }\n": types.NotificationFieldsFragmentDoc,
     "\n  \n  query MesNotifications($nonLuSeulement: Boolean, $limite: Int) {\n    mesNotifications(nonLuSeulement: $nonLuSeulement, limite: $limite) {\n      ...NotificationFields\n    }\n  }\n": types.MesNotificationsDocument,
     "\n  query NombreNotificationsNonLues {\n    nombreNotificationsNonLues\n  }\n": types.NombreNotificationsNonLuesDocument,
     "\n  \n  mutation MarkNotificationRead($id: ID!) {\n    markNotificationRead(id: $id) {\n      ...NotificationFields\n    }\n  }\n": types.MarkNotificationReadDocument,
     "\n  mutation MarkAllNotificationsRead {\n    markAllNotificationsRead\n  }\n": types.MarkAllNotificationsReadDocument,
+    "\n  mutation DeleteNotification($id: ID!) {\n    deleteNotification(id: $id)\n  }\n": types.DeleteNotificationDocument,
+    "\n  mutation DeleteAllNotifications {\n    deleteAllNotifications\n  }\n": types.DeleteAllNotificationsDocument,
     "\n  mutation ResolveAbsenceConflict($absenceId: ID!, $resolution: ConflictResolution!) {\n    resolveAbsenceConflict(absenceId: $absenceId, resolution: $resolution)\n  }\n": types.ResolveAbsenceConflictDocument,
     "\n  fragment ProjectFields on Project {\n    id\n    nom\n    code\n    description\n    dateDebut\n    dateFin\n    estActif\n    createdAt\n  }\n": types.ProjectFieldsFragmentDoc,
     "\n  fragment ProjectFullFields on Project {\n    id\n    nom\n    code\n    description\n    dateDebut\n    dateFin\n    estActif\n    createdAt\n    moderateurs {\n      id\n      nomComplet\n      email\n    }\n    utilisateurs {\n      id\n      nomComplet\n      email\n    }\n    activitesActives {\n      id\n      nom\n      chemin\n    }\n  }\n": types.ProjectFullFieldsFragmentDoc,
@@ -98,17 +130,33 @@ const documents: Documents = {
     "\n  \n  mutation SetProjectActivities($projetId: ID!, $activiteIds: [ID!]!) {\n    setProjectActivities(projetId: $projetId, activiteIds: $activiteIds) {\n      ...ProjectFullFields\n    }\n  }\n": types.SetProjectActivitiesDocument,
     "\n  mutation AddProjectModerator($projetId: ID!, $userId: ID!) {\n    addProjectModerator(projetId: $projetId, userId: $userId) {\n      id\n      moderateurs {\n        id\n        nomComplet\n      }\n    }\n  }\n": types.AddProjectModeratorDocument,
     "\n  mutation RemoveProjectModerator($projetId: ID!, $userId: ID!) {\n    removeProjectModerator(projetId: $projetId, userId: $userId) {\n      id\n      moderateurs {\n        id\n        nomComplet\n      }\n    }\n  }\n": types.RemoveProjectModeratorDocument,
+    "\n  mutation SupprimerDonneesUtilisateur($userId: ID!, $confirmationNom: String!) {\n    supprimerDonneesUtilisateur(userId: $userId, confirmationNom: $confirmationNom) {\n      saisiesSupprimees\n      absencesSupprimees\n      notificationsSupprimees\n      exportsSupprimees\n      logsAnonymises\n    }\n  }\n": types.SupprimerDonneesUtilisateurDocument,
+    "\n  mutation PurgerToutesDonnees($confirmationPhrase: String!) {\n    purgerToutesDonnees(confirmationPhrase: $confirmationPhrase) {\n      saisiesSupprimees\n      logsSupprimees\n      absencesSupprimees\n      notificationsSupprimees\n      exportsSupprimees\n    }\n  }\n": types.PurgerToutesDonneesDocument,
     "\n  fragment SaisieFields on TimeEntry {\n    id\n    date\n    duree\n    commentaire\n    projet {\n      id\n      nom\n      code\n    }\n    activite {\n      id\n      nom\n      chemin\n      cheminComplet\n    }\n  }\n": types.SaisieFieldsFragmentDoc,
     "\n  fragment ProjetFields on Project {\n    id\n    nom\n    code\n    estActif\n  }\n": types.ProjetFieldsFragmentDoc,
     "\n  fragment ActiviteFields on Activity {\n    id\n    nom\n    chemin\n    cheminComplet\n    estFeuille\n    estActif\n  }\n": types.ActiviteFieldsFragmentDoc,
-    "\n  \n  query MesSaisiesSemaine($semaine: String!) {\n    mesSaisiesSemaine(semaine: $semaine) {\n      ...SaisieFields\n    }\n  }\n": types.MesSaisiesSemaineDocument,
+    "\n  \n  query MesSaisiesSemaine($semaine: String!, $userId: ID) {\n    mesSaisiesSemaine(semaine: $semaine, userId: $userId) {\n      ...SaisieFields\n    }\n  }\n": types.MesSaisiesSemaineDocument,
+    "\n  query UtilisateursModerables {\n    utilisateursModerables {\n      id\n      nom\n      prenom\n      nomComplet\n    }\n  }\n": types.UtilisateursModerablesDocument,
     "\n  \n  query ProjetsActifs {\n    projets(actif: true) {\n      ...ProjetFields\n    }\n  }\n": types.ProjetsActifsDocument,
     "\n  \n  query ActivitesDisponibles($projetId: ID!) {\n    activitesDisponibles(projetId: $projetId) {\n      ...ActiviteFields\n    }\n  }\n": types.ActivitesDisponiblesDocument,
+    "\n  query AbsencesSemaine($dateDebut: Date!, $dateFin: Date!, $userId: ID) {\n    absences(dateDebut: $dateDebut, dateFin: $dateFin, userId: $userId) {\n      id\n      type\n      typeLibelle\n      dateDebut\n      dateFin\n      dureeJournaliere\n    }\n  }\n": types.AbsencesSemaineDocument,
+    "\n  mutation SyncAbsences($dateDebut: Date!, $dateFin: Date!, $userId: ID) {\n    syncAbsences(dateDebut: $dateDebut, dateFin: $dateFin, userId: $userId) {\n      importes\n      conflits\n      erreurs\n    }\n  }\n": types.SyncAbsencesDocument,
+    "\n  query HistoriqueSaisie($semaineISO: String!, $userId: ID) {\n    mesSaisiesSemaine(semaine: $semaineISO, userId: $userId) {\n      id\n      date\n      duree\n      projet {\n        id\n        code\n      }\n      activite {\n        id\n        nom\n      }\n      historique {\n        id\n        action\n        ancienneDuree\n        nouvelleDuree\n        ancienCommentaire\n        nouveauCommentaire\n        createdAt\n        auteur {\n          nomComplet\n        }\n      }\n    }\n  }\n": types.HistoriqueSaisieDocument,
     "\n  \n  mutation CreateTimeEntry($input: TimeEntryInput!) {\n    createTimeEntry(input: $input) {\n      ...SaisieFields\n    }\n  }\n": types.CreateTimeEntryDocument,
     "\n  \n  mutation UpdateTimeEntry($id: ID!, $input: TimeEntryInput!) {\n    updateTimeEntry(id: $id, input: $input) {\n      ...SaisieFields\n    }\n  }\n": types.UpdateTimeEntryDocument,
     "\n  mutation DeleteTimeEntry($id: ID!) {\n    deleteTimeEntry(id: $id)\n  }\n": types.DeleteTimeEntryDocument,
     "\n  \n  mutation BulkCreateTimeEntries($inputs: [TimeEntryInput!]!) {\n    bulkCreateTimeEntries(inputs: $inputs) {\n      ...SaisieFields\n    }\n  }\n": types.BulkCreateTimeEntriesDocument,
     "\n  \n  mutation BulkUpdateTimeEntries($entries: [BulkUpdateEntry!]!) {\n    bulkUpdateTimeEntries(entries: $entries) {\n      ...SaisieFields\n    }\n  }\n": types.BulkUpdateTimeEntriesDocument,
+    "\n  mutation DeclarerAbsence($date: Date!, $duree: Float, $type: String, $userId: ID) {\n    declarerAbsence(date: $date, duree: $duree, type: $type, userId: $userId)\n  }\n": types.DeclarerAbsenceDocument,
+    "\n  query Parametres {\n    parametres {\n      id\n      cle\n      valeur\n      description\n    }\n  }\n": types.ParametresDocument,
+    "\n  mutation UpdateSettings($settings: [SettingInput!]!) {\n    updateSettings(settings: $settings) {\n      id\n      cle\n      valeur\n      description\n    }\n  }\n": types.UpdateSettingsDocument,
+    "\n  mutation ResetSettings {\n    resetSettings {\n      id\n      cle\n      valeur\n      description\n    }\n  }\n": types.ResetSettingsDocument,
+    "\n  query ParametreAbsenceMode {\n    parametre(cle: \"absence_mode\") {\n      id\n      valeur\n    }\n  }\n": types.ParametreAbsenceModeDocument,
+    "\n  mutation TesterConnexionRhApi {\n    testerConnexionRhApi\n  }\n": types.TesterConnexionRhApiDocument,
+    "\n  query MesStatistiques($dateDebut: Date!, $dateFin: Date!) {\n    statistiques(dateDebut: $dateDebut, dateFin: $dateFin) {\n      tempsTotal\n      parProjet {\n        projet {\n          id\n          nom\n          code\n        }\n        tempsTotal\n        pourcentage\n      }\n      parActivite {\n        activite {\n          id\n          nom\n        }\n        tempsTotal\n        pourcentage\n      }\n      parJour {\n        date\n        tempsTotal\n        estComplet\n      }\n    }\n  }\n": types.MesStatistiquesDocument,
+    "\n  query StatsGlobales($dateDebut: Date!, $dateFin: Date!, $equipeId: ID) {\n    statistiques(dateDebut: $dateDebut, dateFin: $dateFin, equipeId: $equipeId) {\n      tempsTotal\n      parProjet {\n        projet {\n          id\n          nom\n          code\n        }\n        tempsTotal\n        pourcentage\n      }\n      parActivite {\n        activite {\n          id\n          nom\n        }\n        tempsTotal\n        pourcentage\n      }\n      parUtilisateur {\n        utilisateur {\n          id\n          nomComplet\n        }\n        tempsTotal\n        tauxCompletion\n      }\n      parJour {\n        date\n        tempsTotal\n        estComplet\n      }\n    }\n  }\n": types.StatsGlobalesDocument,
+    "\n  query StatsPeriodePrecedente($dateDebut: Date!, $dateFin: Date!, $equipeId: ID) {\n    statistiques(dateDebut: $dateDebut, dateFin: $dateFin, equipeId: $equipeId) {\n      tempsTotal\n      parUtilisateur {\n        utilisateur {\n          id\n          nomComplet\n        }\n        tempsTotal\n        tauxCompletion\n      }\n    }\n  }\n": types.StatsPeriodePrecedenteDocument,
+    "\n  query StatsProjet($dateDebut: Date!, $dateFin: Date!, $projetId: ID!) {\n    statistiques(dateDebut: $dateDebut, dateFin: $dateFin, projetId: $projetId) {\n      tempsTotal\n      parActivite {\n        activite {\n          id\n          nom\n        }\n        tempsTotal\n        pourcentage\n      }\n      parUtilisateur {\n        utilisateur {\n          id\n          nomComplet\n        }\n        tempsTotal\n        tauxCompletion\n      }\n      parJour {\n        date\n        tempsTotal\n        estComplet\n      }\n    }\n  }\n": types.StatsProjetDocument,
     "\n  query Anomalies(\n    $projetId: ID\n    $equipeId: ID\n    $userId: ID\n    $dateDebut: Date!\n    $dateFin: Date!\n    $types: [AnomalyType!]\n  ) {\n    anomalies(\n      projetId: $projetId\n      equipeId: $equipeId\n      userId: $userId\n      dateDebut: $dateDebut\n      dateFin: $dateFin\n      types: $types\n    ) {\n      id\n      type\n      date\n      semaine\n      detail\n      utilisateur {\n        id\n        nomComplet\n        email\n        equipe {\n          id\n          nom\n        }\n      }\n      projet {\n        id\n        nom\n        code\n      }\n    }\n  }\n": types.AnomaliesDocument,
     "\n  fragment TeamFullFields on Team {\n    id\n    nom\n    code\n    description\n    estActif\n    createdAt\n    membres {\n      id\n      nomComplet\n    }\n  }\n": types.TeamFullFieldsFragmentDoc,
     "\n  \n  query EquipesFull($actifSeulement: Boolean) {\n    equipes(actifSeulement: $actifSeulement) {\n      ...TeamFullFields\n    }\n  }\n": types.EquipesFullDocument,
@@ -118,7 +166,7 @@ const documents: Documents = {
     "\n  mutation DeleteTeam($id: ID!) {\n    deleteTeam(id: $id)\n  }\n": types.DeleteTeamDocument,
     "\n  fragment UserFields on User {\n    id\n    matricule\n    nom\n    prenom\n    email\n    nomComplet\n    role\n    estActif\n    equipe {\n      id\n      nom\n      code\n    }\n    createdAt\n  }\n": types.UserFieldsFragmentDoc,
     "\n  fragment TeamFields on Team {\n    id\n    nom\n    code\n    estActif\n  }\n": types.TeamFieldsFragmentDoc,
-    "\n  \n  query Users($equipeId: ID, $role: UserRole, $search: String, $actifSeulement: Boolean) {\n    users(equipeId: $equipeId, role: $role, search: $search, actifSeulement: $actifSeulement) {\n      data {\n        ...UserFields\n      }\n      paginatorInfo {\n        currentPage\n        lastPage\n        total\n      }\n    }\n  }\n": types.UsersDocument,
+    "\n  \n  query Users($equipeId: ID, $role: UserRole, $search: String, $actifSeulement: Boolean, $page: Int, $first: Int = 20) {\n    users(equipeId: $equipeId, role: $role, search: $search, actifSeulement: $actifSeulement, page: $page, first: $first) {\n      data {\n        ...UserFields\n      }\n      paginatorInfo {\n        currentPage\n        lastPage\n        total\n        hasMorePages\n      }\n    }\n  }\n": types.UsersDocument,
     "\n  \n  query User($id: ID!) {\n    user(id: $id) {\n      ...UserFields\n    }\n  }\n": types.UserDocument,
     "\n  \n  query Equipes($actifSeulement: Boolean) {\n    equipes(actifSeulement: $actifSeulement) {\n      ...TeamFields\n    }\n  }\n": types.EquipesDocument,
     "\n  \n  mutation CreateUser($input: CreateUserInput!) {\n    createUser(input: $input) {\n      ...UserFields\n    }\n  }\n": types.CreateUserDocument,
@@ -175,7 +223,7 @@ export function graphql(source: "\n  \n  mutation MoveActivity($id: ID!, $parent
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      user {\n        id\n        nom\n        prenom\n        email\n        role\n        equipe {\n          id\n          nom\n          code\n        }\n      }\n      token\n    }\n  }\n"): (typeof documents)["\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      user {\n        id\n        nom\n        prenom\n        email\n        role\n        equipe {\n          id\n          nom\n          code\n        }\n      }\n      token\n    }\n  }\n"];
+export function graphql(source: "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      user {\n        id\n        nom\n        prenom\n        email\n        role\n        equipe {\n          id\n          nom\n          code\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      user {\n        id\n        nom\n        prenom\n        email\n        role\n        equipe {\n          id\n          nom\n          code\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -183,7 +231,31 @@ export function graphql(source: "\n  mutation Logout {\n    logout\n  }\n"): (ty
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  mutation DemanderReinitialisationMdp($input: DemanderReinitialisationMdpInput!) {\n    demanderReinitialisationMdp(input: $input)\n  }\n"): (typeof documents)["\n  mutation DemanderReinitialisationMdp($input: DemanderReinitialisationMdpInput!) {\n    demanderReinitialisationMdp(input: $input)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ReinitialiserMdp($input: ReinitialisationMdpInput!) {\n    reinitialiserMdp(input: $input)\n  }\n"): (typeof documents)["\n  mutation ReinitialiserMdp($input: ReinitialisationMdpInput!) {\n    reinitialiserMdp(input: $input)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  query Me {\n    me {\n      id\n      nom\n      prenom\n      email\n      role\n      equipe {\n        id\n        nom\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  query Me {\n    me {\n      id\n      nom\n      prenom\n      email\n      role\n      equipe {\n        id\n        nom\n        code\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RequestExport($input: ExportInput!) {\n    requestExport(input: $input) {\n      id\n      statut\n      filtres\n      expireLe\n      creeLe\n    }\n  }\n"): (typeof documents)["\n  mutation RequestExport($input: ExportInput!) {\n    requestExport(input: $input) {\n      id\n      statut\n      filtres\n      expireLe\n      creeLe\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query MesExports {\n    mesExports {\n      id\n      statut\n      filtres\n      expireLe\n      creeLe\n    }\n  }\n"): (typeof documents)["\n  query MesExports {\n    mesExports {\n      id\n      statut\n      filtres\n      expireLe\n      creeLe\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation DesactiverExport($id: ID!) {\n    desactiverExport(id: $id) {\n      id\n      statut\n      filtres\n      expireLe\n      creeLe\n    }\n  }\n"): (typeof documents)["\n  mutation DesactiverExport($id: ID!) {\n    desactiverExport(id: $id) {\n      id\n      statut\n      filtres\n      expireLe\n      creeLe\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SupprimerExport($id: ID!) {\n    supprimerExport(id: $id)\n  }\n"): (typeof documents)["\n  mutation SupprimerExport($id: ID!) {\n    supprimerExport(id: $id)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -204,6 +276,14 @@ export function graphql(source: "\n  \n  mutation MarkNotificationRead($id: ID!)
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation MarkAllNotificationsRead {\n    markAllNotificationsRead\n  }\n"): (typeof documents)["\n  mutation MarkAllNotificationsRead {\n    markAllNotificationsRead\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation DeleteNotification($id: ID!) {\n    deleteNotification(id: $id)\n  }\n"): (typeof documents)["\n  mutation DeleteNotification($id: ID!) {\n    deleteNotification(id: $id)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation DeleteAllNotifications {\n    deleteAllNotifications\n  }\n"): (typeof documents)["\n  mutation DeleteAllNotifications {\n    deleteAllNotifications\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -251,6 +331,14 @@ export function graphql(source: "\n  mutation RemoveProjectModerator($projetId: 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  mutation SupprimerDonneesUtilisateur($userId: ID!, $confirmationNom: String!) {\n    supprimerDonneesUtilisateur(userId: $userId, confirmationNom: $confirmationNom) {\n      saisiesSupprimees\n      absencesSupprimees\n      notificationsSupprimees\n      exportsSupprimees\n      logsAnonymises\n    }\n  }\n"): (typeof documents)["\n  mutation SupprimerDonneesUtilisateur($userId: ID!, $confirmationNom: String!) {\n    supprimerDonneesUtilisateur(userId: $userId, confirmationNom: $confirmationNom) {\n      saisiesSupprimees\n      absencesSupprimees\n      notificationsSupprimees\n      exportsSupprimees\n      logsAnonymises\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation PurgerToutesDonnees($confirmationPhrase: String!) {\n    purgerToutesDonnees(confirmationPhrase: $confirmationPhrase) {\n      saisiesSupprimees\n      logsSupprimees\n      absencesSupprimees\n      notificationsSupprimees\n      exportsSupprimees\n    }\n  }\n"): (typeof documents)["\n  mutation PurgerToutesDonnees($confirmationPhrase: String!) {\n    purgerToutesDonnees(confirmationPhrase: $confirmationPhrase) {\n      saisiesSupprimees\n      logsSupprimees\n      absencesSupprimees\n      notificationsSupprimees\n      exportsSupprimees\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  fragment SaisieFields on TimeEntry {\n    id\n    date\n    duree\n    commentaire\n    projet {\n      id\n      nom\n      code\n    }\n    activite {\n      id\n      nom\n      chemin\n      cheminComplet\n    }\n  }\n"): (typeof documents)["\n  fragment SaisieFields on TimeEntry {\n    id\n    date\n    duree\n    commentaire\n    projet {\n      id\n      nom\n      code\n    }\n    activite {\n      id\n      nom\n      chemin\n      cheminComplet\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -263,7 +351,11 @@ export function graphql(source: "\n  fragment ActiviteFields on Activity {\n    
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  \n  query MesSaisiesSemaine($semaine: String!) {\n    mesSaisiesSemaine(semaine: $semaine) {\n      ...SaisieFields\n    }\n  }\n"): (typeof documents)["\n  \n  query MesSaisiesSemaine($semaine: String!) {\n    mesSaisiesSemaine(semaine: $semaine) {\n      ...SaisieFields\n    }\n  }\n"];
+export function graphql(source: "\n  \n  query MesSaisiesSemaine($semaine: String!, $userId: ID) {\n    mesSaisiesSemaine(semaine: $semaine, userId: $userId) {\n      ...SaisieFields\n    }\n  }\n"): (typeof documents)["\n  \n  query MesSaisiesSemaine($semaine: String!, $userId: ID) {\n    mesSaisiesSemaine(semaine: $semaine, userId: $userId) {\n      ...SaisieFields\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query UtilisateursModerables {\n    utilisateursModerables {\n      id\n      nom\n      prenom\n      nomComplet\n    }\n  }\n"): (typeof documents)["\n  query UtilisateursModerables {\n    utilisateursModerables {\n      id\n      nom\n      prenom\n      nomComplet\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -272,6 +364,18 @@ export function graphql(source: "\n  \n  query ProjetsActifs {\n    projets(acti
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  \n  query ActivitesDisponibles($projetId: ID!) {\n    activitesDisponibles(projetId: $projetId) {\n      ...ActiviteFields\n    }\n  }\n"): (typeof documents)["\n  \n  query ActivitesDisponibles($projetId: ID!) {\n    activitesDisponibles(projetId: $projetId) {\n      ...ActiviteFields\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query AbsencesSemaine($dateDebut: Date!, $dateFin: Date!, $userId: ID) {\n    absences(dateDebut: $dateDebut, dateFin: $dateFin, userId: $userId) {\n      id\n      type\n      typeLibelle\n      dateDebut\n      dateFin\n      dureeJournaliere\n    }\n  }\n"): (typeof documents)["\n  query AbsencesSemaine($dateDebut: Date!, $dateFin: Date!, $userId: ID) {\n    absences(dateDebut: $dateDebut, dateFin: $dateFin, userId: $userId) {\n      id\n      type\n      typeLibelle\n      dateDebut\n      dateFin\n      dureeJournaliere\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation SyncAbsences($dateDebut: Date!, $dateFin: Date!, $userId: ID) {\n    syncAbsences(dateDebut: $dateDebut, dateFin: $dateFin, userId: $userId) {\n      importes\n      conflits\n      erreurs\n    }\n  }\n"): (typeof documents)["\n  mutation SyncAbsences($dateDebut: Date!, $dateFin: Date!, $userId: ID) {\n    syncAbsences(dateDebut: $dateDebut, dateFin: $dateFin, userId: $userId) {\n      importes\n      conflits\n      erreurs\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query HistoriqueSaisie($semaineISO: String!, $userId: ID) {\n    mesSaisiesSemaine(semaine: $semaineISO, userId: $userId) {\n      id\n      date\n      duree\n      projet {\n        id\n        code\n      }\n      activite {\n        id\n        nom\n      }\n      historique {\n        id\n        action\n        ancienneDuree\n        nouvelleDuree\n        ancienCommentaire\n        nouveauCommentaire\n        createdAt\n        auteur {\n          nomComplet\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query HistoriqueSaisie($semaineISO: String!, $userId: ID) {\n    mesSaisiesSemaine(semaine: $semaineISO, userId: $userId) {\n      id\n      date\n      duree\n      projet {\n        id\n        code\n      }\n      activite {\n        id\n        nom\n      }\n      historique {\n        id\n        action\n        ancienneDuree\n        nouvelleDuree\n        ancienCommentaire\n        nouveauCommentaire\n        createdAt\n        auteur {\n          nomComplet\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -292,6 +396,46 @@ export function graphql(source: "\n  \n  mutation BulkCreateTimeEntries($inputs:
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  \n  mutation BulkUpdateTimeEntries($entries: [BulkUpdateEntry!]!) {\n    bulkUpdateTimeEntries(entries: $entries) {\n      ...SaisieFields\n    }\n  }\n"): (typeof documents)["\n  \n  mutation BulkUpdateTimeEntries($entries: [BulkUpdateEntry!]!) {\n    bulkUpdateTimeEntries(entries: $entries) {\n      ...SaisieFields\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation DeclarerAbsence($date: Date!, $duree: Float, $type: String, $userId: ID) {\n    declarerAbsence(date: $date, duree: $duree, type: $type, userId: $userId)\n  }\n"): (typeof documents)["\n  mutation DeclarerAbsence($date: Date!, $duree: Float, $type: String, $userId: ID) {\n    declarerAbsence(date: $date, duree: $duree, type: $type, userId: $userId)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query Parametres {\n    parametres {\n      id\n      cle\n      valeur\n      description\n    }\n  }\n"): (typeof documents)["\n  query Parametres {\n    parametres {\n      id\n      cle\n      valeur\n      description\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation UpdateSettings($settings: [SettingInput!]!) {\n    updateSettings(settings: $settings) {\n      id\n      cle\n      valeur\n      description\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateSettings($settings: [SettingInput!]!) {\n    updateSettings(settings: $settings) {\n      id\n      cle\n      valeur\n      description\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation ResetSettings {\n    resetSettings {\n      id\n      cle\n      valeur\n      description\n    }\n  }\n"): (typeof documents)["\n  mutation ResetSettings {\n    resetSettings {\n      id\n      cle\n      valeur\n      description\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query ParametreAbsenceMode {\n    parametre(cle: \"absence_mode\") {\n      id\n      valeur\n    }\n  }\n"): (typeof documents)["\n  query ParametreAbsenceMode {\n    parametre(cle: \"absence_mode\") {\n      id\n      valeur\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation TesterConnexionRhApi {\n    testerConnexionRhApi\n  }\n"): (typeof documents)["\n  mutation TesterConnexionRhApi {\n    testerConnexionRhApi\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query MesStatistiques($dateDebut: Date!, $dateFin: Date!) {\n    statistiques(dateDebut: $dateDebut, dateFin: $dateFin) {\n      tempsTotal\n      parProjet {\n        projet {\n          id\n          nom\n          code\n        }\n        tempsTotal\n        pourcentage\n      }\n      parActivite {\n        activite {\n          id\n          nom\n        }\n        tempsTotal\n        pourcentage\n      }\n      parJour {\n        date\n        tempsTotal\n        estComplet\n      }\n    }\n  }\n"): (typeof documents)["\n  query MesStatistiques($dateDebut: Date!, $dateFin: Date!) {\n    statistiques(dateDebut: $dateDebut, dateFin: $dateFin) {\n      tempsTotal\n      parProjet {\n        projet {\n          id\n          nom\n          code\n        }\n        tempsTotal\n        pourcentage\n      }\n      parActivite {\n        activite {\n          id\n          nom\n        }\n        tempsTotal\n        pourcentage\n      }\n      parJour {\n        date\n        tempsTotal\n        estComplet\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query StatsGlobales($dateDebut: Date!, $dateFin: Date!, $equipeId: ID) {\n    statistiques(dateDebut: $dateDebut, dateFin: $dateFin, equipeId: $equipeId) {\n      tempsTotal\n      parProjet {\n        projet {\n          id\n          nom\n          code\n        }\n        tempsTotal\n        pourcentage\n      }\n      parActivite {\n        activite {\n          id\n          nom\n        }\n        tempsTotal\n        pourcentage\n      }\n      parUtilisateur {\n        utilisateur {\n          id\n          nomComplet\n        }\n        tempsTotal\n        tauxCompletion\n      }\n      parJour {\n        date\n        tempsTotal\n        estComplet\n      }\n    }\n  }\n"): (typeof documents)["\n  query StatsGlobales($dateDebut: Date!, $dateFin: Date!, $equipeId: ID) {\n    statistiques(dateDebut: $dateDebut, dateFin: $dateFin, equipeId: $equipeId) {\n      tempsTotal\n      parProjet {\n        projet {\n          id\n          nom\n          code\n        }\n        tempsTotal\n        pourcentage\n      }\n      parActivite {\n        activite {\n          id\n          nom\n        }\n        tempsTotal\n        pourcentage\n      }\n      parUtilisateur {\n        utilisateur {\n          id\n          nomComplet\n        }\n        tempsTotal\n        tauxCompletion\n      }\n      parJour {\n        date\n        tempsTotal\n        estComplet\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query StatsPeriodePrecedente($dateDebut: Date!, $dateFin: Date!, $equipeId: ID) {\n    statistiques(dateDebut: $dateDebut, dateFin: $dateFin, equipeId: $equipeId) {\n      tempsTotal\n      parUtilisateur {\n        utilisateur {\n          id\n          nomComplet\n        }\n        tempsTotal\n        tauxCompletion\n      }\n    }\n  }\n"): (typeof documents)["\n  query StatsPeriodePrecedente($dateDebut: Date!, $dateFin: Date!, $equipeId: ID) {\n    statistiques(dateDebut: $dateDebut, dateFin: $dateFin, equipeId: $equipeId) {\n      tempsTotal\n      parUtilisateur {\n        utilisateur {\n          id\n          nomComplet\n        }\n        tempsTotal\n        tauxCompletion\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query StatsProjet($dateDebut: Date!, $dateFin: Date!, $projetId: ID!) {\n    statistiques(dateDebut: $dateDebut, dateFin: $dateFin, projetId: $projetId) {\n      tempsTotal\n      parActivite {\n        activite {\n          id\n          nom\n        }\n        tempsTotal\n        pourcentage\n      }\n      parUtilisateur {\n        utilisateur {\n          id\n          nomComplet\n        }\n        tempsTotal\n        tauxCompletion\n      }\n      parJour {\n        date\n        tempsTotal\n        estComplet\n      }\n    }\n  }\n"): (typeof documents)["\n  query StatsProjet($dateDebut: Date!, $dateFin: Date!, $projetId: ID!) {\n    statistiques(dateDebut: $dateDebut, dateFin: $dateFin, projetId: $projetId) {\n      tempsTotal\n      parActivite {\n        activite {\n          id\n          nom\n        }\n        tempsTotal\n        pourcentage\n      }\n      parUtilisateur {\n        utilisateur {\n          id\n          nomComplet\n        }\n        tempsTotal\n        tauxCompletion\n      }\n      parJour {\n        date\n        tempsTotal\n        estComplet\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -331,7 +475,7 @@ export function graphql(source: "\n  fragment TeamFields on Team {\n    id\n    
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  \n  query Users($equipeId: ID, $role: UserRole, $search: String, $actifSeulement: Boolean) {\n    users(equipeId: $equipeId, role: $role, search: $search, actifSeulement: $actifSeulement) {\n      data {\n        ...UserFields\n      }\n      paginatorInfo {\n        currentPage\n        lastPage\n        total\n      }\n    }\n  }\n"): (typeof documents)["\n  \n  query Users($equipeId: ID, $role: UserRole, $search: String, $actifSeulement: Boolean) {\n    users(equipeId: $equipeId, role: $role, search: $search, actifSeulement: $actifSeulement) {\n      data {\n        ...UserFields\n      }\n      paginatorInfo {\n        currentPage\n        lastPage\n        total\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  \n  query Users($equipeId: ID, $role: UserRole, $search: String, $actifSeulement: Boolean, $page: Int, $first: Int = 20) {\n    users(equipeId: $equipeId, role: $role, search: $search, actifSeulement: $actifSeulement, page: $page, first: $first) {\n      data {\n        ...UserFields\n      }\n      paginatorInfo {\n        currentPage\n        lastPage\n        total\n        hasMorePages\n      }\n    }\n  }\n"): (typeof documents)["\n  \n  query Users($equipeId: ID, $role: UserRole, $search: String, $actifSeulement: Boolean, $page: Int, $first: Int = 20) {\n    users(equipeId: $equipeId, role: $role, search: $search, actifSeulement: $actifSeulement, page: $page, first: $first) {\n      data {\n        ...UserFields\n      }\n      paginatorInfo {\n        currentPage\n        lastPage\n        total\n        hasMorePages\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
