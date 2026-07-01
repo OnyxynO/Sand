@@ -33,10 +33,12 @@ export default function GraphiqueJournalier({ donnees }: GraphiqueJournalierProp
     estComplet: d.estComplet,
   }));
 
-  const renderTooltip = (valeur: number | string | undefined): [string, string] => [
-    `${Number(valeur ?? 0).toFixed(2)} ETP`,
-    'Temps',
-  ];
+  const renderTooltip = (
+    valeur: number | string | readonly (number | string)[] | undefined,
+  ): [string, string] => {
+    const brut = Array.isArray(valeur) ? valeur[0] : valeur;
+    return [`${Number(brut ?? 0).toFixed(2)} ETP`, 'Temps'];
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
