@@ -12,6 +12,7 @@
     "build:docker": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "schema": "cd ../backend && php artisan lighthouse:print-schema > ../frontend/schema.graphql",
     "codegen": "graphql-codegen --config codegen.ts",
     "codegen:watch": "graphql-codegen --config codegen.ts --watch",
     "test": "vitest",

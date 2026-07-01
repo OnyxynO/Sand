@@ -32,8 +32,8 @@ export const TEAM_FRAGMENT = gql`
 // Queries
 export const USERS_QUERY = gql`
   ${USER_FRAGMENT}
-  query Users($equipeId: ID, $role: UserRole, $search: String, $actifSeulement: Boolean, $page: Int) {
-    users(equipeId: $equipeId, role: $role, search: $search, actifSeulement: $actifSeulement, page: $page) {
+  query Users($equipeId: ID, $role: UserRole, $search: String, $actifSeulement: Boolean, $page: Int, $first: Int = 20) {
+    users(equipeId: $equipeId, role: $role, search: $search, actifSeulement: $actifSeulement, page: $page, first: $first) {
       data {
         ...UserFields
       }

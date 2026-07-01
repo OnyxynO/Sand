@@ -1,8 +1,12 @@
 import type { CodegenConfig } from '@graphql-codegen/cli'
 
 const config: CodegenConfig = {
-  // Schema depuis le backend (introspection HTTP)
-  schema: 'http://localhost:8080/graphql',
+  // Schema depuis le fichier SDL local (genere par `php artisan lighthouse:print-schema`).
+  // Evite l'introspection HTTP, bloquee par la limite de securite max_query_depth = 7
+  // de Lighthouse (une requete d'introspection depasse cette profondeur). Codegen
+  // fonctionne ainsi sans backend qui tourne. Regenerer schema.graphql apres toute
+  // modification du schema GraphQL cote backend (voir `bun run schema`).
+  schema: './schema.graphql',
 
   // Fichiers contenant les operations GraphQL
   documents: ['src/**/*.ts', 'src/**/*.tsx'],

@@ -1,0 +1,1304 @@
+type Query {
+  "Utilisateur connecte"
+  me: User
+
+  "Un utilisateur par ID"
+  user(
+    "Identifiant de l'utilisateur"
+    id: ID!
+  ): User
+
+  "Liste des equipes"
+  equipes(
+    "Afficher uniquement les equipes actives"
+    actifSeulement: Boolean
+  ): [Team!]!
+
+  "Une equipe par ID"
+  equipe(
+    "Identifiant de l'equipe"
+    id: ID!
+  ): Team
+
+  "Liste des projets"
+  projets(
+    "Filtrer par statut actif/inactif"
+    actif: Boolean
+
+    "Filtrer par moderateur assigne"
+    moderateurId: ID
+  ): [Project!]!
+
+  "Un projet par ID"
+  projet(
+    "Identifiant du projet"
+    id: ID!
+  ): Project
+
+  "Arborescence complete des activites (hors activites systeme)"
+  arbreActivites: [Activity!]!
+
+  "Activites disponibles pour un projet"
+  activitesDisponibles(
+    "Identifiant du projet"
+    projetId: ID!
+  ): [Activity!]!
+
+  "Une activite par ID"
+  activite(
+    "Identifiant de l'activite"
+    id: ID!
+  ): Activity
+
+  "Saisies de temps (filtrees par droits d'acces)"
+  saisies(
+    "Filtrer par utilisateur"
+    userId: ID
+
+    "Filtrer par projet"
+    projetId: ID
+
+    "Filtrer par activite"
+    activiteId: ID
+
+    "Date de debut de la periode"
+    dateDebut: Date!
+
+    "Date de fin de la periode"
+    dateFin: Date!
+  ): [TimeEntry!]!
+
+  "Saisies de la semaine (pour soi-meme ou un utilisateur modere)"
+  mesSaisiesSemaine(
+    "Semaine au format ISO (ex: 2024-W03)"
+    semaine: String!
+
+    "Utilisateur cible (moderateurs/admins)"
+    userId: ID
+  ): [TimeEntry!]!
+
+  "Utilisateurs dont le moderateur peut gerer les saisies"
+  utilisateursModerables: [User!]!
+
+  "Absences (avec detection des chevauchements)"
+  absences(
+    "Filtrer par utilisateur"
+    userId: ID
+
+    "Date de debut de la periode"
+    dateDebut: Date!
+
+    "Date de fin de la periode"
+    dateFin: Date!
+  ): [Absence!]!
+
+  "Mes notifications"
+  mesNotifications(
+    "Afficher uniquement les non lues"
+    nonLuSeulement: Boolean
+
+    "Nombre maximum de notifications"
+    limite: Int
+  ): [Notification!]!
+
+  "Nombre de notifications non lues"
+  nombreNotificationsNonLues: Int!
+
+  "Statistiques agregees sur une periode"
+  statistiques(
+    "Filtrer par projet"
+    projetId: ID
+
+    "Filtrer par equipe"
+    equipeId: ID
+
+    "Filtrer par utilisateur"
+    userId: ID
+
+    "Date de debut de la periode"
+    dateDebut: Date!
+
+    "Date de fin de la periode"
+    dateFin: Date!
+  ): Statistics!
+
+  "Anomalies detectees dans les saisies"
+  anomalies(
+    "Filtrer par projet"
+    projetId: ID
+
+    "Filtrer par equipe"
+    equipeId: ID
+
+    "Filtrer par utilisateur"
+    userId: ID
+
+    "Date de debut de la periode"
+    dateDebut: Date!
+
+    "Date de fin de la periode"
+    dateFin: Date!
+
+    "Types d'anomalies a inclure"
+    types: [AnomalyType!]
+  ): [Anomaly!]!
+
+  "Mes exports CSV (du plus recent au plus ancien)"
+  mesExports: [ExportJob!]!
+
+  "Liste des parametres systeme"
+  parametres: [Setting!]!
+
+  "Un parametre par cle"
+  parametre(
+    "Cle du parametre"
+    cle: String!
+  ): Setting
+
+  "Restrictions de visibilite d'un projet"
+  restrictionsVisibilite(
+    "Identifiant du projet"
+    projetId: ID!
+  ): [ActivityVisibility!]!
+
+  "Liste des utilisateurs"
+  users(
+    "Filtrer par equipe"
+    equipeId: ID
+
+    "Filtrer par role"
+    role: UserRole
+
+    "Recherche par nom (partielle)"
+    search: String
+
+    "Afficher uniquement les utilisateurs actifs"
+    actifSeulement: Boolean
+
+    "Limits number of fetched items."
+    first: Int! = 20
+
+    "The offset from which items are returned."
+    page: Int
+  ): UserPaginator!
+}
+
+type Mutation {
+  "Synchroniser les absences depuis l'API RH"
+  syncAbsences(userId: ID, dateDebut: Date!, dateFin: Date!): SyncResult!
+
+  "Creer une absence manuellement"
+  createAbsence(input: AbsenceInput!): Absence!
+
+  "Supprimer une absence"
+  deleteAbsence(id: ID!): Boolean!
+
+  "Resoudre un conflit d'absence"
+  resolveAbsenceConflict(absenceId: ID!, resolution: ConflictResolution!): Boolean!
+
+  "Mode manuel : declarer une absence pour une journee (duree null = supprimer). userId optionnel pour admin/moderateur."
+  declarerAbsence(date: Date!, duree: Float, type: String, userId: ID): Boolean!
+
+  "Tester la connexion a l'API RH avec les settings actuels (null = OK, sinon message erreur)"
+  testerConnexionRhApi: String
+
+  "Creer une activite (Admin)"
+  createActivity(input: CreateActivityInput!): Activity!
+
+  "Modifier une activite (Admin)"
+  updateActivity(id: ID!, input: UpdateActivityInput!): Activity!
+
+  "Supprimer une activite (Admin, soft delete)"
+  deleteActivity(id: ID!): Boolean!
+
+  "Restaurer une activite supprimee (Admin)"
+  restoreActivity(id: ID!): Activity!
+
+  "Deplacer/reordonner une activite dans l'arborescence"
+  moveActivity(id: ID!, parentId: ID, ordre: Int!): Activity!
+
+  "Reordonner des activites"
+  reorderActivities(ids: [ID!]!): [Activity!]!
+
+  "Connexion"
+  login(input: LoginInput!): AuthPayload!
+
+  "Deconnexion"
+  logout: Boolean!
+
+  "Demande de reinitialisation de mot de passe (envoi d'un email avec lien)"
+  demanderReinitialisationMdp(input: DemanderReinitialisationMdpInput!): Boolean!
+
+  "Reinitialisation du mot de passe via le token recu par email"
+  reinitialiserMdp(input: ReinitialisationMdpInput!): Boolean!
+
+  "Demander un export"
+  requestExport(input: ExportInput!): ExportJob!
+
+  "Desactiver un export (supprime le fichier, conserve la ligne)"
+  desactiverExport(id: ID!): ExportJob!
+
+  "Supprimer definitivement un export (supprime la ligne en base)"
+  supprimerExport(id: ID!): Boolean!
+
+  "Marquer une notification comme lue"
+  markNotificationRead(id: ID!): Notification!
+
+  "Marquer toutes les notifications comme lues"
+  markAllNotificationsRead: Boolean!
+
+  "Supprimer une notification"
+  deleteNotification(id: ID!): Boolean!
+
+  "Supprimer toutes les notifications"
+  deleteAllNotifications: Boolean!
+
+  "Creer un projet (Admin)"
+  createProject(input: CreateProjectInput!): Project!
+
+  "Modifier un projet (Admin)"
+  updateProject(id: ID!, input: UpdateProjectInput!): Project!
+
+  "Supprimer un projet (Admin, soft delete)"
+  deleteProject(id: ID!): Boolean!
+
+  "Restaurer un projet supprime (Admin)"
+  restoreProject(id: ID!): Project!
+
+  "Ajouter un moderateur au projet"
+  addProjectModerator(projetId: ID!, userId: ID!): Project!
+
+  "Retirer un moderateur du projet"
+  removeProjectModerator(projetId: ID!, userId: ID!): Project!
+
+  "Affecter un utilisateur au projet"
+  addProjectUser(projetId: ID!, userId: ID!): Project!
+
+  "Retirer un utilisateur du projet"
+  removeProjectUser(projetId: ID!, userId: ID!): Project!
+
+  "Definir les activites actives sur un projet"
+  setProjectActivities(projetId: ID!, activiteIds: [ID!]!): Project!
+
+  "Masquer une activite pour un utilisateur sur un projet"
+  hideActivityForUser(projetId: ID!, activiteId: ID!, userId: ID!): Boolean!
+
+  "Rendre visible une activite pour un utilisateur sur un projet"
+  showActivityForUser(projetId: ID!, activiteId: ID!, userId: ID!): Boolean!
+
+  "Supprimer les donnees d'un utilisateur (RGPD droit a l'oubli, Admin)"
+  supprimerDonneesUtilisateur(userId: ID!, confirmationNom: String!): ResultatSuppressionRgpd!
+
+  "Purger toutes les donnees transactionnelles (Admin)"
+  purgerToutesDonnees(confirmationPhrase: String!): ResultatPurge!
+
+  "Modifier un parametre systeme (Admin)"
+  updateSetting(cle: String!, valeur: JSON!): Setting!
+
+  "Modifier plusieurs parametres (Admin)"
+  updateSettings(settings: [SettingInput!]!): [Setting!]!
+
+  "Reinitialiser tous les parametres a leurs valeurs par defaut (Admin)"
+  resetSettings: [Setting!]!
+
+  "Creer une equipe (Admin)"
+  createTeam(input: TeamInput!): Team!
+
+  "Modifier une equipe (Admin)"
+  updateTeam(id: ID!, input: TeamInput!): Team!
+
+  "Supprimer une equipe (Admin)"
+  deleteTeam(id: ID!): Boolean!
+
+  "Creer une saisie de temps"
+  createTimeEntry(input: TimeEntryInput!): TimeEntry!
+
+  "Modifier une saisie de temps"
+  updateTimeEntry(id: ID!, input: TimeEntryInput!): TimeEntry!
+
+  "Supprimer une saisie de temps"
+  deleteTimeEntry(id: ID!): Boolean!
+
+  "Creer plusieurs saisies d'un coup"
+  bulkCreateTimeEntries(inputs: [TimeEntryInput!]!): [TimeEntry!]!
+
+  "Mettre a jour plusieurs saisies d'un coup"
+  bulkUpdateTimeEntries(entries: [BulkUpdateEntry!]!): [TimeEntry!]!
+
+  "Creer un utilisateur (Admin)"
+  createUser(input: CreateUserInput!): User!
+
+  "Modifier un utilisateur (Admin)"
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+
+  "Supprimer un utilisateur (Admin, soft delete)"
+  deleteUser(id: ID!): Boolean!
+
+  "Restaurer un utilisateur supprime (Admin)"
+  restoreUser(id: ID!): User!
+}
+
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`."
+scalar DateTime
+
+"A date string with format `Y-m-d`, e.g. `2025-01-27`."
+scalar Date
+
+"Arbitrary JSON data."
+scalar JSON
+
+"Absence d'un utilisateur"
+type Absence {
+  "Identifiant unique"
+  id: ID!
+
+  "Code du type d'absence"
+  type: String!
+
+  "Libelle du type d'absence"
+  typeLibelle: String!
+
+  "Date de debut de l'absence"
+  dateDebut: Date!
+
+  "Date de fin de l'absence"
+  dateFin: Date!
+
+  "Duree journaliere en ETP (0.5 ou 1.0)"
+  dureeJournaliere: Float!
+
+  "Statut de l'absence (validee, en_attente, etc.)"
+  statut: String!
+
+  "Reference dans le systeme RH externe"
+  referenceExterne: String
+
+  "Date d'import depuis l'API RH"
+  importeLe: DateTime
+
+  "Date de creation"
+  createdAt: DateTime!
+
+  "Date de derniere modification"
+  updatedAt: DateTime!
+
+  "Nombre de jours d'absence"
+  nombreJours: Int!
+
+  "Total ETP de l'absence"
+  totalEtp: Float!
+
+  "Utilisateur concerne"
+  utilisateur: User!
+}
+
+"Resultat d'une synchronisation d'absences"
+type SyncResult {
+  "Nombre d'absences importees"
+  importes: Int!
+
+  "Nombre de conflits detectes"
+  conflits: Int!
+
+  "Liste des messages d'erreur"
+  erreurs: [String!]!
+}
+
+"Activite (arborescence)"
+type Activity {
+  "Identifiant unique"
+  id: ID!
+
+  "Nom de l'activite"
+  nom: String!
+
+  "Code court (optionnel)"
+  code: String
+
+  "Description de l'activite"
+  description: String
+
+  "Chemin ltree dans l'arborescence"
+  chemin: String!
+
+  "Niveau de profondeur dans l'arborescence (0 = racine)"
+  niveau: Int!
+
+  "Ordre d'affichage parmi les freres"
+  ordre: Int!
+
+  "Indique si c'est une feuille saisissable"
+  estFeuille: Boolean!
+
+  "Indique si c'est une activite systeme protegee"
+  estSysteme: Boolean!
+
+  "Indique si l'activite est active"
+  estActif: Boolean!
+
+  "Date de creation"
+  createdAt: DateTime!
+
+  "Date de derniere modification"
+  updatedAt: DateTime!
+
+  "Activite parente"
+  parent: Activity
+
+  "Activites enfants"
+  enfants: [Activity!]!
+
+  "Chemin complet avec noms"
+  cheminComplet: String!
+
+  "Projets sur lesquels cette activite est activee"
+  projets: [Project!]!
+}
+
+"Role d'un utilisateur dans le systeme"
+enum UserRole {
+  "Utilisateur standard (saisie personnelle uniquement)"
+  UTILISATEUR
+
+  "Moderateur (gestion des equipes et projets assignes)"
+  MODERATEUR
+
+  "Administrateur (configuration globale du systeme)"
+  ADMIN
+}
+
+"Type d'action dans l'historique"
+enum LogAction {
+  "Creation d'un enregistrement"
+  CREATION
+
+  "Modification d'un enregistrement"
+  MODIFICATION
+
+  "Suppression d'un enregistrement"
+  SUPPRESSION
+}
+
+"Type de notification"
+enum NotificationType {
+  "Saisie incomplete sur un ou plusieurs jours"
+  SAISIE_INCOMPLETE
+
+  "Absence importee depuis l'API RH"
+  ABSENCE_IMPORTEE
+
+  "Conflit entre une absence et des saisies existantes"
+  CONFLIT_ABSENCE
+
+  "Export CSV pret a telecharger"
+  EXPORT_PRET
+
+  "Notification systeme generale"
+  SYSTEME
+}
+
+"Type d'anomalie detectee"
+enum AnomalyType {
+  "Jour avec total ETP inferieur a 1.0"
+  JOUR_INCOMPLET
+
+  "Jour avec total ETP superieur a 1.0"
+  JOUR_DEPASSE
+
+  "Semaine sans aucune saisie"
+  SEMAINE_VIDE
+
+  "Conflit entre absence et saisie sur la meme date"
+  CONFLIT_ABSENCE
+
+  "Jour ouvre sans aucune saisie"
+  JOUR_MANQUANT
+
+  "Saisie existante sur un jour d'absence"
+  SAISIE_SUR_ABSENCE
+}
+
+"Resolution d'un conflit d'absence"
+enum ConflictResolution {
+  "Ecraser les saisies existantes par l'absence"
+  ECRASER
+
+  "Ignorer l'absence et conserver les saisies"
+  IGNORER
+
+  "Ajuster la duree de l'absence"
+  AJUSTER
+}
+
+"Format d'export"
+enum ExportFormat {
+  "Export au format CSV"
+  CSV
+}
+
+"Statut d'un job d'export"
+enum ExportStatus {
+  "Export en attente de traitement"
+  EN_ATTENTE
+
+  "Export en cours de generation"
+  EN_COURS
+
+  "Export termine et disponible"
+  TERMINE
+
+  "Export echoue"
+  ECHEC
+
+  "Export desactive manuellement (fichier supprime)"
+  DESACTIVE
+}
+
+"Notification utilisateur"
+type Notification {
+  "Identifiant unique"
+  id: ID!
+
+  "Type de notification"
+  type: String!
+
+  "Titre de la notification"
+  titre: String!
+
+  "Contenu de la notification"
+  message: String!
+
+  "Donnees supplementaires (JSON)"
+  donnees: JSON
+
+  "Indique si la notification a ete lue"
+  estLu: Boolean!
+
+  "Date de lecture"
+  luLe: DateTime
+
+  "Date d'envoi"
+  createdAt: DateTime!
+
+  "Utilisateur destinataire"
+  utilisateur: User!
+}
+
+"Projet"
+type Project {
+  "Identifiant unique"
+  id: ID!
+
+  "Nom du projet"
+  nom: String!
+
+  "Code court unique"
+  code: String!
+
+  "Description du projet"
+  description: String
+
+  "Date de debut du projet"
+  dateDebut: Date
+
+  "Date de fin du projet"
+  dateFin: Date
+
+  "Indique si le projet est actif"
+  estActif: Boolean!
+
+  "Date de creation"
+  createdAt: DateTime!
+
+  "Date de derniere modification"
+  updatedAt: DateTime!
+
+  "Utilisateurs affectes au projet"
+  utilisateurs: [User!]!
+
+  "Moderateurs du projet"
+  moderateurs: [User!]!
+
+  "Activites explicitement activees sur ce projet"
+  activitesActives: [Activity!]!
+
+  "Saisies sur ce projet"
+  saisies(dateDebut: Date, dateFin: Date): [TimeEntry!]!
+
+  "Temps total sur une periode"
+  tempsTotal(dateDebut: Date!, dateFin: Date!): Float!
+}
+
+"Parametre systeme"
+type Setting {
+  "Identifiant unique"
+  id: ID!
+
+  "Cle unique du parametre"
+  cle: String!
+
+  "Valeur du parametre (JSON)"
+  valeur: JSON!
+
+  "Description du parametre"
+  description: String
+
+  "Date de creation"
+  createdAt: DateTime!
+
+  "Date de derniere modification"
+  updatedAt: DateTime!
+}
+
+"Statistiques agregees sur une periode"
+type Statistics {
+  "Temps total en ETP sur la periode"
+  tempsTotal: Float!
+
+  "Repartition du temps par projet"
+  parProjet: [ProjectStat!]!
+
+  "Repartition du temps par activite"
+  parActivite: [ActivityStat!]!
+
+  "Repartition du temps par utilisateur (moderateurs/admins)"
+  parUtilisateur: [UserStat!]!
+
+  "Detail jour par jour"
+  parJour: [DayStat!]!
+}
+
+"Statistiques par projet"
+type ProjectStat {
+  "Projet concerne"
+  projet: Project!
+
+  "Temps total en ETP"
+  tempsTotal: Float!
+
+  "Pourcentage du temps total"
+  pourcentage: Float!
+}
+
+"Statistiques par activite"
+type ActivityStat {
+  "Activite concernee"
+  activite: Activity!
+
+  "Temps total en ETP"
+  tempsTotal: Float!
+
+  "Pourcentage du temps total"
+  pourcentage: Float!
+}
+
+"Statistiques par utilisateur"
+type UserStat {
+  "Utilisateur concerne"
+  utilisateur: User!
+
+  "Temps total en ETP"
+  tempsTotal: Float!
+
+  "Taux de completion par rapport aux jours ouvres (%)"
+  tauxCompletion: Float!
+}
+
+"Statistiques par jour"
+type DayStat {
+  "Date du jour"
+  date: Date!
+
+  "Temps total en ETP"
+  tempsTotal: Float!
+
+  "Indique si le jour est complet (total ~= 1.0 ETP)"
+  estComplet: Boolean!
+}
+
+"Anomalie detectee dans les saisies"
+type Anomaly {
+  "Identifiant unique"
+  id: ID!
+
+  "Type d'anomalie"
+  type: AnomalyType!
+
+  "Utilisateur concerne"
+  utilisateur: User!
+
+  "Date de l'anomalie (si applicable)"
+  date: Date
+
+  "Semaine de l'anomalie (format ISO, si applicable)"
+  semaine: String
+
+  "Description de l'anomalie"
+  detail: String!
+
+  "Projet concerne (si applicable)"
+  projet: Project
+}
+
+"Job d'export asynchrone"
+type ExportJob {
+  "Identifiant unique"
+  id: ID!
+
+  "Statut du job"
+  statut: ExportStatus!
+
+  "Filtres utilises pour generer l'export"
+  filtres: JSON
+
+  "URL de telechargement (disponible quand termine)"
+  urlTelechargement: String
+
+  "Date d'expiration du fichier"
+  expireLe: DateTime
+
+  "Date de creation de la demande"
+  creeLe: DateTime!
+}
+
+"Payload retourne apres authentification"
+type AuthPayload {
+  "Utilisateur authentifie"
+  user: User!
+}
+
+"Equipe ou service"
+type Team {
+  "Identifiant unique"
+  id: ID!
+
+  "Nom de l'equipe"
+  nom: String!
+
+  "Code court unique"
+  code: String!
+
+  "Description de l'equipe"
+  description: String
+
+  "Indique si l'equipe est active"
+  estActif: Boolean!
+
+  "Date de creation"
+  createdAt: DateTime!
+
+  "Date de derniere modification"
+  updatedAt: DateTime!
+
+  "Membres de l'equipe"
+  membres: [User!]!
+}
+
+"Saisie de temps"
+type TimeEntry {
+  "Identifiant unique"
+  id: ID!
+
+  "Date de la saisie"
+  date: Date!
+
+  "Duree en ETP (0.01 a 1.00)"
+  duree: Float!
+
+  "Commentaire optionnel"
+  commentaire: String
+
+  "Date de creation"
+  createdAt: DateTime!
+
+  "Date de derniere modification"
+  updatedAt: DateTime!
+
+  "Utilisateur qui a fait la saisie"
+  utilisateur: User!
+
+  "Projet concerne"
+  projet: Project!
+
+  "Activite concernee"
+  activite: Activity!
+
+  "Historique des modifications"
+  historique: [TimeEntryLog!]!
+}
+
+"Historique d'une saisie"
+type TimeEntryLog {
+  "Identifiant unique"
+  id: ID!
+
+  "Type d'action effectuee"
+  action: LogAction!
+
+  "Duree avant modification"
+  ancienneDuree: Float
+
+  "Duree apres modification"
+  nouvelleDuree: Float
+
+  "Commentaire avant modification"
+  ancienCommentaire: String
+
+  "Commentaire apres modification"
+  nouveauCommentaire: String
+
+  "Date de la modification"
+  createdAt: DateTime!
+
+  "Utilisateur ayant fait la modification"
+  auteur: User!
+
+  "Saisie concernee"
+  saisie: TimeEntry!
+}
+
+"Utilisateur du systeme"
+type User {
+  "Identifiant unique"
+  id: ID!
+
+  "Matricule interne (optionnel)"
+  matricule: String
+
+  "Nom de famille"
+  nom: String!
+
+  "Prenom"
+  prenom: String!
+
+  "Adresse email"
+  email: String!
+
+  "Role dans le systeme"
+  role: UserRole!
+
+  "Indique si le compte est actif"
+  estActif: Boolean!
+
+  "Date de creation du compte"
+  createdAt: DateTime!
+
+  "Date de derniere modification"
+  updatedAt: DateTime!
+
+  "Nom complet (prenom + nom)"
+  nomComplet: String!
+
+  "Equipe de l'utilisateur"
+  equipe: Team
+
+  "Projets auxquels l'utilisateur est affecte"
+  projets: [Project!]!
+
+  "Projets que l'utilisateur modere"
+  projetsModeres: [Project!]!
+
+  "Saisies de l'utilisateur"
+  saisies(dateDebut: Date, dateFin: Date, projectId: ID): [TimeEntry!]!
+
+  "Absences de l'utilisateur"
+  absences(dateDebut: Date, dateFin: Date): [Absence!]!
+
+  "Notifications de l'utilisateur"
+  notifications(nonLuSeulement: Boolean): [Notification!]!
+}
+
+"Restriction de visibilite d'une activite pour un utilisateur"
+type ActivityVisibility {
+  "Identifiant unique"
+  id: ID!
+
+  "Activite concernee"
+  activite: Activity!
+
+  "Utilisateur concerne"
+  utilisateur: User!
+
+  "Projet concerne"
+  projet: Project!
+
+  "Indique si l'activite est visible pour cet utilisateur"
+  estVisible: Boolean!
+
+  "Date de creation de la restriction"
+  createdAt: DateTime!
+}
+
+"Donnees d'une absence"
+input AbsenceInput {
+  "Identifiant de l'utilisateur concerne"
+  userId: ID!
+
+  "Code du type d'absence"
+  type: String!
+
+  "Date de debut de l'absence"
+  dateDebut: Date!
+
+  "Date de fin de l'absence"
+  dateFin: Date!
+
+  "Duree journaliere en ETP (0.5 a 1.0)"
+  dureeJournaliere: Float
+}
+
+"Creation d'une activite"
+input CreateActivityInput {
+  "Nom de l'activite"
+  nom: String!
+
+  "Code court (optionnel)"
+  code: String
+
+  "Description de l'activite"
+  description: String
+
+  "ID de l'activite parente (null = racine)"
+  parentId: ID
+
+  "Ordre d'affichage"
+  ordre: Int
+
+  "Activer ou desactiver l'activite"
+  estActif: Boolean
+}
+
+"Modification d'une activite"
+input UpdateActivityInput {
+  "Nom de l'activite"
+  nom: String
+
+  "Code court"
+  code: String
+
+  "Description de l'activite"
+  description: String
+
+  "ID de l'activite parente (null = racine)"
+  parentId: ID
+
+  "Ordre d'affichage"
+  ordre: Int
+
+  "Activer ou desactiver l'activite"
+  estActif: Boolean
+}
+
+"Donnees de connexion"
+input LoginInput {
+  "Adresse email de l'utilisateur (max 80 caracteres)"
+  email: String!
+
+  "Mot de passe (6 caracteres minimum, 80 maximum)"
+  password: String!
+}
+
+"Demande de reinitialisation de mot de passe"
+input DemanderReinitialisationMdpInput {
+  "Adresse email du compte (max 80 caracteres)"
+  email: String!
+}
+
+"Reinitialisation du mot de passe avec token"
+input ReinitialisationMdpInput {
+  "Token recu par email"
+  token: String!
+
+  "Adresse email du compte (max 80 caracteres)"
+  email: String!
+
+  "Nouveau mot de passe (8 caracteres minimum, 80 maximum)"
+  password: String!
+
+  "Confirmation du nouveau mot de passe (max 80 caracteres)"
+  password_confirmation: String!
+}
+
+"Parametres d'export"
+input ExportInput {
+  "Format de l'export"
+  format: ExportFormat!
+
+  "Date de debut de la periode"
+  dateDebut: Date!
+
+  "Date de fin de la periode"
+  dateFin: Date!
+
+  "Filtrer par projet"
+  projetId: ID
+
+  "Filtrer par equipe"
+  equipeId: ID
+
+  "Filtrer par utilisateur"
+  userId: ID
+}
+
+"Parametre systeme"
+input SettingInput {
+  "Cle du parametre"
+  cle: String!
+
+  "Nouvelle valeur (JSON)"
+  valeur: JSON!
+}
+
+"Creation d'un projet"
+input CreateProjectInput {
+  "Nom du projet"
+  nom: String!
+
+  "Code court unique"
+  code: String!
+
+  "Description du projet"
+  description: String
+
+  "Date de debut du projet"
+  dateDebut: Date
+
+  "Date de fin du projet"
+  dateFin: Date
+
+  "Activer ou desactiver le projet"
+  estActif: Boolean
+
+  "IDs des moderateurs a assigner"
+  moderateurIds: [ID!]
+
+  "IDs des activites a activer"
+  activiteIds: [ID!]
+}
+
+"Modification d'un projet"
+input UpdateProjectInput {
+  "Nom du projet"
+  nom: String
+
+  "Code court"
+  code: String
+
+  "Description du projet"
+  description: String
+
+  "Date de debut du projet"
+  dateDebut: Date
+
+  "Date de fin du projet"
+  dateFin: Date
+
+  "Activer ou desactiver le projet"
+  estActif: Boolean
+}
+
+"Donnees d'une equipe"
+input TeamInput {
+  "Nom de l'equipe"
+  nom: String!
+
+  "Code court unique"
+  code: String!
+
+  "Description de l'equipe"
+  description: String
+
+  "Activer ou desactiver l'equipe"
+  estActif: Boolean
+}
+
+"Donnees d'une saisie de temps"
+input TimeEntryInput {
+  "Identifiant du projet"
+  projetId: ID!
+
+  "Identifiant de l'activite"
+  activiteId: ID!
+
+  "Date de la saisie"
+  date: Date!
+
+  "Duree en ETP (0.01 a 1.00)"
+  duree: Float!
+
+  "Commentaire optionnel (1000 caracteres max)"
+  commentaire: String
+
+  "Utilisateur cible (moderateurs/admins uniquement)"
+  userId: ID
+}
+
+"Mise a jour en lot"
+input BulkUpdateEntry {
+  "Identifiant de la saisie a modifier"
+  id: ID!
+
+  "Nouvelle duree en ETP (0.01 a 1.00)"
+  duree: Float!
+
+  "Nouveau commentaire (1000 caracteres max)"
+  commentaire: String
+}
+
+"Creation d'un utilisateur"
+input CreateUserInput {
+  "Matricule interne (unique, optionnel)"
+  matricule: String
+
+  "Nom de famille"
+  nom: String!
+
+  "Prenom"
+  prenom: String!
+
+  "Adresse email (unique parmi les comptes non supprimes)"
+  email: String!
+
+  "Mot de passe (8 caracteres minimum)"
+  password: String!
+
+  "Role dans le systeme"
+  role: UserRole!
+
+  "Identifiant de l'equipe"
+  equipeId: ID
+}
+
+"Modification d'un utilisateur"
+input UpdateUserInput {
+  "Matricule interne"
+  matricule: String
+
+  "Nom de famille"
+  nom: String
+
+  "Prenom"
+  prenom: String
+
+  "Adresse email"
+  email: String
+
+  "Nouveau mot de passe (8 caracteres minimum)"
+  password: String
+
+  "Role dans le systeme"
+  role: UserRole
+
+  "Identifiant de l'equipe"
+  equipeId: ID
+
+  "Activer ou desactiver le compte"
+  estActif: Boolean
+}
+
+type ResultatSuppressionRgpd {
+  saisiesSupprimees: Int!
+  absencesSupprimees: Int!
+  notificationsSupprimees: Int!
+  exportsSupprimees: Int!
+  logsAnonymises: Int!
+}
+
+type ResultatPurge {
+  saisiesSupprimees: Int!
+  logsSupprimees: Int!
+  absencesSupprimees: Int!
+  notificationsSupprimees: Int!
+  exportsSupprimees: Int!
+}
+
+"Information about pagination using a fully featured paginator."
+type PaginatorInfo {
+  "Number of items in the current page."
+  count: Int!
+
+  "Index of the current page."
+  currentPage: Int!
+
+  "Index of the first item in the current page."
+  firstItem: Int
+
+  "Are there more pages after this one?"
+  hasMorePages: Boolean!
+
+  "Index of the last item in the current page."
+  lastItem: Int
+
+  "Index of the last available page."
+  lastPage: Int!
+
+  "Number of items per page."
+  perPage: Int!
+
+  "Number of total available items."
+  total: Int!
+}
+
+"A paginated list of User items."
+type UserPaginator {
+  "Pagination information about the list of items."
+  paginatorInfo: PaginatorInfo!
+
+  "A list of User items."
+  data: [User!]!
+}
+
+"Directions for ordering a list of records."
+enum SortOrder {
+  "Sort records in ascending order."
+  ASC
+
+  "Sort records in descending order."
+  DESC
+}
+
+"Aggregate functions when ordering by a relation without specifying a column."
+enum OrderByRelationAggregateFunction {
+  "Amount of items."
+  COUNT
+}
+
+"Aggregate functions when ordering by a relation that may specify a column."
+enum OrderByRelationWithColumnAggregateFunction {
+  "Average."
+  AVG
+
+  "Minimum."
+  MIN
+
+  "Maximum."
+  MAX
+
+  "Sum."
+  SUM
+
+  "Amount of items."
+  COUNT
+}
+
+"Allows ordering a list of records."
+input OrderByClause {
+  "The column that is used for ordering."
+  column: String!
+
+  "The direction that is used for ordering."
+  order: SortOrder!
+}
+
+"Specify if you want to include or exclude trashed results from a query."
+enum Trashed {
+  "Only return trashed results."
+  ONLY
+
+  "Return both trashed and non-trashed results."
+  WITH
+
+  "Only return non-trashed results."
+  WITHOUT
+}
+
