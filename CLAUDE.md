@@ -12,7 +12,7 @@ Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte 
 
 | Couche | Technologies |
 |--------|--------------|
-| Backend | Laravel 12, PHP 8.4, Lighthouse 6 (GraphQL), Sanctum |
+| Backend | Laravel 13, PHP 8.4 (min 8.3), Lighthouse 6 (GraphQL), Sanctum |
 | Frontend | React 19, TypeScript, Apollo Client 4, Tailwind CSS, Zustand |
 | Base de donnees | PostgreSQL 16 (extension ltree) |
 | Cache/Queue | Redis |
@@ -193,6 +193,7 @@ Commandes de deploiement : voir `../infra/DEPLOY_PROD_SAND.md` (repo prive).
 - **Caddy — rewrite obligatoire pour sand-watcher** : Caddy transmet le chemin complet (`/api/wake`) au backend. Le wake-server ecoute sur `/wake`. Sans `rewrite * /wake` dans le bloc Caddy, le endpoint retourne 404.
 - **Health check — StartSession bloque avant le handler** : toute route dans `web.php` herite du middleware `web` (inclut `StartSession`). Si Redis est lent au demarrage, `StartSession` echoue avant d'atteindre le handler → 500 HTML au lieu de JSON. `curl` reussit (pas de session) mais le navigateur echoue silencieusement. Fix : `Route::withoutMiddleware([...])->get('/api/health', ...)` pour exclure le middleware session.
 - **Sentry frontend — bruit reseau `Failed to fetch`** : le polling health-check (`ServiceWaitingPage` / reveil sand-watcher) genere des `TypeError: Failed to fetch` quand la requete est coupee (onglet ferme, crawler `HeadlessChrome` depuis un datacenter AWS). Remonte comme `onunhandledrejection`, 0 utilisateur impacte = bruit. Fix : `ignoreErrors: ['Failed to fetch', 'NetworkError when attempting to fetch resource', 'AbortError']` dans `Sentry.init` (`frontend/src/main.tsx`) — couvre Chrome / Firefox / requete annulee. ⚠️ `ignoreErrors` est integre **au build Vite** → effectif uniquement apres rebuild + redeploiement prod. Incident SAND-4 (juin 2026, PR #14).
+- **Laravel 13 — préfixes cache/session** : L13 change le format des défauts de préfixe (`_session` → `-session`, etc.). SAND **n'est pas impacté** car sa config (`config/session.php`, `config/cache.php`, `config/database.php`) publie déjà les valeurs explicites en tiret — le breaking change ne touche que les apps qui s'appuient sur le fallback framework. Aucune déconnexion au déploiement. PHP min requis par L13 : 8.3 (prod en 8.4, CI en 8.4). PHPUnit passé en `^12.0` (recommandation du guide, pas 13).
 - **Sentry — org instance EU** : l'org `interstice` est sur l'instance **europeenne** (`https://de.sentry.io`, web `https://interstice.sentry.io`). Toute requete API / MCP Sentry doit cibler `regionUrl=https://de.sentry.io`, pas l'US par defaut. Org `o4511071617024000`, projet `sand`. Acces lecture/triage via le MCP Sentry (`/sentry` ou `mcp__plugin_sentry_sentry__*`). Les DSN dans les `.env` ne servent qu'a l'ingestion, pas a la lecture des issues.
 
 ## Outils qualite et securite
