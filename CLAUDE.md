@@ -17,7 +17,7 @@ Ce fichier est le point d'entree pour Claude Code. Il contient tout le contexte 
 | Base de donnees | PostgreSQL 16 (extension ltree) |
 | Cache/Queue | Redis |
 | Conteneurisation | Docker, Docker Compose |
-| Tests | PHPUnit 262 tests + Vitest 238 tests + Playwright 100 specs |
+| Tests | PHPUnit 272 tests + Vitest 238 tests + Playwright 100 specs |
 
 ## Etat du projet
 
@@ -75,7 +75,7 @@ docker compose exec app php artisan db:seed --class=DemoSeeder
 | Frontend (composants) | Vitest | `docker compose exec frontend npm run test` |
 | E2E (navigateur) | Playwright | `cd frontend && npm run e2e` |
 
-Resultats valides (2026-03-13) : PHPUnit 262/262, Vitest 238/238, Playwright 98/100.
+Resultats valides (2026-07-01, apres migration Laravel 13) : PHPUnit 272/272, Vitest 238/238, Playwright 98/100.
 
 ### Playwright E2E
 
