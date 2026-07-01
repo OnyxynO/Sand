@@ -32,10 +32,12 @@ export default function GraphiqueEvolution({ donnees }: GraphiqueEvolutionProps)
     etp: d.tempsTotal,
   }));
 
-  const renderTooltip = (valeur: number | string | undefined): [string, string] => [
-    `${Number(valeur ?? 0).toFixed(2)} ETP`,
-    'Temps total',
-  ];
+  const renderTooltip = (
+    valeur: number | string | readonly (number | string)[] | undefined,
+  ): [string, string] => {
+    const brut = Array.isArray(valeur) ? valeur[0] : valeur;
+    return [`${Number(brut ?? 0).toFixed(2)} ETP`, 'Temps total'];
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6">
