@@ -36,14 +36,17 @@ export default function SelecteurProjetActivite({
     activitesDisponibles: ActiviteDisponible[];
   }>(ACTIVITES_DISPONIBLES);
 
-  // Reset a la fermeture
-  useEffect(() => {
+  // Reset a la fermeture : setState pendant le rendu (pas dans un effet),
+  // en comparant `ouvert` a sa valeur du rendu precedent.
+  const [ouvertPrecedent, setOuvertPrecedent] = useState(false);
+  if (ouvert !== ouvertPrecedent) {
+    setOuvertPrecedent(ouvert);
     if (!ouvert) {
       setEtape('projet');
       setProjetSelectionne(null);
       setRecherche('');
     }
-  }, [ouvert]);
+  }
 
   // Charger les activites quand on selectionne un projet
   useEffect(() => {

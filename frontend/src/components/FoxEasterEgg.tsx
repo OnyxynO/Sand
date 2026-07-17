@@ -34,16 +34,15 @@ function choisirPosition(): Position {
 }
 
 export default function FoxEasterEgg({ actif, onTermine }: Props) {
-  const [visible, setVisible] = useState(false);
-  const [position, setPosition] = useState<Position | null>(null);
-  const [src, setSrc] = useState(foxWebp);
+  // Le composant est remonte (key sur konamiActif cote Layout) a chaque activation :
+  // position/src/visible peuvent donc etre calcules une seule fois via l'initialiseur
+  // paresseux de useState, sans setState synchrone dans un effet.
+  const [visible, setVisible] = useState(actif);
+  const [position] = useState<Position | null>(() => (actif ? choisirPosition() : null));
+  const [src] = useState(() => (actif ? `${foxWebp}?t=${Date.now()}` : foxWebp)); // cache-busting → animation repart frame 0
 
   useEffect(() => {
     if (!actif) return;
-
-    setPosition(choisirPosition());
-    setSrc(`${foxWebp}?t=${Date.now()}`); // cache-busting → animation repart frame 0
-    setVisible(true);
 
     const timer = setTimeout(() => {
       setVisible(false);

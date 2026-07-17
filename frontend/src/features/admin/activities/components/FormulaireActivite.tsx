@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from 'react';
+import { useState, Fragment } from 'react';
 import { useMutation } from '@apollo/client/react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
@@ -36,7 +36,11 @@ export function FormulaireActivite({
 
   const enCours = creationEnCours || modificationEnCours;
 
-  useEffect(() => {
+  // Initialiser le formulaire quand on ouvre (edition ou creation) : setState pendant le
+  // rendu (pas dans un effet), en comparant `ouvert` a sa valeur du rendu precedent.
+  const [ouvertPrecedent, setOuvertPrecedent] = useState(false);
+  if (ouvert !== ouvertPrecedent) {
+    setOuvertPrecedent(ouvert);
     if (ouvert && activite) {
       setFormData({
         id: activite.id,
@@ -55,7 +59,7 @@ export function FormulaireActivite({
       });
     }
     setErreur('');
-  }, [ouvert, activite, parentId]);
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;

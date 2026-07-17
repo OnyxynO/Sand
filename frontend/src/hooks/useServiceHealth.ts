@@ -134,13 +134,11 @@ export function useServiceHealth(): EtatSante {
     iterationPostReveil();
   }
 
-  function demarrerPolling() {
+  // Cycle de polling seul, sans reinitialisation d'etat — utilise au montage
+  // (l'etat initial des useState correspond deja aux valeurs par defaut).
+  function lancerCyclePolling() {
     if (timerRef.current) clearTimeout(timerRef.current);
     tentativesRef.current = 0;
-    setReveilEnCours(false);
-    setEchec(false);
-    setServices(SERVICES_VERIFICATION);
-    setPremierCheckFait(false);
 
     async function iteration() {
       const ok = await verifier();
@@ -159,8 +157,17 @@ export function useServiceHealth(): EtatSante {
     iteration();
   }
 
+  // Reinitialise l'etat puis relance un cycle — utilise par le bouton "Réessayer" (relancer)
+  function demarrerPolling() {
+    setReveilEnCours(false);
+    setEchec(false);
+    setServices(SERVICES_VERIFICATION);
+    setPremierCheckFait(false);
+    lancerCyclePolling();
+  }
+
   useEffect(() => {
-    demarrerPolling();
+    lancerCyclePolling();
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };

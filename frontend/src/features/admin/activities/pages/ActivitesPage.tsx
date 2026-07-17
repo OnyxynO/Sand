@@ -1,6 +1,6 @@
 // Page de gestion de l'arborescence des activites (Admin)
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import {
   DndContext,
@@ -80,20 +80,21 @@ export default function ActivitesPage() {
     useSensor(KeyboardSensor),
   );
 
-  // Ouvrir tous les noeuds au chargement
-  useEffect(() => {
-    if (activites.length > 0 && ouverts.size === 0) {
-      const tousLesIds = new Set<string>();
-      const collecterIds = (liste: Activite[]) => {
-        liste.forEach((a) => {
-          tousLesIds.add(a.id);
-          if (a.enfants) collecterIds(a.enfants);
-        });
-      };
-      collecterIds(activites);
-      setOuverts(tousLesIds);
-    }
-  }, [activites, ouverts.size]);
+  // Ouvrir tous les noeuds a l'arrivee des donnees (une seule fois, sans effet) :
+  // setState pendant le rendu, gardee par ouverts.size === 0 (se referme des la premiere
+  // expansion, se rouvre si l'utilisateur reduit manuellement tous les noeuds — comportement
+  // identique a l'ancien effet, qui dependait deja de [activites, ouverts.size]).
+  if (activites.length > 0 && ouverts.size === 0) {
+    const tousLesIds = new Set<string>();
+    const collecterIds = (liste: Activite[]) => {
+      liste.forEach((a) => {
+        tousLesIds.add(a.id);
+        if (a.enfants) collecterIds(a.enfants);
+      });
+    };
+    collecterIds(activites);
+    setOuverts(tousLesIds);
+  }
 
   const toggleOuvert = (id: string) => {
     setOuverts((prev) => {

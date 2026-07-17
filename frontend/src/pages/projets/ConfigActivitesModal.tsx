@@ -126,11 +126,23 @@ export default function ConfigActivitesModal({
 
   const activites = dataActivites?.arbreActivites || [];
 
+  // Synchroniser la selection avec les donnees projet des qu'elles arrivent (reseau),
+  // sans passer par un effet : setState pendant le rendu, en comparant a la valeur precedente.
+  // Seed a `undefined` (et non `dataProjet`) pour ne pas manquer un premier rendu ou la
+  // donnee serait deja disponible.
+  const [dataProjetPrecedent, setDataProjetPrecedent] = useState<typeof dataProjet>(undefined);
+  if (dataProjet !== dataProjetPrecedent) {
+    setDataProjetPrecedent(dataProjet);
+    if (dataProjet?.projet?.activitesActives) {
+      setSelectionnees(new Set(dataProjet.projet.activitesActives.map((a) => a.id)));
+    }
+  }
+
+  // Le ref (utilise seulement dans des handlers, pas au rendu) est mis a jour dans un effet :
+  // les refs ne doivent pas etre modifiees pendant le rendu (react-hooks/refs).
   useEffect(() => {
     if (dataProjet?.projet?.activitesActives) {
-      const initialIds = new Set(dataProjet.projet.activitesActives.map((a) => a.id));
-      setSelectionnees(initialIds);
-      etatInitialRef.current = initialIds;
+      etatInitialRef.current = new Set(dataProjet.projet.activitesActives.map((a) => a.id));
     }
   }, [dataProjet]);
 

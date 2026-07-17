@@ -17,13 +17,19 @@ import { useIsMobile } from '../../../hooks/useIsMobile';
 export default function SaisiePage() {
   const isMobile = useIsMobile();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [userIdModeration, setUserIdModeration] = useState<string | null>(null);
-  const { erreur, aDesModifications, sauvegarde, sauvegarder, absencesParJour, modeAbsence, refetcherAbsences } = useSaisieHebdo(userIdModeration);
   const utilisateur = useAuthStore((state) => state.utilisateur);
   const setSemaine = useSaisieStore((state) => state.setSemaine);
 
   // Afficher le selecteur si moderateur ou admin
   const estModerateurOuAdmin = utilisateur?.role === 'MODERATEUR' || utilisateur?.role === 'ADMIN';
+
+  // Valeur lue une seule fois au montage (query param de navigation depuis supervision) :
+  // initialiseur paresseux plutot qu'un setState dans un effet.
+  const [userIdModeration, setUserIdModeration] = useState<string | null>(() => {
+    const userIdParam = searchParams.get('userId');
+    return userIdParam && estModerateurOuAdmin ? userIdParam : null;
+  });
+  const { erreur, aDesModifications, sauvegarde, sauvegarder, absencesParJour, modeAbsence, refetcherAbsences } = useSaisieHebdo(userIdModeration);
 
   // Bloquer la navigation si des modifications non sauvegardees
   const blocker = useBlocker(aDesModifications);
@@ -39,13 +45,11 @@ export default function SaisiePage() {
   }, [aDesModifications]);
 
   // Lire les query params au montage (navigation depuis supervision)
+  // userIdModeration est deja initialise via l'initialiseur paresseux ci-dessus ;
+  // il ne reste ici que la synchronisation avec des systemes externes (store semaine, URL).
   useEffect(() => {
     const userIdParam = searchParams.get('userId');
     const semaineParam = searchParams.get('semaine');
-
-    if (userIdParam && estModerateurOuAdmin) {
-      setUserIdModeration(userIdParam);
-    }
 
     if (semaineParam && /^\d{4}-W\d{2}$/.test(semaineParam)) {
       setSemaine(semaineParam);

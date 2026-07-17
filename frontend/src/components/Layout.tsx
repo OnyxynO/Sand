@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useMutation } from '@apollo/client/react';
 import {
@@ -20,11 +20,6 @@ export default function Layout() {
   const { utilisateur, deconnecter } = useAuthStore();
   const [menuOuvert, setMenuOuvert] = useState(false);
   const konamiActif = useKonamiCode();
-  const [foxActif, setFoxActif] = useState(false);
-
-  useEffect(() => {
-    if (konamiActif > 0) setFoxActif(true);
-  }, [konamiActif]);
 
   const [logout] = useMutation(LOGOUT_MUTATION, {
     onCompleted: () => {
@@ -164,8 +159,9 @@ export default function Layout() {
       {/* Panneau notifications (slide-over) */}
       <NotificationPanel />
 
-      {/* Easter egg Konami Code */}
-      <FoxEasterEgg key={konamiActif} actif={foxActif} onTermine={() => setFoxActif(false)} />
+      {/* Easter egg Konami Code : la key remonte le composant a chaque activation,
+          ce qui evite d'avoir besoin d'un etat + effet pour reagir au declenchement */}
+      <FoxEasterEgg key={konamiActif} actif={konamiActif > 0} onTermine={() => {}} />
     </div>
   );
 }

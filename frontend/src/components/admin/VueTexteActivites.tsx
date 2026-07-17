@@ -8,7 +8,7 @@ import {
   validerTexte,
   calculerDiff,
 } from '../../hooks/useParserArbreTexte';
-import type { Changement } from '../../hooks/useParserArbreTexte';
+import type { Changement, NoeudArbre } from '../../hooks/useParserArbreTexte';
 import {
   CREATE_ACTIVITY,
   UPDATE_ACTIVITY,
@@ -319,16 +319,16 @@ export default function VueTexteActivites({ activites, onAppliquer }: Props) {
 
 // Utilitaires pour naviguer dans le nouvel arbre parse
 
-function trouverParentDansNouvelArbre(nom: string, noeuds: { nom: string; enfants: any[] }[]): string | null {
+function trouverParentDansNouvelArbre(nom: string, noeuds: NoeudArbre[]): string | null {
   for (const n of noeuds) {
-    if (n.enfants.some((e: any) => e.nom === nom)) return n.nom;
+    if (n.enfants.some((e) => e.nom === nom)) return n.nom;
     const resultat = trouverParentDansNouvelArbre(nom, n.enfants);
     if (resultat) return resultat;
   }
   return null;
 }
 
-function trouverNoeudParNom(nom: string, noeuds: { nom: string; code?: string; enfants: any[] }[]): { nom: string; code?: string } | null {
+function trouverNoeudParNom(nom: string, noeuds: NoeudArbre[]): NoeudArbre | null {
   for (const n of noeuds) {
     if (n.nom === nom) return n;
     const resultat = trouverNoeudParNom(nom, n.enfants);

@@ -1,6 +1,6 @@
 // Formulaire de creation/modification d'utilisateur
 
-import { useState, useEffect, Fragment } from 'react';
+import { useState, Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useQuery, useMutation } from '@apollo/client/react';
@@ -71,8 +71,11 @@ export default function FormulaireUtilisateur({
 
   const enCours = creationEnCours || modificationEnCours;
 
-  // Initialiser le formulaire quand on ouvre en mode edition
-  useEffect(() => {
+  // Initialiser le formulaire quand on ouvre (edition ou creation) : setState pendant le
+  // rendu (pas dans un effet), en comparant `ouvert` a sa valeur du rendu precedent.
+  const [ouvertPrecedent, setOuvertPrecedent] = useState(false);
+  if (ouvert !== ouvertPrecedent) {
+    setOuvertPrecedent(ouvert);
     if (ouvert && utilisateur) {
       setFormData({
         id: utilisateur.id,
@@ -98,7 +101,7 @@ export default function FormulaireUtilisateur({
       });
     }
     setErreur('');
-  }, [ouvert, utilisateur]);
+  }
 
   // Gestion des changements
   const handleChange = (

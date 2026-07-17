@@ -1,7 +1,7 @@
 // Composant cellule editable de la grille de saisie
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import type { KeyboardEvent, FocusEvent, MouseEvent } from 'react';
+import type { KeyboardEvent, MouseEvent } from 'react';
 import { ClockIcon } from '@heroicons/react/24/outline';
 import { useSaisieStore } from '../../stores/saisieStore';
 import { formatDuree, parseDuree } from '../../utils/semaineUtils';
@@ -22,17 +22,17 @@ export default function CelluleSaisie({ ligneId, jour, cellule, onNavigate }: Ce
   const [valeurTemp, setValeurTemp] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Initialiser la valeur temporaire quand on entre en edition
+  // Focus l'input quand on entre en edition (la valeur temporaire est initialisee
+  // directement au clic, cf. handleClicEdition — pas de setState synchrone ici)
   useEffect(() => {
-    if (enEdition) {
-      setValeurTemp(formatDuree(cellule.duree));
-      // Focus avec un petit delai pour laisser le DOM se mettre a jour
-      setTimeout(() => {
-        inputRef.current?.focus();
-        inputRef.current?.select();
-      }, 0);
-    }
-  }, [enEdition, cellule.duree]);
+    if (!enEdition) return;
+    // Focus avec un petit delai pour laisser le DOM se mettre a jour
+    const timer = setTimeout(() => {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [enEdition]);
 
   // Valider et sauvegarder la valeur
   const validerValeur = useCallback(() => {
@@ -85,7 +85,7 @@ export default function CelluleSaisie({ ligneId, jour, cellule, onNavigate }: Ce
   };
 
   // Gestion du blur
-  const handleBlur = (_e: FocusEvent<HTMLInputElement>) => {
+  const handleBlur = () => {
     // Eviter de valider si on clique sur une autre cellule (gere par onNavigate)
     validerValeur();
   };
@@ -148,7 +148,10 @@ export default function CelluleSaisie({ ligneId, jour, cellule, onNavigate }: Ce
       <button
         type="button"
         className={`${cellClasses} relative group/cell focus-visible:ring-2 focus-visible:ring-blue-400`}
-        onClick={() => setEnEdition(true)}
+        onClick={() => {
+          setValeurTemp(formatDuree(cellule.duree));
+          setEnEdition(true);
+        }}
         aria-label={`Saisir pour ${jour.jourComplet}`}
       >
         <span className="leading-10">

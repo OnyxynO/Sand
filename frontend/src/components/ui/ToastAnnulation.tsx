@@ -24,13 +24,16 @@ export default function ToastAnnulation({
   const [progression, setProgression] = useState(100);
   const [tempsRestant, setTempsRestant] = useState(delaiMs);
 
-  // Reset quand le toast devient visible
-  useEffect(() => {
+  // Reset quand le toast devient visible : setState pendant le rendu (pas dans un effet),
+  // en comparant `visible` a sa valeur du rendu precedent.
+  const [visiblePrecedent, setVisiblePrecedent] = useState(false);
+  if (visible !== visiblePrecedent) {
+    setVisiblePrecedent(visible);
     if (visible) {
       setProgression(100);
       setTempsRestant(delaiMs);
     }
-  }, [visible, delaiMs]);
+  }
 
   // Decompte et barre de progression
   useEffect(() => {

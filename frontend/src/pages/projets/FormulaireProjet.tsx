@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from 'react';
+import { useState, Fragment } from 'react';
 import { useMutation } from '@apollo/client/react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
@@ -30,7 +30,11 @@ export default function FormulaireProjet({
   const [createProject, { loading: creationEnCours }] = useMutation(CREATE_PROJECT);
   const [updateProject, { loading: modificationEnCours }] = useMutation(UPDATE_PROJECT);
 
-  useEffect(() => {
+  // Initialiser le formulaire quand on ouvre (edition ou creation) : setState pendant le
+  // rendu (pas dans un effet), en comparant `ouvert` a sa valeur du rendu precedent.
+  const [ouvertPrecedent, setOuvertPrecedent] = useState(false);
+  if (ouvert !== ouvertPrecedent) {
+    setOuvertPrecedent(ouvert);
     if (ouvert && projet) {
       setFormData({
         nom: projet.nom,
@@ -44,7 +48,7 @@ export default function FormulaireProjet({
       setFormData({ nom: '', code: '', description: '', dateDebut: '', dateFin: '', estActif: true });
     }
     setErreur('');
-  }, [ouvert, projet]);
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
