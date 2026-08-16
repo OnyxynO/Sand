@@ -7,7 +7,7 @@ modules:
 - des
 - modules
 - concernés
-statut: accepte
+statut: remplace
 titre: Intégration de Sentry pour le monitoring des erreurs en production
 ---
 
@@ -22,3 +22,5 @@ L'intégration de Sentry est activée en production avec les DSN configurés via
 ## Conséquences
 
 Conseillés : amélioration du monitoring des erreurs, contexte utilisateur pour la dérivation des erreurs. Négatifs : risque de sécurité si les DSN sont exposés, mais cela est évité en production.
+
+**Remplacée par [[016]] (2026-08-16)** : le DSN backend (SENTRY_LARAVEL_DSN) était en réalité le DSN révoqué le 2026-03-29 (exposé publiquement) — jamais remplacé depuis, le monitoring backend était donc silencieusement mort. Décision de retirer entièrement Sentry (backend et frontend) plutôt que de le réparer, jugé disproportionné pour les besoins du projet.
