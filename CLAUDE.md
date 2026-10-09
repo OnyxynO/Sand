@@ -252,6 +252,11 @@ Commandes de déploiement complètes (premier déploiement VPS vierge et mise à
 
 ## Pièges connus
 
+- **`@graphql-tools/utils` 11 (codegen, dev) : ne PAS monter codegen pour la corriger** (essai
+  2026-10-09, abandonné) : le correctif exige cli 7 / client-preset 6, et client-preset 6 ne
+  génère plus que les types **utilisés** — `Scalars`, `Absence`, `Activity`, `ResultatPurge`…
+  disparaissent de `src/gql/graphql.ts` alors que le code les importe. Et une copie de utils
+  11.2.2 subsistait quand même (audit inchangé). Outil de dev sur un schéma local : risque réel nul.
 - **Cache Lighthouse** : vider après modification du schéma GraphQL (`php artisan lighthouse:clear-cache`)
 - **Tests dans Docker** : `DB_HOST=db` (hostname Docker), pas accessible depuis l'hôte
 - **Apollo Client 4** : imports depuis `@apollo/client/react` (pas `@apollo/client`)
