@@ -82,7 +82,7 @@ Configuration de la hiérarchie des activités par codes métier. Seules les feu
 
 | Couche | Technologies |
 |--------|-------------|
-| Backend | Laravel 12 · PHP 8.4 · Lighthouse 6 (GraphQL) · Sanctum |
+| Backend | Laravel 13 · PHP 8.5 · Lighthouse 6 (GraphQL) · Sanctum |
 | Frontend | React 19 · TypeScript · Apollo Client 4 · Tailwind CSS · Zustand |
 | Base de données | PostgreSQL 16 (extension ltree) |
 | Cache / Queue | Redis 7 |
@@ -95,7 +95,7 @@ Configuration de la hiérarchie des activités par codes métier. Seules les feu
 
 ### Développement local natif
 
-- **PHP 8.4**
+- **PHP 8.5**
 - **Composer**
 - **Node.js ≥ 20**
 - **PostgreSQL 16**

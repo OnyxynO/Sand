@@ -27,7 +27,7 @@ des développements par rapport au rapport d'audit technique de référence.
 
 ## Contexte projet
 
-- Backend : Laravel 12, PHP 8.4, Lighthouse 6 (GraphQL), Sanctum
+- Backend : Laravel 13, PHP 8.5, Lighthouse 6 (GraphQL), Sanctum
 - Frontend : React 19, TypeScript, Apollo Client 4, Tailwind CSS, Zustand
 - Base de données : PostgreSQL 16 (ltree)
 - Rapport d'audit de référence : `docs/07_AUDIT_TECHNIQUE.md`
