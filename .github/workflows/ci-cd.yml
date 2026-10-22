@@ -36,10 +36,10 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Setup PHP 8.4
+      - name: Setup PHP 8.5
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.5'
           extensions: pdo, pdo_pgsql, pgsql, mbstring, exif, pcntl, bcmath, gd, zip, redis
           coverage: none
 
@@ -125,6 +125,8 @@ jobs:
             cd /var/www/sand
             git fetch origin
             git reset --hard origin/main
-            docker compose --project-name sand -f docker-compose.yml -f docker-compose.prod.yml up -d --build --remove-orphans
+            # --pull : reprendre la dernière image de base PHP (versions de sécurité), jamais celle du cache
+            docker compose --project-name sand -f docker-compose.yml -f docker-compose.prod.yml build --pull
+            docker compose --project-name sand -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
             docker compose --project-name sand -f docker-compose.yml -f docker-compose.prod.yml exec -T app \
               php artisan migrate --force

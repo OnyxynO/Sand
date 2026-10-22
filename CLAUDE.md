@@ -12,7 +12,7 @@ Ce fichier est le point d'entrée pour Claude Code (et, par import, pour Codex v
 
 | Couche | Technologies |
 |--------|--------------|
-| Backend | Laravel 13, PHP 8.4 (min 8.3), Lighthouse 6 (GraphQL), Sanctum |
+| Backend | Laravel 13, PHP 8.5 (min 8.3), Lighthouse 6 (GraphQL), Sanctum |
 | Frontend | React 19, TypeScript, Apollo Client 4, Tailwind CSS, Zustand |
 | Base de données | PostgreSQL 16 (extension ltree) |
 | Cache/Queue | Redis |
