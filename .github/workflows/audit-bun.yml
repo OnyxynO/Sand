@@ -30,9 +30,11 @@ jobs:
           - dossier: frontend
             # Exceptions documentées (revérifier à chaque passage) :
             #   GHSA-7mx3-vvmw-hjmv — @graphql-tools/utils 11 (codegen, dev) : le correctif casse les types générés, cf. CLAUDE.md § Pièges
+            #   GHSA-c4qx-w738-7hr3 — @graphql-tools/utils 11.2.2 : idem, aucune 11.x corrigée (dernière = 11.2.2)
             #   GHSA-vfj7-8cjw-p6xm — braces : aucun correctif publié
             ignore: >-
               GHSA-7mx3-vvmw-hjmv
+              GHSA-c4qx-w738-7hr3
               GHSA-vfj7-8cjw-p6xm
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
