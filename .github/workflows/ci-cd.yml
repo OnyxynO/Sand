@@ -128,5 +128,15 @@ jobs:
             # --pull : reprendre la dernière image de base PHP (versions de sécurité), jamais celle du cache
             docker compose --project-name sand -f docker-compose.yml -f docker-compose.prod.yml build --pull
             docker compose --project-name sand -f docker-compose.yml -f docker-compose.prod.yml up -d --remove-orphans
+            # vendor/ vit sur l'hôte (bind mount) : ni git ni le build de l'image ne le mettent à jour
+            docker compose --project-name sand -f docker-compose.yml -f docker-compose.prod.yml exec -T app \
+              composer install --no-dev --optimize-autoloader --no-interaction
+            # Échoue si vendor/ ne correspond pas au lockfile déployé
+            docker compose --project-name sand -f docker-compose.yml -f docker-compose.prod.yml exec -T app \
+              sh -c 'composer install --no-dev --dry-run --no-interaction 2>&1 | grep -q "Nothing to install"'
+            docker compose --project-name sand -f docker-compose.yml -f docker-compose.prod.yml exec -T app \
+              php artisan lighthouse:clear-cache
             docker compose --project-name sand -f docker-compose.yml -f docker-compose.prod.yml exec -T app \
               php artisan migrate --force
+            # Recharger les paquets dans le worker et dans OPcache
+            docker compose --project-name sand -f docker-compose.yml -f docker-compose.prod.yml restart app queue
