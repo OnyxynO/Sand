@@ -1,0 +1,36 @@
+name: Audit des dépendances (composer)
+
+# Dependabot n'a signalé aucun des 7 avis Symfony du 2026-11-04 : `composer audit`, qui lit la
+# base Packagist, est le contrôle fiable côté PHP. Pendant de audit-bun.yml : séparé du
+# déploiement, hebdomadaire, le jeudi pour que la revue GitHub de vigie le remonte le vendredi.
+on:
+  push:
+    branches: [main]
+    paths: ['backend/composer.lock', '.github/workflows/audit-composer.yml']
+  pull_request:
+    paths: ['backend/composer.lock', '.github/workflows/audit-composer.yml']
+  schedule:
+    - cron: '0 6 * * 4'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: composer audit (backend)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
+        with:
+          php-version: '8.5'
+          tools: composer
+          coverage: none
+      # Lit seulement composer.lock : aucun `composer install`, donc aucun script de paquet exécuté.
+      # Pas de seuil de gravité : plusieurs avis Symfony du 2026-11-04 n'en ont aucune.
+      - name: composer audit --locked
+        working-directory: backend
+        run: composer audit --locked --no-interaction --abandoned=report
