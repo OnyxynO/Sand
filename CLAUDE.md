@@ -212,7 +212,7 @@ Résumés des décisions clés :
 - **Soft delete** : users, projects, activities, time_entries, absences
 - **Model events** : `est_feuille` recalculé automatiquement via les événements Eloquent `deleted`/`restored`
 - **Export CSV** : Job queue Redis asynchrone, notification quand prêt
-- **Design system** : variables CSS `--sand-*`, police Fraunces (Google Fonts), `.sand-card`
+- **Design system** : variables CSS `--sand-*`, police Fraunces auto-hébergée (`src/assets/fonts/`, latin + latin-ext, OFL ; la CSP n'autorise que `font-src 'self'`) — la règle de base des titres vit dans `@layer base`, sinon elle écrase les classes `font-[...]` de Tailwind v4 (cause des titres restés en Iowan jusqu'au 2026-11-20), `.sand-card`
 - **Tests** : PostgreSQL obligatoire (ltree incompatible SQLite), base `sand_v2_test`
 - **Easter egg** : Konami Code (haut haut bas bas gauche droite gauche droite B A) → renard animé sur un `.sand-card` aléatoire. Hook `useKonamiCode`, composant `FoxEasterEgg`.
 
