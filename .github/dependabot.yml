@@ -14,6 +14,13 @@ updates:
     cooldown:
       default-days: 3
     open-pull-requests-limit: 10
+    # TypeScript 7 n'a pas encore d'API JavaScript et typescript-eslint la refuse
+    # (« does not support TS 7.0 », peer typescript <6.1.0). Rester en 6.x jusqu'au support,
+    # suivi : https://github.com/typescript-eslint/typescript-eslint/issues/10940
+    # Retirer ce bloc à ce moment-là (décision du 2026-11-20, chantier TypeScript 7).
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     groups:
       # `dependency-type` n'est pas pris en charge par l'écosystème bun : regroupement par
       # type de mise à jour seulement.

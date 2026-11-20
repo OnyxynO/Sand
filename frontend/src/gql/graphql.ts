@@ -1,158 +1,9 @@
 /* eslint-disable */
-import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
-export type Maybe<T> = T | null;
-export type InputMaybe<T> = T | null | undefined;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
-/** All built-in and custom scalars, mapped to their actual values */
-export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
-  /** A date string with format `Y-m-d`, e.g. `2025-01-27`. */
-  Date: { input: any; output: any; }
-  /** A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`. */
-  DateTime: { input: any; output: any; }
-  /** Arbitrary JSON data. */
-  JSON: { input: any; output: any; }
-};
-
-/** Absence d'un utilisateur */
-export type Absence = {
-  __typename?: 'Absence';
-  /** Date de creation */
-  createdAt: Scalars['DateTime']['output'];
-  /** Date de debut de l'absence */
-  dateDebut: Scalars['Date']['output'];
-  /** Date de fin de l'absence */
-  dateFin: Scalars['Date']['output'];
-  /** Duree journaliere en ETP (0.5 ou 1.0) */
-  dureeJournaliere: Scalars['Float']['output'];
-  /** Identifiant unique */
-  id: Scalars['ID']['output'];
-  /** Date d'import depuis l'API RH */
-  importeLe?: Maybe<Scalars['DateTime']['output']>;
-  /** Nombre de jours d'absence */
-  nombreJours: Scalars['Int']['output'];
-  /** Reference dans le systeme RH externe */
-  referenceExterne?: Maybe<Scalars['String']['output']>;
-  /** Statut de l'absence (validee, en_attente, etc.) */
-  statut: Scalars['String']['output'];
-  /** Total ETP de l'absence */
-  totalEtp: Scalars['Float']['output'];
-  /** Code du type d'absence */
-  type: Scalars['String']['output'];
-  /** Libelle du type d'absence */
-  typeLibelle: Scalars['String']['output'];
-  /** Date de derniere modification */
-  updatedAt: Scalars['DateTime']['output'];
-  /** Utilisateur concerne */
-  utilisateur: User;
-};
-
-/** Donnees d'une absence */
-export type AbsenceInput = {
-  /** Date de debut de l'absence */
-  dateDebut: Scalars['Date']['input'];
-  /** Date de fin de l'absence */
-  dateFin: Scalars['Date']['input'];
-  /** Duree journaliere en ETP (0.5 a 1.0) */
-  dureeJournaliere?: InputMaybe<Scalars['Float']['input']>;
-  /** Code du type d'absence */
-  type: Scalars['String']['input'];
-  /** Identifiant de l'utilisateur concerne */
-  userId: Scalars['ID']['input'];
-};
-
-/** Activite (arborescence) */
-export type Activity = {
-  __typename?: 'Activity';
-  /** Chemin ltree dans l'arborescence */
-  chemin: Scalars['String']['output'];
-  /** Chemin complet avec noms */
-  cheminComplet: Scalars['String']['output'];
-  /** Code court (optionnel) */
-  code?: Maybe<Scalars['String']['output']>;
-  /** Date de creation */
-  createdAt: Scalars['DateTime']['output'];
-  /** Description de l'activite */
-  description?: Maybe<Scalars['String']['output']>;
-  /** Activites enfants */
-  enfants: Array<Activity>;
-  /** Indique si l'activite est active */
-  estActif: Scalars['Boolean']['output'];
-  /** Indique si c'est une feuille saisissable */
-  estFeuille: Scalars['Boolean']['output'];
-  /** Indique si c'est une activite systeme protegee */
-  estSysteme: Scalars['Boolean']['output'];
-  /** Identifiant unique */
-  id: Scalars['ID']['output'];
-  /** Niveau de profondeur dans l'arborescence (0 = racine) */
-  niveau: Scalars['Int']['output'];
-  /** Nom de l'activite */
-  nom: Scalars['String']['output'];
-  /** Ordre d'affichage parmi les freres */
-  ordre: Scalars['Int']['output'];
-  /** Activite parente */
-  parent?: Maybe<Activity>;
-  /** Projets sur lesquels cette activite est activee */
-  projets: Array<Project>;
-  /** Date de derniere modification */
-  updatedAt: Scalars['DateTime']['output'];
-};
-
-/** Statistiques par activite */
-export type ActivityStat = {
-  __typename?: 'ActivityStat';
-  /** Activite concernee */
-  activite: Activity;
-  /** Pourcentage du temps total */
-  pourcentage: Scalars['Float']['output'];
-  /** Temps total en ETP */
-  tempsTotal: Scalars['Float']['output'];
-};
-
-/** Restriction de visibilite d'une activite pour un utilisateur */
-export type ActivityVisibility = {
-  __typename?: 'ActivityVisibility';
-  /** Activite concernee */
-  activite: Activity;
-  /** Date de creation de la restriction */
-  createdAt: Scalars['DateTime']['output'];
-  /** Indique si l'activite est visible pour cet utilisateur */
-  estVisible: Scalars['Boolean']['output'];
-  /** Identifiant unique */
-  id: Scalars['ID']['output'];
-  /** Projet concerne */
-  projet: Project;
-  /** Utilisateur concerne */
-  utilisateur: User;
-};
-
-/** Anomalie detectee dans les saisies */
-export type Anomaly = {
-  __typename?: 'Anomaly';
-  /** Date de l'anomalie (si applicable) */
-  date?: Maybe<Scalars['Date']['output']>;
-  /** Description de l'anomalie */
-  detail: Scalars['String']['output'];
-  /** Identifiant unique */
-  id: Scalars['ID']['output'];
-  /** Projet concerne (si applicable) */
-  projet?: Maybe<Project>;
-  /** Semaine de l'anomalie (format ISO, si applicable) */
-  semaine?: Maybe<Scalars['String']['output']>;
-  /** Type d'anomalie */
-  type: AnomalyType;
-  /** Utilisateur concerne */
-  utilisateur: User;
-};
-
+import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 /** Type d'anomalie detectee */
 export type AnomalyType =
   /** Conflit entre absence et saisie sur la meme date */
@@ -168,21 +19,14 @@ export type AnomalyType =
   /** Semaine sans aucune saisie */
   | 'SEMAINE_VIDE';
 
-/** Payload retourne apres authentification */
-export type AuthPayload = {
-  __typename?: 'AuthPayload';
-  /** Utilisateur authentifie */
-  user: User;
-};
-
 /** Mise a jour en lot */
 export type BulkUpdateEntry = {
   /** Nouveau commentaire (1000 caracteres max) */
-  commentaire?: InputMaybe<Scalars['String']['input']>;
+  commentaire?: string | null | undefined;
   /** Nouvelle duree en ETP (0.01 a 1.00) */
-  duree: Scalars['Float']['input'];
+  duree: number;
   /** Identifiant de la saisie a modifier */
-  id: Scalars['ID']['input'];
+  id: string | number;
 };
 
 /** Resolution d'un conflit d'absence */
@@ -197,72 +41,61 @@ export type ConflictResolution =
 /** Creation d'une activite */
 export type CreateActivityInput = {
   /** Code court (optionnel) */
-  code?: InputMaybe<Scalars['String']['input']>;
+  code?: string | null | undefined;
   /** Description de l'activite */
-  description?: InputMaybe<Scalars['String']['input']>;
+  description?: string | null | undefined;
   /** Activer ou desactiver l'activite */
-  estActif?: InputMaybe<Scalars['Boolean']['input']>;
+  estActif?: boolean | null | undefined;
   /** Nom de l'activite */
-  nom: Scalars['String']['input'];
+  nom: string;
   /** Ordre d'affichage */
-  ordre?: InputMaybe<Scalars['Int']['input']>;
+  ordre?: number | null | undefined;
   /** ID de l'activite parente (null = racine) */
-  parentId?: InputMaybe<Scalars['ID']['input']>;
+  parentId?: string | number | null | undefined;
 };
 
 /** Creation d'un projet */
 export type CreateProjectInput = {
   /** IDs des activites a activer */
-  activiteIds?: InputMaybe<Array<Scalars['ID']['input']>>;
+  activiteIds?: Array<string | number> | null | undefined;
   /** Code court unique */
-  code: Scalars['String']['input'];
+  code: string;
   /** Date de debut du projet */
-  dateDebut?: InputMaybe<Scalars['Date']['input']>;
+  dateDebut?: unknown;
   /** Date de fin du projet */
-  dateFin?: InputMaybe<Scalars['Date']['input']>;
+  dateFin?: unknown;
   /** Description du projet */
-  description?: InputMaybe<Scalars['String']['input']>;
+  description?: string | null | undefined;
   /** Activer ou desactiver le projet */
-  estActif?: InputMaybe<Scalars['Boolean']['input']>;
+  estActif?: boolean | null | undefined;
   /** IDs des moderateurs a assigner */
-  moderateurIds?: InputMaybe<Array<Scalars['ID']['input']>>;
+  moderateurIds?: Array<string | number> | null | undefined;
   /** Nom du projet */
-  nom: Scalars['String']['input'];
+  nom: string;
 };
 
 /** Creation d'un utilisateur */
 export type CreateUserInput = {
   /** Adresse email (unique parmi les comptes non supprimes) */
-  email: Scalars['String']['input'];
+  email: string;
   /** Identifiant de l'equipe */
-  equipeId?: InputMaybe<Scalars['ID']['input']>;
+  equipeId?: string | number | null | undefined;
   /** Matricule interne (unique, optionnel) */
-  matricule?: InputMaybe<Scalars['String']['input']>;
+  matricule?: string | null | undefined;
   /** Nom de famille */
-  nom: Scalars['String']['input'];
+  nom: string;
   /** Mot de passe (8 caracteres minimum) */
-  password: Scalars['String']['input'];
+  password: string;
   /** Prenom */
-  prenom: Scalars['String']['input'];
+  prenom: string;
   /** Role dans le systeme */
   role: UserRole;
-};
-
-/** Statistiques par jour */
-export type DayStat = {
-  __typename?: 'DayStat';
-  /** Date du jour */
-  date: Scalars['Date']['output'];
-  /** Indique si le jour est complet (total ~= 1.0 ETP) */
-  estComplet: Scalars['Boolean']['output'];
-  /** Temps total en ETP */
-  tempsTotal: Scalars['Float']['output'];
 };
 
 /** Demande de reinitialisation de mot de passe */
 export type DemanderReinitialisationMdpInput = {
   /** Adresse email du compte (max 80 caracteres) */
-  email: Scalars['String']['input'];
+  email: string;
 };
 
 /** Format d'export */
@@ -273,34 +106,17 @@ export type ExportFormat =
 /** Parametres d'export */
 export type ExportInput = {
   /** Date de debut de la periode */
-  dateDebut: Scalars['Date']['input'];
+  dateDebut: unknown;
   /** Date de fin de la periode */
-  dateFin: Scalars['Date']['input'];
+  dateFin: unknown;
   /** Filtrer par equipe */
-  equipeId?: InputMaybe<Scalars['ID']['input']>;
+  equipeId?: string | number | null | undefined;
   /** Format de l'export */
   format: ExportFormat;
   /** Filtrer par projet */
-  projetId?: InputMaybe<Scalars['ID']['input']>;
+  projetId?: string | number | null | undefined;
   /** Filtrer par utilisateur */
-  userId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-/** Job d'export asynchrone */
-export type ExportJob = {
-  __typename?: 'ExportJob';
-  /** Date de creation de la demande */
-  creeLe: Scalars['DateTime']['output'];
-  /** Date d'expiration du fichier */
-  expireLe?: Maybe<Scalars['DateTime']['output']>;
-  /** Filtres utilises pour generer l'export */
-  filtres?: Maybe<Scalars['JSON']['output']>;
-  /** Identifiant unique */
-  id: Scalars['ID']['output'];
-  /** Statut du job */
-  statut: ExportStatus;
-  /** URL de telechargement (disponible quand termine) */
-  urlTelechargement?: Maybe<Scalars['String']['output']>;
+  userId?: string | number | null | undefined;
 };
 
 /** Statut d'un job d'export */
@@ -328,974 +144,109 @@ export type LogAction =
 /** Donnees de connexion */
 export type LoginInput = {
   /** Adresse email de l'utilisateur (max 80 caracteres) */
-  email: Scalars['String']['input'];
+  email: string;
   /** Mot de passe (6 caracteres minimum, 80 maximum) */
-  password: Scalars['String']['input'];
-};
-
-export type Mutation = {
-  __typename?: 'Mutation';
-  /** Ajouter un moderateur au projet */
-  addProjectModerator: Project;
-  /** Affecter un utilisateur au projet */
-  addProjectUser: Project;
-  /** Creer plusieurs saisies d'un coup */
-  bulkCreateTimeEntries: Array<TimeEntry>;
-  /** Mettre a jour plusieurs saisies d'un coup */
-  bulkUpdateTimeEntries: Array<TimeEntry>;
-  /** Creer une absence manuellement */
-  createAbsence: Absence;
-  /** Creer une activite (Admin) */
-  createActivity: Activity;
-  /** Creer un projet (Admin) */
-  createProject: Project;
-  /** Creer une equipe (Admin) */
-  createTeam: Team;
-  /** Creer une saisie de temps */
-  createTimeEntry: TimeEntry;
-  /** Creer un utilisateur (Admin) */
-  createUser: User;
-  /** Mode manuel : declarer une absence pour une journee (duree null = supprimer). userId optionnel pour admin/moderateur. */
-  declarerAbsence: Scalars['Boolean']['output'];
-  /** Supprimer une absence */
-  deleteAbsence: Scalars['Boolean']['output'];
-  /** Supprimer une activite (Admin, soft delete) */
-  deleteActivity: Scalars['Boolean']['output'];
-  /** Supprimer toutes les notifications */
-  deleteAllNotifications: Scalars['Boolean']['output'];
-  /** Supprimer une notification */
-  deleteNotification: Scalars['Boolean']['output'];
-  /** Supprimer un projet (Admin, soft delete) */
-  deleteProject: Scalars['Boolean']['output'];
-  /** Supprimer une equipe (Admin) */
-  deleteTeam: Scalars['Boolean']['output'];
-  /** Supprimer une saisie de temps */
-  deleteTimeEntry: Scalars['Boolean']['output'];
-  /** Supprimer un utilisateur (Admin, soft delete) */
-  deleteUser: Scalars['Boolean']['output'];
-  /** Demande de reinitialisation de mot de passe (envoi d'un email avec lien) */
-  demanderReinitialisationMdp: Scalars['Boolean']['output'];
-  /** Desactiver un export (supprime le fichier, conserve la ligne) */
-  desactiverExport: ExportJob;
-  /** Masquer une activite pour un utilisateur sur un projet */
-  hideActivityForUser: Scalars['Boolean']['output'];
-  /** Connexion */
-  login: AuthPayload;
-  /** Deconnexion */
-  logout: Scalars['Boolean']['output'];
-  /** Marquer toutes les notifications comme lues */
-  markAllNotificationsRead: Scalars['Boolean']['output'];
-  /** Marquer une notification comme lue */
-  markNotificationRead: Notification;
-  /** Deplacer/reordonner une activite dans l'arborescence */
-  moveActivity: Activity;
-  /** Purger toutes les donnees transactionnelles (Admin) */
-  purgerToutesDonnees: ResultatPurge;
-  /** Reinitialisation du mot de passe via le token recu par email */
-  reinitialiserMdp: Scalars['Boolean']['output'];
-  /** Retirer un moderateur du projet */
-  removeProjectModerator: Project;
-  /** Retirer un utilisateur du projet */
-  removeProjectUser: Project;
-  /** Reordonner des activites */
-  reorderActivities: Array<Activity>;
-  /** Demander un export */
-  requestExport: ExportJob;
-  /** Reinitialiser tous les parametres a leurs valeurs par defaut (Admin) */
-  resetSettings: Array<Setting>;
-  /** Resoudre un conflit d'absence */
-  resolveAbsenceConflict: Scalars['Boolean']['output'];
-  /** Restaurer une activite supprimee (Admin) */
-  restoreActivity: Activity;
-  /** Restaurer un projet supprime (Admin) */
-  restoreProject: Project;
-  /** Restaurer un utilisateur supprime (Admin) */
-  restoreUser: User;
-  /** Definir les activites actives sur un projet */
-  setProjectActivities: Project;
-  /** Rendre visible une activite pour un utilisateur sur un projet */
-  showActivityForUser: Scalars['Boolean']['output'];
-  /** Supprimer les donnees d'un utilisateur (RGPD droit a l'oubli, Admin) */
-  supprimerDonneesUtilisateur: ResultatSuppressionRgpd;
-  /** Supprimer definitivement un export (supprime la ligne en base) */
-  supprimerExport: Scalars['Boolean']['output'];
-  /** Synchroniser les absences depuis l'API RH */
-  syncAbsences: SyncResult;
-  /** Tester la connexion a l'API RH avec les settings actuels (null = OK, sinon message erreur) */
-  testerConnexionRhApi?: Maybe<Scalars['String']['output']>;
-  /** Modifier une activite (Admin) */
-  updateActivity: Activity;
-  /** Modifier un projet (Admin) */
-  updateProject: Project;
-  /** Modifier un parametre systeme (Admin) */
-  updateSetting: Setting;
-  /** Modifier plusieurs parametres (Admin) */
-  updateSettings: Array<Setting>;
-  /** Modifier une equipe (Admin) */
-  updateTeam: Team;
-  /** Modifier une saisie de temps */
-  updateTimeEntry: TimeEntry;
-  /** Modifier un utilisateur (Admin) */
-  updateUser: User;
-};
-
-
-export type MutationaddProjectModeratorArgs = {
-  projetId: Scalars['ID']['input'];
-  userId: Scalars['ID']['input'];
-};
-
-
-export type MutationaddProjectUserArgs = {
-  projetId: Scalars['ID']['input'];
-  userId: Scalars['ID']['input'];
-};
-
-
-export type MutationbulkCreateTimeEntriesArgs = {
-  inputs: Array<TimeEntryInput>;
-};
-
-
-export type MutationbulkUpdateTimeEntriesArgs = {
-  entries: Array<BulkUpdateEntry>;
-};
-
-
-export type MutationcreateAbsenceArgs = {
-  input: AbsenceInput;
-};
-
-
-export type MutationcreateActivityArgs = {
-  input: CreateActivityInput;
-};
-
-
-export type MutationcreateProjectArgs = {
-  input: CreateProjectInput;
-};
-
-
-export type MutationcreateTeamArgs = {
-  input: TeamInput;
-};
-
-
-export type MutationcreateTimeEntryArgs = {
-  input: TimeEntryInput;
-};
-
-
-export type MutationcreateUserArgs = {
-  input: CreateUserInput;
-};
-
-
-export type MutationdeclarerAbsenceArgs = {
-  date: Scalars['Date']['input'];
-  duree?: InputMaybe<Scalars['Float']['input']>;
-  type?: InputMaybe<Scalars['String']['input']>;
-  userId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type MutationdeleteAbsenceArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationdeleteActivityArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationdeleteNotificationArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationdeleteProjectArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationdeleteTeamArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationdeleteTimeEntryArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationdeleteUserArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationdemanderReinitialisationMdpArgs = {
-  input: DemanderReinitialisationMdpInput;
-};
-
-
-export type MutationdesactiverExportArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationhideActivityForUserArgs = {
-  activiteId: Scalars['ID']['input'];
-  projetId: Scalars['ID']['input'];
-  userId: Scalars['ID']['input'];
-};
-
-
-export type MutationloginArgs = {
-  input: LoginInput;
-};
-
-
-export type MutationmarkNotificationReadArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationmoveActivityArgs = {
-  id: Scalars['ID']['input'];
-  ordre: Scalars['Int']['input'];
-  parentId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type MutationpurgerToutesDonneesArgs = {
-  confirmationPhrase: Scalars['String']['input'];
-};
-
-
-export type MutationreinitialiserMdpArgs = {
-  input: ReinitialisationMdpInput;
-};
-
-
-export type MutationremoveProjectModeratorArgs = {
-  projetId: Scalars['ID']['input'];
-  userId: Scalars['ID']['input'];
-};
-
-
-export type MutationremoveProjectUserArgs = {
-  projetId: Scalars['ID']['input'];
-  userId: Scalars['ID']['input'];
-};
-
-
-export type MutationreorderActivitiesArgs = {
-  ids: Array<Scalars['ID']['input']>;
-};
-
-
-export type MutationrequestExportArgs = {
-  input: ExportInput;
-};
-
-
-export type MutationresolveAbsenceConflictArgs = {
-  absenceId: Scalars['ID']['input'];
-  resolution: ConflictResolution;
-};
-
-
-export type MutationrestoreActivityArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationrestoreProjectArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationrestoreUserArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationsetProjectActivitiesArgs = {
-  activiteIds: Array<Scalars['ID']['input']>;
-  projetId: Scalars['ID']['input'];
-};
-
-
-export type MutationshowActivityForUserArgs = {
-  activiteId: Scalars['ID']['input'];
-  projetId: Scalars['ID']['input'];
-  userId: Scalars['ID']['input'];
-};
-
-
-export type MutationsupprimerDonneesUtilisateurArgs = {
-  confirmationNom: Scalars['String']['input'];
-  userId: Scalars['ID']['input'];
-};
-
-
-export type MutationsupprimerExportArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationsyncAbsencesArgs = {
-  dateDebut: Scalars['Date']['input'];
-  dateFin: Scalars['Date']['input'];
-  userId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type MutationupdateActivityArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateActivityInput;
-};
-
-
-export type MutationupdateProjectArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateProjectInput;
-};
-
-
-export type MutationupdateSettingArgs = {
-  cle: Scalars['String']['input'];
-  valeur: Scalars['JSON']['input'];
-};
-
-
-export type MutationupdateSettingsArgs = {
-  settings: Array<SettingInput>;
-};
-
-
-export type MutationupdateTeamArgs = {
-  id: Scalars['ID']['input'];
-  input: TeamInput;
-};
-
-
-export type MutationupdateTimeEntryArgs = {
-  id: Scalars['ID']['input'];
-  input: TimeEntryInput;
-};
-
-
-export type MutationupdateUserArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateUserInput;
-};
-
-/** Notification utilisateur */
-export type Notification = {
-  __typename?: 'Notification';
-  /** Date d'envoi */
-  createdAt: Scalars['DateTime']['output'];
-  /** Donnees supplementaires (JSON) */
-  donnees?: Maybe<Scalars['JSON']['output']>;
-  /** Indique si la notification a ete lue */
-  estLu: Scalars['Boolean']['output'];
-  /** Identifiant unique */
-  id: Scalars['ID']['output'];
-  /** Date de lecture */
-  luLe?: Maybe<Scalars['DateTime']['output']>;
-  /** Contenu de la notification */
-  message: Scalars['String']['output'];
-  /** Titre de la notification */
-  titre: Scalars['String']['output'];
-  /** Type de notification */
-  type: Scalars['String']['output'];
-  /** Utilisateur destinataire */
-  utilisateur: User;
-};
-
-/** Type de notification */
-export type NotificationType =
-  /** Absence importee depuis l'API RH */
-  | 'ABSENCE_IMPORTEE'
-  /** Conflit entre une absence et des saisies existantes */
-  | 'CONFLIT_ABSENCE'
-  /** Export CSV pret a telecharger */
-  | 'EXPORT_PRET'
-  /** Saisie incomplete sur un ou plusieurs jours */
-  | 'SAISIE_INCOMPLETE'
-  /** Notification systeme generale */
-  | 'SYSTEME';
-
-/** Allows ordering a list of records. */
-export type OrderByClause = {
-  /** The column that is used for ordering. */
-  column: Scalars['String']['input'];
-  /** The direction that is used for ordering. */
-  order: SortOrder;
-};
-
-/** Aggregate functions when ordering by a relation without specifying a column. */
-export type OrderByRelationAggregateFunction =
-  /** Amount of items. */
-  | 'COUNT';
-
-/** Aggregate functions when ordering by a relation that may specify a column. */
-export type OrderByRelationWithColumnAggregateFunction =
-  /** Average. */
-  | 'AVG'
-  /** Amount of items. */
-  | 'COUNT'
-  /** Maximum. */
-  | 'MAX'
-  /** Minimum. */
-  | 'MIN'
-  /** Sum. */
-  | 'SUM';
-
-/** Information about pagination using a fully featured paginator. */
-export type PaginatorInfo = {
-  __typename?: 'PaginatorInfo';
-  /** Number of items in the current page. */
-  count: Scalars['Int']['output'];
-  /** Index of the current page. */
-  currentPage: Scalars['Int']['output'];
-  /** Index of the first item in the current page. */
-  firstItem?: Maybe<Scalars['Int']['output']>;
-  /** Are there more pages after this one? */
-  hasMorePages: Scalars['Boolean']['output'];
-  /** Index of the last item in the current page. */
-  lastItem?: Maybe<Scalars['Int']['output']>;
-  /** Index of the last available page. */
-  lastPage: Scalars['Int']['output'];
-  /** Number of items per page. */
-  perPage: Scalars['Int']['output'];
-  /** Number of total available items. */
-  total: Scalars['Int']['output'];
-};
-
-/** Projet */
-export type Project = {
-  __typename?: 'Project';
-  /** Activites explicitement activees sur ce projet */
-  activitesActives: Array<Activity>;
-  /** Code court unique */
-  code: Scalars['String']['output'];
-  /** Date de creation */
-  createdAt: Scalars['DateTime']['output'];
-  /** Date de debut du projet */
-  dateDebut?: Maybe<Scalars['Date']['output']>;
-  /** Date de fin du projet */
-  dateFin?: Maybe<Scalars['Date']['output']>;
-  /** Description du projet */
-  description?: Maybe<Scalars['String']['output']>;
-  /** Indique si le projet est actif */
-  estActif: Scalars['Boolean']['output'];
-  /** Identifiant unique */
-  id: Scalars['ID']['output'];
-  /** Moderateurs du projet */
-  moderateurs: Array<User>;
-  /** Nom du projet */
-  nom: Scalars['String']['output'];
-  /** Saisies sur ce projet */
-  saisies: Array<TimeEntry>;
-  /** Temps total sur une periode */
-  tempsTotal: Scalars['Float']['output'];
-  /** Date de derniere modification */
-  updatedAt: Scalars['DateTime']['output'];
-  /** Utilisateurs affectes au projet */
-  utilisateurs: Array<User>;
-};
-
-
-/** Projet */
-export type ProjectsaisiesArgs = {
-  dateDebut?: InputMaybe<Scalars['Date']['input']>;
-  dateFin?: InputMaybe<Scalars['Date']['input']>;
-};
-
-
-/** Projet */
-export type ProjecttempsTotalArgs = {
-  dateDebut: Scalars['Date']['input'];
-  dateFin: Scalars['Date']['input'];
-};
-
-/** Statistiques par projet */
-export type ProjectStat = {
-  __typename?: 'ProjectStat';
-  /** Pourcentage du temps total */
-  pourcentage: Scalars['Float']['output'];
-  /** Projet concerne */
-  projet: Project;
-  /** Temps total en ETP */
-  tempsTotal: Scalars['Float']['output'];
-};
-
-export type Query = {
-  __typename?: 'Query';
-  /** Absences (avec detection des chevauchements) */
-  absences: Array<Absence>;
-  /** Une activite par ID */
-  activite?: Maybe<Activity>;
-  /** Activites disponibles pour un projet */
-  activitesDisponibles: Array<Activity>;
-  /** Anomalies detectees dans les saisies */
-  anomalies: Array<Anomaly>;
-  /** Arborescence complete des activites (hors activites systeme) */
-  arbreActivites: Array<Activity>;
-  /** Une equipe par ID */
-  equipe?: Maybe<Team>;
-  /** Liste des equipes */
-  equipes: Array<Team>;
-  /** Utilisateur connecte */
-  me?: Maybe<User>;
-  /** Mes exports CSV (du plus recent au plus ancien) */
-  mesExports: Array<ExportJob>;
-  /** Mes notifications */
-  mesNotifications: Array<Notification>;
-  /** Saisies de la semaine (pour soi-meme ou un utilisateur modere) */
-  mesSaisiesSemaine: Array<TimeEntry>;
-  /** Nombre de notifications non lues */
-  nombreNotificationsNonLues: Scalars['Int']['output'];
-  /** Un parametre par cle */
-  parametre?: Maybe<Setting>;
-  /** Liste des parametres systeme */
-  parametres: Array<Setting>;
-  /** Un projet par ID */
-  projet?: Maybe<Project>;
-  /** Liste des projets */
-  projets: Array<Project>;
-  /** Restrictions de visibilite d'un projet */
-  restrictionsVisibilite: Array<ActivityVisibility>;
-  /** Saisies de temps (filtrees par droits d'acces) */
-  saisies: Array<TimeEntry>;
-  /** Statistiques agregees sur une periode */
-  statistiques: Statistics;
-  /** Un utilisateur par ID */
-  user?: Maybe<User>;
-  /** Liste des utilisateurs */
-  users: UserPaginator;
-  /** Utilisateurs dont le moderateur peut gerer les saisies */
-  utilisateursModerables: Array<User>;
-};
-
-
-export type QueryabsencesArgs = {
-  dateDebut: Scalars['Date']['input'];
-  dateFin: Scalars['Date']['input'];
-  userId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryactiviteArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryactivitesDisponiblesArgs = {
-  projetId: Scalars['ID']['input'];
-};
-
-
-export type QueryanomaliesArgs = {
-  dateDebut: Scalars['Date']['input'];
-  dateFin: Scalars['Date']['input'];
-  equipeId?: InputMaybe<Scalars['ID']['input']>;
-  projetId?: InputMaybe<Scalars['ID']['input']>;
-  types?: InputMaybe<Array<AnomalyType>>;
-  userId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryequipeArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryequipesArgs = {
-  actifSeulement?: InputMaybe<Scalars['Boolean']['input']>;
-};
-
-
-export type QuerymesNotificationsArgs = {
-  limite?: InputMaybe<Scalars['Int']['input']>;
-  nonLuSeulement?: InputMaybe<Scalars['Boolean']['input']>;
-};
-
-
-export type QuerymesSaisiesSemaineArgs = {
-  semaine: Scalars['String']['input'];
-  userId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryparametreArgs = {
-  cle: Scalars['String']['input'];
-};
-
-
-export type QueryprojetArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryprojetsArgs = {
-  actif?: InputMaybe<Scalars['Boolean']['input']>;
-  moderateurId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryrestrictionsVisibiliteArgs = {
-  projetId: Scalars['ID']['input'];
-};
-
-
-export type QuerysaisiesArgs = {
-  activiteId?: InputMaybe<Scalars['ID']['input']>;
-  dateDebut: Scalars['Date']['input'];
-  dateFin: Scalars['Date']['input'];
-  projetId?: InputMaybe<Scalars['ID']['input']>;
-  userId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QuerystatistiquesArgs = {
-  dateDebut: Scalars['Date']['input'];
-  dateFin: Scalars['Date']['input'];
-  equipeId?: InputMaybe<Scalars['ID']['input']>;
-  projetId?: InputMaybe<Scalars['ID']['input']>;
-  userId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryuserArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryusersArgs = {
-  actifSeulement?: InputMaybe<Scalars['Boolean']['input']>;
-  equipeId?: InputMaybe<Scalars['ID']['input']>;
-  first?: Scalars['Int']['input'];
-  page?: InputMaybe<Scalars['Int']['input']>;
-  role?: InputMaybe<UserRole>;
-  search?: InputMaybe<Scalars['String']['input']>;
+  password: string;
 };
 
 /** Reinitialisation du mot de passe avec token */
 export type ReinitialisationMdpInput = {
   /** Adresse email du compte (max 80 caracteres) */
-  email: Scalars['String']['input'];
+  email: string;
   /** Nouveau mot de passe (8 caracteres minimum, 80 maximum) */
-  password: Scalars['String']['input'];
+  password: string;
   /** Confirmation du nouveau mot de passe (max 80 caracteres) */
-  password_confirmation: Scalars['String']['input'];
+  password_confirmation: string;
   /** Token recu par email */
-  token: Scalars['String']['input'];
-};
-
-export type ResultatPurge = {
-  __typename?: 'ResultatPurge';
-  absencesSupprimees: Scalars['Int']['output'];
-  exportsSupprimees: Scalars['Int']['output'];
-  logsSupprimees: Scalars['Int']['output'];
-  notificationsSupprimees: Scalars['Int']['output'];
-  saisiesSupprimees: Scalars['Int']['output'];
-};
-
-export type ResultatSuppressionRgpd = {
-  __typename?: 'ResultatSuppressionRgpd';
-  absencesSupprimees: Scalars['Int']['output'];
-  exportsSupprimees: Scalars['Int']['output'];
-  logsAnonymises: Scalars['Int']['output'];
-  notificationsSupprimees: Scalars['Int']['output'];
-  saisiesSupprimees: Scalars['Int']['output'];
-};
-
-/** Parametre systeme */
-export type Setting = {
-  __typename?: 'Setting';
-  /** Cle unique du parametre */
-  cle: Scalars['String']['output'];
-  /** Date de creation */
-  createdAt: Scalars['DateTime']['output'];
-  /** Description du parametre */
-  description?: Maybe<Scalars['String']['output']>;
-  /** Identifiant unique */
-  id: Scalars['ID']['output'];
-  /** Date de derniere modification */
-  updatedAt: Scalars['DateTime']['output'];
-  /** Valeur du parametre (JSON) */
-  valeur: Scalars['JSON']['output'];
+  token: string;
 };
 
 /** Parametre systeme */
 export type SettingInput = {
   /** Cle du parametre */
-  cle: Scalars['String']['input'];
+  cle: string;
   /** Nouvelle valeur (JSON) */
-  valeur: Scalars['JSON']['input'];
-};
-
-/** Directions for ordering a list of records. */
-export type SortOrder =
-  /** Sort records in ascending order. */
-  | 'ASC'
-  /** Sort records in descending order. */
-  | 'DESC';
-
-/** Statistiques agregees sur une periode */
-export type Statistics = {
-  __typename?: 'Statistics';
-  /** Repartition du temps par activite */
-  parActivite: Array<ActivityStat>;
-  /** Detail jour par jour */
-  parJour: Array<DayStat>;
-  /** Repartition du temps par projet */
-  parProjet: Array<ProjectStat>;
-  /** Repartition du temps par utilisateur (moderateurs/admins) */
-  parUtilisateur: Array<UserStat>;
-  /** Temps total en ETP sur la periode */
-  tempsTotal: Scalars['Float']['output'];
-};
-
-/** Resultat d'une synchronisation d'absences */
-export type SyncResult = {
-  __typename?: 'SyncResult';
-  /** Nombre de conflits detectes */
-  conflits: Scalars['Int']['output'];
-  /** Liste des messages d'erreur */
-  erreurs: Array<Scalars['String']['output']>;
-  /** Nombre d'absences importees */
-  importes: Scalars['Int']['output'];
-};
-
-/** Equipe ou service */
-export type Team = {
-  __typename?: 'Team';
-  /** Code court unique */
-  code: Scalars['String']['output'];
-  /** Date de creation */
-  createdAt: Scalars['DateTime']['output'];
-  /** Description de l'equipe */
-  description?: Maybe<Scalars['String']['output']>;
-  /** Indique si l'equipe est active */
-  estActif: Scalars['Boolean']['output'];
-  /** Identifiant unique */
-  id: Scalars['ID']['output'];
-  /** Membres de l'equipe */
-  membres: Array<User>;
-  /** Nom de l'equipe */
-  nom: Scalars['String']['output'];
-  /** Date de derniere modification */
-  updatedAt: Scalars['DateTime']['output'];
+  valeur: unknown;
 };
 
 /** Donnees d'une equipe */
 export type TeamInput = {
   /** Code court unique */
-  code: Scalars['String']['input'];
+  code: string;
   /** Description de l'equipe */
-  description?: InputMaybe<Scalars['String']['input']>;
+  description?: string | null | undefined;
   /** Activer ou desactiver l'equipe */
-  estActif?: InputMaybe<Scalars['Boolean']['input']>;
+  estActif?: boolean | null | undefined;
   /** Nom de l'equipe */
-  nom: Scalars['String']['input'];
-};
-
-/** Saisie de temps */
-export type TimeEntry = {
-  __typename?: 'TimeEntry';
-  /** Activite concernee */
-  activite: Activity;
-  /** Commentaire optionnel */
-  commentaire?: Maybe<Scalars['String']['output']>;
-  /** Date de creation */
-  createdAt: Scalars['DateTime']['output'];
-  /** Date de la saisie */
-  date: Scalars['Date']['output'];
-  /** Duree en ETP (0.01 a 1.00) */
-  duree: Scalars['Float']['output'];
-  /** Historique des modifications */
-  historique: Array<TimeEntryLog>;
-  /** Identifiant unique */
-  id: Scalars['ID']['output'];
-  /** Projet concerne */
-  projet: Project;
-  /** Date de derniere modification */
-  updatedAt: Scalars['DateTime']['output'];
-  /** Utilisateur qui a fait la saisie */
-  utilisateur: User;
+  nom: string;
 };
 
 /** Donnees d'une saisie de temps */
 export type TimeEntryInput = {
   /** Identifiant de l'activite */
-  activiteId: Scalars['ID']['input'];
+  activiteId: string | number;
   /** Commentaire optionnel (1000 caracteres max) */
-  commentaire?: InputMaybe<Scalars['String']['input']>;
+  commentaire?: string | null | undefined;
   /** Date de la saisie */
-  date: Scalars['Date']['input'];
+  date: unknown;
   /** Duree en ETP (0.01 a 1.00) */
-  duree: Scalars['Float']['input'];
+  duree: number;
   /** Identifiant du projet */
-  projetId: Scalars['ID']['input'];
+  projetId: string | number;
   /** Utilisateur cible (moderateurs/admins uniquement) */
-  userId?: InputMaybe<Scalars['ID']['input']>;
+  userId?: string | number | null | undefined;
 };
-
-/** Historique d'une saisie */
-export type TimeEntryLog = {
-  __typename?: 'TimeEntryLog';
-  /** Type d'action effectuee */
-  action: LogAction;
-  /** Commentaire avant modification */
-  ancienCommentaire?: Maybe<Scalars['String']['output']>;
-  /** Duree avant modification */
-  ancienneDuree?: Maybe<Scalars['Float']['output']>;
-  /** Utilisateur ayant fait la modification */
-  auteur: User;
-  /** Date de la modification */
-  createdAt: Scalars['DateTime']['output'];
-  /** Identifiant unique */
-  id: Scalars['ID']['output'];
-  /** Commentaire apres modification */
-  nouveauCommentaire?: Maybe<Scalars['String']['output']>;
-  /** Duree apres modification */
-  nouvelleDuree?: Maybe<Scalars['Float']['output']>;
-  /** Saisie concernee */
-  saisie: TimeEntry;
-};
-
-/** Specify if you want to include or exclude trashed results from a query. */
-export type Trashed =
-  /** Only return trashed results. */
-  | 'ONLY'
-  /** Return both trashed and non-trashed results. */
-  | 'WITH'
-  /** Only return non-trashed results. */
-  | 'WITHOUT';
 
 /** Modification d'une activite */
 export type UpdateActivityInput = {
   /** Code court */
-  code?: InputMaybe<Scalars['String']['input']>;
+  code?: string | null | undefined;
   /** Description de l'activite */
-  description?: InputMaybe<Scalars['String']['input']>;
+  description?: string | null | undefined;
   /** Activer ou desactiver l'activite */
-  estActif?: InputMaybe<Scalars['Boolean']['input']>;
+  estActif?: boolean | null | undefined;
   /** Nom de l'activite */
-  nom?: InputMaybe<Scalars['String']['input']>;
+  nom?: string | null | undefined;
   /** Ordre d'affichage */
-  ordre?: InputMaybe<Scalars['Int']['input']>;
+  ordre?: number | null | undefined;
   /** ID de l'activite parente (null = racine) */
-  parentId?: InputMaybe<Scalars['ID']['input']>;
+  parentId?: string | number | null | undefined;
 };
 
 /** Modification d'un projet */
 export type UpdateProjectInput = {
   /** Code court */
-  code?: InputMaybe<Scalars['String']['input']>;
+  code?: string | null | undefined;
   /** Date de debut du projet */
-  dateDebut?: InputMaybe<Scalars['Date']['input']>;
+  dateDebut?: unknown;
   /** Date de fin du projet */
-  dateFin?: InputMaybe<Scalars['Date']['input']>;
+  dateFin?: unknown;
   /** Description du projet */
-  description?: InputMaybe<Scalars['String']['input']>;
+  description?: string | null | undefined;
   /** Activer ou desactiver le projet */
-  estActif?: InputMaybe<Scalars['Boolean']['input']>;
+  estActif?: boolean | null | undefined;
   /** Nom du projet */
-  nom?: InputMaybe<Scalars['String']['input']>;
+  nom?: string | null | undefined;
 };
 
 /** Modification d'un utilisateur */
 export type UpdateUserInput = {
   /** Adresse email */
-  email?: InputMaybe<Scalars['String']['input']>;
+  email?: string | null | undefined;
   /** Identifiant de l'equipe */
-  equipeId?: InputMaybe<Scalars['ID']['input']>;
+  equipeId?: string | number | null | undefined;
   /** Activer ou desactiver le compte */
-  estActif?: InputMaybe<Scalars['Boolean']['input']>;
+  estActif?: boolean | null | undefined;
   /** Matricule interne */
-  matricule?: InputMaybe<Scalars['String']['input']>;
+  matricule?: string | null | undefined;
   /** Nom de famille */
-  nom?: InputMaybe<Scalars['String']['input']>;
+  nom?: string | null | undefined;
   /** Nouveau mot de passe (8 caracteres minimum) */
-  password?: InputMaybe<Scalars['String']['input']>;
+  password?: string | null | undefined;
   /** Prenom */
-  prenom?: InputMaybe<Scalars['String']['input']>;
+  prenom?: string | null | undefined;
   /** Role dans le systeme */
-  role?: InputMaybe<UserRole>;
-};
-
-/** Utilisateur du systeme */
-export type User = {
-  __typename?: 'User';
-  /** Absences de l'utilisateur */
-  absences: Array<Absence>;
-  /** Date de creation du compte */
-  createdAt: Scalars['DateTime']['output'];
-  /** Adresse email */
-  email: Scalars['String']['output'];
-  /** Equipe de l'utilisateur */
-  equipe?: Maybe<Team>;
-  /** Indique si le compte est actif */
-  estActif: Scalars['Boolean']['output'];
-  /** Identifiant unique */
-  id: Scalars['ID']['output'];
-  /** Matricule interne (optionnel) */
-  matricule?: Maybe<Scalars['String']['output']>;
-  /** Nom de famille */
-  nom: Scalars['String']['output'];
-  /** Nom complet (prenom + nom) */
-  nomComplet: Scalars['String']['output'];
-  /** Notifications de l'utilisateur */
-  notifications: Array<Notification>;
-  /** Prenom */
-  prenom: Scalars['String']['output'];
-  /** Projets auxquels l'utilisateur est affecte */
-  projets: Array<Project>;
-  /** Projets que l'utilisateur modere */
-  projetsModeres: Array<Project>;
-  /** Role dans le systeme */
-  role: UserRole;
-  /** Saisies de l'utilisateur */
-  saisies: Array<TimeEntry>;
-  /** Date de derniere modification */
-  updatedAt: Scalars['DateTime']['output'];
-};
-
-
-/** Utilisateur du systeme */
-export type UserabsencesArgs = {
-  dateDebut?: InputMaybe<Scalars['Date']['input']>;
-  dateFin?: InputMaybe<Scalars['Date']['input']>;
-};
-
-
-/** Utilisateur du systeme */
-export type UsernotificationsArgs = {
-  nonLuSeulement?: InputMaybe<Scalars['Boolean']['input']>;
-};
-
-
-/** Utilisateur du systeme */
-export type UsersaisiesArgs = {
-  dateDebut?: InputMaybe<Scalars['Date']['input']>;
-  dateFin?: InputMaybe<Scalars['Date']['input']>;
-  projectId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-/** A paginated list of User items. */
-export type UserPaginator = {
-  __typename?: 'UserPaginator';
-  /** A list of User items. */
-  data: Array<User>;
-  /** Pagination information about the list of items. */
-  paginatorInfo: PaginatorInfo;
+  role?: UserRole | null | undefined;
 };
 
 /** Role d'un utilisateur dans le systeme */
@@ -1307,539 +258,528 @@ export type UserRole =
   /** Utilisateur standard (saisie personnelle uniquement) */
   | 'UTILISATEUR';
 
-/** Statistiques par utilisateur */
-export type UserStat = {
-  __typename?: 'UserStat';
-  /** Taux de completion par rapport aux jours ouvres (%) */
-  tauxCompletion: Scalars['Float']['output'];
-  /** Temps total en ETP */
-  tempsTotal: Scalars['Float']['output'];
-  /** Utilisateur concerne */
-  utilisateur: User;
-};
+export type ActivityFieldsFragment = { id: string, nom: string, code: string | null, description: string | null, chemin: string, cheminComplet: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean };
 
-export type ActivityFieldsFragment = { __typename?: 'Activity', id: string, nom: string, code?: string | null, description?: string | null, chemin: string, cheminComplet: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean };
-
-export type ActivityTreeFieldsFragment = { __typename?: 'Activity', id: string, nom: string, code?: string | null, description?: string | null, chemin: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean, enfants: Array<{ __typename?: 'Activity', id: string, nom: string, code?: string | null, description?: string | null, chemin: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean, enfants: Array<{ __typename?: 'Activity', id: string, nom: string, code?: string | null, chemin: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean, enfants: Array<{ __typename?: 'Activity', id: string, nom: string, code?: string | null, chemin: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean }> }> }> };
+export type ActivityTreeFieldsFragment = { id: string, nom: string, code: string | null, description: string | null, chemin: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean, enfants: Array<{ id: string, nom: string, code: string | null, description: string | null, chemin: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean, enfants: Array<{ id: string, nom: string, code: string | null, chemin: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean, enfants: Array<{ id: string, nom: string, code: string | null, chemin: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean }> }> }> };
 
 export type ArbreActivitesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ArbreActivitesQuery = { __typename?: 'Query', arbreActivites: Array<{ __typename?: 'Activity', id: string, nom: string, code?: string | null, description?: string | null, chemin: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean, enfants: Array<{ __typename?: 'Activity', id: string, nom: string, code?: string | null, description?: string | null, chemin: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean, enfants: Array<{ __typename?: 'Activity', id: string, nom: string, code?: string | null, chemin: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean, enfants: Array<{ __typename?: 'Activity', id: string, nom: string, code?: string | null, chemin: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean }> }> }> }> };
+export type ArbreActivitesQuery = { arbreActivites: Array<{ id: string, nom: string, code: string | null, description: string | null, chemin: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean, enfants: Array<{ id: string, nom: string, code: string | null, description: string | null, chemin: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean, enfants: Array<{ id: string, nom: string, code: string | null, chemin: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean, enfants: Array<{ id: string, nom: string, code: string | null, chemin: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean }> }> }> }> };
 
 export type CreateActivityMutationVariables = Exact<{
   input: CreateActivityInput;
 }>;
 
 
-export type CreateActivityMutation = { __typename?: 'Mutation', createActivity: { __typename?: 'Activity', id: string, nom: string, code?: string | null, description?: string | null, chemin: string, cheminComplet: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean } };
+export type CreateActivityMutation = { createActivity: { id: string, nom: string, code: string | null, description: string | null, chemin: string, cheminComplet: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean } };
 
 export type UpdateActivityMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
   input: UpdateActivityInput;
 }>;
 
 
-export type UpdateActivityMutation = { __typename?: 'Mutation', updateActivity: { __typename?: 'Activity', id: string, nom: string, code?: string | null, description?: string | null, chemin: string, cheminComplet: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean } };
+export type UpdateActivityMutation = { updateActivity: { id: string, nom: string, code: string | null, description: string | null, chemin: string, cheminComplet: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean } };
 
 export type DeleteActivityMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteActivityMutation = { __typename?: 'Mutation', deleteActivity: boolean };
+export type DeleteActivityMutation = { deleteActivity: boolean };
 
 export type MoveActivityMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  parentId?: InputMaybe<Scalars['ID']['input']>;
-  ordre: Scalars['Int']['input'];
+  id: string | number;
+  parentId?: string | number | null | undefined;
+  ordre: number;
 }>;
 
 
-export type MoveActivityMutation = { __typename?: 'Mutation', moveActivity: { __typename?: 'Activity', id: string, nom: string, code?: string | null, description?: string | null, chemin: string, cheminComplet: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean } };
+export type MoveActivityMutation = { moveActivity: { id: string, nom: string, code: string | null, description: string | null, chemin: string, cheminComplet: string, niveau: number, ordre: number, estFeuille: boolean, estSysteme: boolean, estActif: boolean } };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'AuthPayload', user: { __typename?: 'User', id: string, nom: string, prenom: string, email: string, role: UserRole, equipe?: { __typename?: 'Team', id: string, nom: string, code: string } | null } } };
+export type LoginMutation = { login: { user: { id: string, nom: string, prenom: string, email: string, role: UserRole, equipe: { id: string, nom: string, code: string } | null } } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
+export type LogoutMutation = { logout: boolean };
 
 export type DemanderReinitialisationMdpMutationVariables = Exact<{
   input: DemanderReinitialisationMdpInput;
 }>;
 
 
-export type DemanderReinitialisationMdpMutation = { __typename?: 'Mutation', demanderReinitialisationMdp: boolean };
+export type DemanderReinitialisationMdpMutation = { demanderReinitialisationMdp: boolean };
 
 export type ReinitialiserMdpMutationVariables = Exact<{
   input: ReinitialisationMdpInput;
 }>;
 
 
-export type ReinitialiserMdpMutation = { __typename?: 'Mutation', reinitialiserMdp: boolean };
+export type ReinitialiserMdpMutation = { reinitialiserMdp: boolean };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string, nom: string, prenom: string, email: string, role: UserRole, equipe?: { __typename?: 'Team', id: string, nom: string, code: string } | null } | null };
+export type MeQuery = { me: { id: string, nom: string, prenom: string, email: string, role: UserRole, equipe: { id: string, nom: string, code: string } | null } | null };
 
 export type RequestExportMutationVariables = Exact<{
   input: ExportInput;
 }>;
 
 
-export type RequestExportMutation = { __typename?: 'Mutation', requestExport: { __typename?: 'ExportJob', id: string, statut: ExportStatus, filtres?: any | null, expireLe?: any | null, creeLe: any } };
+export type RequestExportMutation = { requestExport: { id: string, statut: ExportStatus, filtres: unknown, expireLe: unknown, creeLe: unknown } };
 
 export type MesExportsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MesExportsQuery = { __typename?: 'Query', mesExports: Array<{ __typename?: 'ExportJob', id: string, statut: ExportStatus, filtres?: any | null, expireLe?: any | null, creeLe: any }> };
+export type MesExportsQuery = { mesExports: Array<{ id: string, statut: ExportStatus, filtres: unknown, expireLe: unknown, creeLe: unknown }> };
 
 export type DesactiverExportMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DesactiverExportMutation = { __typename?: 'Mutation', desactiverExport: { __typename?: 'ExportJob', id: string, statut: ExportStatus, filtres?: any | null, expireLe?: any | null, creeLe: any } };
+export type DesactiverExportMutation = { desactiverExport: { id: string, statut: ExportStatus, filtres: unknown, expireLe: unknown, creeLe: unknown } };
 
 export type SupprimerExportMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type SupprimerExportMutation = { __typename?: 'Mutation', supprimerExport: boolean };
+export type SupprimerExportMutation = { supprimerExport: boolean };
 
-export type NotificationFieldsFragment = { __typename?: 'Notification', id: string, type: string, titre: string, message: string, donnees?: any | null, estLu: boolean, luLe?: any | null, createdAt: any };
+export type NotificationFieldsFragment = { id: string, type: string, titre: string, message: string, donnees: unknown, estLu: boolean, luLe: unknown, createdAt: unknown };
 
 export type MesNotificationsQueryVariables = Exact<{
-  nonLuSeulement?: InputMaybe<Scalars['Boolean']['input']>;
-  limite?: InputMaybe<Scalars['Int']['input']>;
+  nonLuSeulement?: boolean | null | undefined;
+  limite?: number | null | undefined;
 }>;
 
 
-export type MesNotificationsQuery = { __typename?: 'Query', mesNotifications: Array<{ __typename?: 'Notification', id: string, type: string, titre: string, message: string, donnees?: any | null, estLu: boolean, luLe?: any | null, createdAt: any }> };
+export type MesNotificationsQuery = { mesNotifications: Array<{ id: string, type: string, titre: string, message: string, donnees: unknown, estLu: boolean, luLe: unknown, createdAt: unknown }> };
 
 export type NombreNotificationsNonLuesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type NombreNotificationsNonLuesQuery = { __typename?: 'Query', nombreNotificationsNonLues: number };
+export type NombreNotificationsNonLuesQuery = { nombreNotificationsNonLues: number };
 
 export type MarkNotificationReadMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type MarkNotificationReadMutation = { __typename?: 'Mutation', markNotificationRead: { __typename?: 'Notification', id: string, type: string, titre: string, message: string, donnees?: any | null, estLu: boolean, luLe?: any | null, createdAt: any } };
+export type MarkNotificationReadMutation = { markNotificationRead: { id: string, type: string, titre: string, message: string, donnees: unknown, estLu: boolean, luLe: unknown, createdAt: unknown } };
 
 export type MarkAllNotificationsReadMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MarkAllNotificationsReadMutation = { __typename?: 'Mutation', markAllNotificationsRead: boolean };
+export type MarkAllNotificationsReadMutation = { markAllNotificationsRead: boolean };
 
 export type DeleteNotificationMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteNotificationMutation = { __typename?: 'Mutation', deleteNotification: boolean };
+export type DeleteNotificationMutation = { deleteNotification: boolean };
 
 export type DeleteAllNotificationsMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DeleteAllNotificationsMutation = { __typename?: 'Mutation', deleteAllNotifications: boolean };
+export type DeleteAllNotificationsMutation = { deleteAllNotifications: boolean };
 
 export type ResolveAbsenceConflictMutationVariables = Exact<{
-  absenceId: Scalars['ID']['input'];
+  absenceId: string | number;
   resolution: ConflictResolution;
 }>;
 
 
-export type ResolveAbsenceConflictMutation = { __typename?: 'Mutation', resolveAbsenceConflict: boolean };
+export type ResolveAbsenceConflictMutation = { resolveAbsenceConflict: boolean };
 
-export type ProjectFieldsFragment = { __typename?: 'Project', id: string, nom: string, code: string, description?: string | null, dateDebut?: any | null, dateFin?: any | null, estActif: boolean, createdAt: any };
+export type ProjectFieldsFragment = { id: string, nom: string, code: string, description: string | null, dateDebut: unknown, dateFin: unknown, estActif: boolean, createdAt: unknown };
 
-export type ProjectFullFieldsFragment = { __typename?: 'Project', id: string, nom: string, code: string, description?: string | null, dateDebut?: any | null, dateFin?: any | null, estActif: boolean, createdAt: any, moderateurs: Array<{ __typename?: 'User', id: string, nomComplet: string, email: string }>, utilisateurs: Array<{ __typename?: 'User', id: string, nomComplet: string, email: string }>, activitesActives: Array<{ __typename?: 'Activity', id: string, nom: string, chemin: string }> };
+export type ProjectFullFieldsFragment = { id: string, nom: string, code: string, description: string | null, dateDebut: unknown, dateFin: unknown, estActif: boolean, createdAt: unknown, moderateurs: Array<{ id: string, nomComplet: string, email: string }>, utilisateurs: Array<{ id: string, nomComplet: string, email: string }>, activitesActives: Array<{ id: string, nom: string, chemin: string }> };
 
 export type ProjetsQueryVariables = Exact<{
-  actif?: InputMaybe<Scalars['Boolean']['input']>;
-  moderateurId?: InputMaybe<Scalars['ID']['input']>;
+  actif?: boolean | null | undefined;
+  moderateurId?: string | number | null | undefined;
 }>;
 
 
-export type ProjetsQuery = { __typename?: 'Query', projets: Array<{ __typename?: 'Project', id: string, nom: string, code: string, description?: string | null, dateDebut?: any | null, dateFin?: any | null, estActif: boolean, createdAt: any, moderateurs: Array<{ __typename?: 'User', id: string, nomComplet: string }> }> };
+export type ProjetsQuery = { projets: Array<{ id: string, nom: string, code: string, description: string | null, dateDebut: unknown, dateFin: unknown, estActif: boolean, createdAt: unknown, moderateurs: Array<{ id: string, nomComplet: string }> }> };
 
 export type ProjetQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type ProjetQuery = { __typename?: 'Query', projet?: { __typename?: 'Project', id: string, nom: string, code: string, description?: string | null, dateDebut?: any | null, dateFin?: any | null, estActif: boolean, createdAt: any, moderateurs: Array<{ __typename?: 'User', id: string, nomComplet: string, email: string }>, utilisateurs: Array<{ __typename?: 'User', id: string, nomComplet: string, email: string }>, activitesActives: Array<{ __typename?: 'Activity', id: string, nom: string, chemin: string }> } | null };
+export type ProjetQuery = { projet: { id: string, nom: string, code: string, description: string | null, dateDebut: unknown, dateFin: unknown, estActif: boolean, createdAt: unknown, moderateurs: Array<{ id: string, nomComplet: string, email: string }>, utilisateurs: Array<{ id: string, nomComplet: string, email: string }>, activitesActives: Array<{ id: string, nom: string, chemin: string }> } | null };
 
 export type CreateProjectMutationVariables = Exact<{
   input: CreateProjectInput;
 }>;
 
 
-export type CreateProjectMutation = { __typename?: 'Mutation', createProject: { __typename?: 'Project', id: string, nom: string, code: string, description?: string | null, dateDebut?: any | null, dateFin?: any | null, estActif: boolean, createdAt: any, moderateurs: Array<{ __typename?: 'User', id: string, nomComplet: string, email: string }>, utilisateurs: Array<{ __typename?: 'User', id: string, nomComplet: string, email: string }>, activitesActives: Array<{ __typename?: 'Activity', id: string, nom: string, chemin: string }> } };
+export type CreateProjectMutation = { createProject: { id: string, nom: string, code: string, description: string | null, dateDebut: unknown, dateFin: unknown, estActif: boolean, createdAt: unknown, moderateurs: Array<{ id: string, nomComplet: string, email: string }>, utilisateurs: Array<{ id: string, nomComplet: string, email: string }>, activitesActives: Array<{ id: string, nom: string, chemin: string }> } };
 
 export type UpdateProjectMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
   input: UpdateProjectInput;
 }>;
 
 
-export type UpdateProjectMutation = { __typename?: 'Mutation', updateProject: { __typename?: 'Project', id: string, nom: string, code: string, description?: string | null, dateDebut?: any | null, dateFin?: any | null, estActif: boolean, createdAt: any, moderateurs: Array<{ __typename?: 'User', id: string, nomComplet: string, email: string }>, utilisateurs: Array<{ __typename?: 'User', id: string, nomComplet: string, email: string }>, activitesActives: Array<{ __typename?: 'Activity', id: string, nom: string, chemin: string }> } };
+export type UpdateProjectMutation = { updateProject: { id: string, nom: string, code: string, description: string | null, dateDebut: unknown, dateFin: unknown, estActif: boolean, createdAt: unknown, moderateurs: Array<{ id: string, nomComplet: string, email: string }>, utilisateurs: Array<{ id: string, nomComplet: string, email: string }>, activitesActives: Array<{ id: string, nom: string, chemin: string }> } };
 
 export type DeleteProjectMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteProjectMutation = { __typename?: 'Mutation', deleteProject: boolean };
+export type DeleteProjectMutation = { deleteProject: boolean };
 
 export type SetProjectActivitiesMutationVariables = Exact<{
-  projetId: Scalars['ID']['input'];
-  activiteIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+  projetId: string | number;
+  activiteIds: Array<string | number> | string | number;
 }>;
 
 
-export type SetProjectActivitiesMutation = { __typename?: 'Mutation', setProjectActivities: { __typename?: 'Project', id: string, nom: string, code: string, description?: string | null, dateDebut?: any | null, dateFin?: any | null, estActif: boolean, createdAt: any, moderateurs: Array<{ __typename?: 'User', id: string, nomComplet: string, email: string }>, utilisateurs: Array<{ __typename?: 'User', id: string, nomComplet: string, email: string }>, activitesActives: Array<{ __typename?: 'Activity', id: string, nom: string, chemin: string }> } };
+export type SetProjectActivitiesMutation = { setProjectActivities: { id: string, nom: string, code: string, description: string | null, dateDebut: unknown, dateFin: unknown, estActif: boolean, createdAt: unknown, moderateurs: Array<{ id: string, nomComplet: string, email: string }>, utilisateurs: Array<{ id: string, nomComplet: string, email: string }>, activitesActives: Array<{ id: string, nom: string, chemin: string }> } };
 
 export type AddProjectModeratorMutationVariables = Exact<{
-  projetId: Scalars['ID']['input'];
-  userId: Scalars['ID']['input'];
+  projetId: string | number;
+  userId: string | number;
 }>;
 
 
-export type AddProjectModeratorMutation = { __typename?: 'Mutation', addProjectModerator: { __typename?: 'Project', id: string, moderateurs: Array<{ __typename?: 'User', id: string, nomComplet: string }> } };
+export type AddProjectModeratorMutation = { addProjectModerator: { id: string, moderateurs: Array<{ id: string, nomComplet: string }> } };
 
 export type RemoveProjectModeratorMutationVariables = Exact<{
-  projetId: Scalars['ID']['input'];
-  userId: Scalars['ID']['input'];
+  projetId: string | number;
+  userId: string | number;
 }>;
 
 
-export type RemoveProjectModeratorMutation = { __typename?: 'Mutation', removeProjectModerator: { __typename?: 'Project', id: string, moderateurs: Array<{ __typename?: 'User', id: string, nomComplet: string }> } };
+export type RemoveProjectModeratorMutation = { removeProjectModerator: { id: string, moderateurs: Array<{ id: string, nomComplet: string }> } };
 
 export type SupprimerDonneesUtilisateurMutationVariables = Exact<{
-  userId: Scalars['ID']['input'];
-  confirmationNom: Scalars['String']['input'];
+  userId: string | number;
+  confirmationNom: string;
 }>;
 
 
-export type SupprimerDonneesUtilisateurMutation = { __typename?: 'Mutation', supprimerDonneesUtilisateur: { __typename?: 'ResultatSuppressionRgpd', saisiesSupprimees: number, absencesSupprimees: number, notificationsSupprimees: number, exportsSupprimees: number, logsAnonymises: number } };
+export type SupprimerDonneesUtilisateurMutation = { supprimerDonneesUtilisateur: { saisiesSupprimees: number, absencesSupprimees: number, notificationsSupprimees: number, exportsSupprimees: number, logsAnonymises: number } };
 
 export type PurgerToutesDonneesMutationVariables = Exact<{
-  confirmationPhrase: Scalars['String']['input'];
+  confirmationPhrase: string;
 }>;
 
 
-export type PurgerToutesDonneesMutation = { __typename?: 'Mutation', purgerToutesDonnees: { __typename?: 'ResultatPurge', saisiesSupprimees: number, logsSupprimees: number, absencesSupprimees: number, notificationsSupprimees: number, exportsSupprimees: number } };
+export type PurgerToutesDonneesMutation = { purgerToutesDonnees: { saisiesSupprimees: number, logsSupprimees: number, absencesSupprimees: number, notificationsSupprimees: number, exportsSupprimees: number } };
 
-export type SaisieFieldsFragment = { __typename?: 'TimeEntry', id: string, date: any, duree: number, commentaire?: string | null, projet: { __typename?: 'Project', id: string, nom: string, code: string }, activite: { __typename?: 'Activity', id: string, nom: string, chemin: string, cheminComplet: string } };
+export type SaisieFieldsFragment = { id: string, date: unknown, duree: number, commentaire: string | null, projet: { id: string, nom: string, code: string }, activite: { id: string, nom: string, chemin: string, cheminComplet: string } };
 
-export type ProjetFieldsFragment = { __typename?: 'Project', id: string, nom: string, code: string, estActif: boolean };
+export type ProjetFieldsFragment = { id: string, nom: string, code: string, estActif: boolean };
 
-export type ActiviteFieldsFragment = { __typename?: 'Activity', id: string, nom: string, chemin: string, cheminComplet: string, estFeuille: boolean, estActif: boolean };
+export type ActiviteFieldsFragment = { id: string, nom: string, chemin: string, cheminComplet: string, estFeuille: boolean, estActif: boolean };
 
 export type MesSaisiesSemaineQueryVariables = Exact<{
-  semaine: Scalars['String']['input'];
-  userId?: InputMaybe<Scalars['ID']['input']>;
+  semaine: string;
+  userId?: string | number | null | undefined;
 }>;
 
 
-export type MesSaisiesSemaineQuery = { __typename?: 'Query', mesSaisiesSemaine: Array<{ __typename?: 'TimeEntry', id: string, date: any, duree: number, commentaire?: string | null, projet: { __typename?: 'Project', id: string, nom: string, code: string }, activite: { __typename?: 'Activity', id: string, nom: string, chemin: string, cheminComplet: string } }> };
+export type MesSaisiesSemaineQuery = { mesSaisiesSemaine: Array<{ id: string, date: unknown, duree: number, commentaire: string | null, projet: { id: string, nom: string, code: string }, activite: { id: string, nom: string, chemin: string, cheminComplet: string } }> };
 
 export type UtilisateursModerablesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UtilisateursModerablesQuery = { __typename?: 'Query', utilisateursModerables: Array<{ __typename?: 'User', id: string, nom: string, prenom: string, nomComplet: string }> };
+export type UtilisateursModerablesQuery = { utilisateursModerables: Array<{ id: string, nom: string, prenom: string, nomComplet: string }> };
 
 export type ProjetsActifsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ProjetsActifsQuery = { __typename?: 'Query', projets: Array<{ __typename?: 'Project', id: string, nom: string, code: string, estActif: boolean }> };
+export type ProjetsActifsQuery = { projets: Array<{ id: string, nom: string, code: string, estActif: boolean }> };
 
 export type ActivitesDisponiblesQueryVariables = Exact<{
-  projetId: Scalars['ID']['input'];
+  projetId: string | number;
 }>;
 
 
-export type ActivitesDisponiblesQuery = { __typename?: 'Query', activitesDisponibles: Array<{ __typename?: 'Activity', id: string, nom: string, chemin: string, cheminComplet: string, estFeuille: boolean, estActif: boolean }> };
+export type ActivitesDisponiblesQuery = { activitesDisponibles: Array<{ id: string, nom: string, chemin: string, cheminComplet: string, estFeuille: boolean, estActif: boolean }> };
 
 export type AbsencesSemaineQueryVariables = Exact<{
-  dateDebut: Scalars['Date']['input'];
-  dateFin: Scalars['Date']['input'];
-  userId?: InputMaybe<Scalars['ID']['input']>;
+  dateDebut: unknown;
+  dateFin: unknown;
+  userId?: string | number | null | undefined;
 }>;
 
 
-export type AbsencesSemaineQuery = { __typename?: 'Query', absences: Array<{ __typename?: 'Absence', id: string, type: string, typeLibelle: string, dateDebut: any, dateFin: any, dureeJournaliere: number }> };
+export type AbsencesSemaineQuery = { absences: Array<{ id: string, type: string, typeLibelle: string, dateDebut: unknown, dateFin: unknown, dureeJournaliere: number }> };
 
 export type SyncAbsencesMutationVariables = Exact<{
-  dateDebut: Scalars['Date']['input'];
-  dateFin: Scalars['Date']['input'];
-  userId?: InputMaybe<Scalars['ID']['input']>;
+  dateDebut: unknown;
+  dateFin: unknown;
+  userId?: string | number | null | undefined;
 }>;
 
 
-export type SyncAbsencesMutation = { __typename?: 'Mutation', syncAbsences: { __typename?: 'SyncResult', importes: number, conflits: number, erreurs: Array<string> } };
+export type SyncAbsencesMutation = { syncAbsences: { importes: number, conflits: number, erreurs: Array<string> } };
 
 export type HistoriqueSaisieQueryVariables = Exact<{
-  semaineISO: Scalars['String']['input'];
-  userId?: InputMaybe<Scalars['ID']['input']>;
+  semaineISO: string;
+  userId?: string | number | null | undefined;
 }>;
 
 
-export type HistoriqueSaisieQuery = { __typename?: 'Query', mesSaisiesSemaine: Array<{ __typename?: 'TimeEntry', id: string, date: any, duree: number, projet: { __typename?: 'Project', id: string, code: string }, activite: { __typename?: 'Activity', id: string, nom: string }, historique: Array<{ __typename?: 'TimeEntryLog', id: string, action: LogAction, ancienneDuree?: number | null, nouvelleDuree?: number | null, ancienCommentaire?: string | null, nouveauCommentaire?: string | null, createdAt: any, auteur: { __typename?: 'User', nomComplet: string } }> }> };
+export type HistoriqueSaisieQuery = { mesSaisiesSemaine: Array<{ id: string, date: unknown, duree: number, projet: { id: string, code: string }, activite: { id: string, nom: string }, historique: Array<{ id: string, action: LogAction, ancienneDuree: number | null, nouvelleDuree: number | null, ancienCommentaire: string | null, nouveauCommentaire: string | null, createdAt: unknown, auteur: { nomComplet: string } }> }> };
 
 export type CreateTimeEntryMutationVariables = Exact<{
   input: TimeEntryInput;
 }>;
 
 
-export type CreateTimeEntryMutation = { __typename?: 'Mutation', createTimeEntry: { __typename?: 'TimeEntry', id: string, date: any, duree: number, commentaire?: string | null, projet: { __typename?: 'Project', id: string, nom: string, code: string }, activite: { __typename?: 'Activity', id: string, nom: string, chemin: string, cheminComplet: string } } };
+export type CreateTimeEntryMutation = { createTimeEntry: { id: string, date: unknown, duree: number, commentaire: string | null, projet: { id: string, nom: string, code: string }, activite: { id: string, nom: string, chemin: string, cheminComplet: string } } };
 
 export type UpdateTimeEntryMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
   input: TimeEntryInput;
 }>;
 
 
-export type UpdateTimeEntryMutation = { __typename?: 'Mutation', updateTimeEntry: { __typename?: 'TimeEntry', id: string, date: any, duree: number, commentaire?: string | null, projet: { __typename?: 'Project', id: string, nom: string, code: string }, activite: { __typename?: 'Activity', id: string, nom: string, chemin: string, cheminComplet: string } } };
+export type UpdateTimeEntryMutation = { updateTimeEntry: { id: string, date: unknown, duree: number, commentaire: string | null, projet: { id: string, nom: string, code: string }, activite: { id: string, nom: string, chemin: string, cheminComplet: string } } };
 
 export type DeleteTimeEntryMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteTimeEntryMutation = { __typename?: 'Mutation', deleteTimeEntry: boolean };
+export type DeleteTimeEntryMutation = { deleteTimeEntry: boolean };
 
 export type BulkCreateTimeEntriesMutationVariables = Exact<{
   inputs: Array<TimeEntryInput> | TimeEntryInput;
 }>;
 
 
-export type BulkCreateTimeEntriesMutation = { __typename?: 'Mutation', bulkCreateTimeEntries: Array<{ __typename?: 'TimeEntry', id: string, date: any, duree: number, commentaire?: string | null, projet: { __typename?: 'Project', id: string, nom: string, code: string }, activite: { __typename?: 'Activity', id: string, nom: string, chemin: string, cheminComplet: string } }> };
+export type BulkCreateTimeEntriesMutation = { bulkCreateTimeEntries: Array<{ id: string, date: unknown, duree: number, commentaire: string | null, projet: { id: string, nom: string, code: string }, activite: { id: string, nom: string, chemin: string, cheminComplet: string } }> };
 
 export type BulkUpdateTimeEntriesMutationVariables = Exact<{
   entries: Array<BulkUpdateEntry> | BulkUpdateEntry;
 }>;
 
 
-export type BulkUpdateTimeEntriesMutation = { __typename?: 'Mutation', bulkUpdateTimeEntries: Array<{ __typename?: 'TimeEntry', id: string, date: any, duree: number, commentaire?: string | null, projet: { __typename?: 'Project', id: string, nom: string, code: string }, activite: { __typename?: 'Activity', id: string, nom: string, chemin: string, cheminComplet: string } }> };
+export type BulkUpdateTimeEntriesMutation = { bulkUpdateTimeEntries: Array<{ id: string, date: unknown, duree: number, commentaire: string | null, projet: { id: string, nom: string, code: string }, activite: { id: string, nom: string, chemin: string, cheminComplet: string } }> };
 
 export type DeclarerAbsenceMutationVariables = Exact<{
-  date: Scalars['Date']['input'];
-  duree?: InputMaybe<Scalars['Float']['input']>;
-  type?: InputMaybe<Scalars['String']['input']>;
-  userId?: InputMaybe<Scalars['ID']['input']>;
+  date: unknown;
+  duree?: number | null | undefined;
+  type?: string | null | undefined;
+  userId?: string | number | null | undefined;
 }>;
 
 
-export type DeclarerAbsenceMutation = { __typename?: 'Mutation', declarerAbsence: boolean };
+export type DeclarerAbsenceMutation = { declarerAbsence: boolean };
 
 export type ParametresQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ParametresQuery = { __typename?: 'Query', parametres: Array<{ __typename?: 'Setting', id: string, cle: string, valeur: any, description?: string | null }> };
+export type ParametresQuery = { parametres: Array<{ id: string, cle: string, valeur: unknown, description: string | null }> };
 
 export type UpdateSettingsMutationVariables = Exact<{
   settings: Array<SettingInput> | SettingInput;
 }>;
 
 
-export type UpdateSettingsMutation = { __typename?: 'Mutation', updateSettings: Array<{ __typename?: 'Setting', id: string, cle: string, valeur: any, description?: string | null }> };
+export type UpdateSettingsMutation = { updateSettings: Array<{ id: string, cle: string, valeur: unknown, description: string | null }> };
 
 export type ResetSettingsMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ResetSettingsMutation = { __typename?: 'Mutation', resetSettings: Array<{ __typename?: 'Setting', id: string, cle: string, valeur: any, description?: string | null }> };
+export type ResetSettingsMutation = { resetSettings: Array<{ id: string, cle: string, valeur: unknown, description: string | null }> };
 
 export type ParametreAbsenceModeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ParametreAbsenceModeQuery = { __typename?: 'Query', parametre?: { __typename?: 'Setting', id: string, valeur: any } | null };
+export type ParametreAbsenceModeQuery = { parametre: { id: string, valeur: unknown } | null };
 
 export type TesterConnexionRhApiMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type TesterConnexionRhApiMutation = { __typename?: 'Mutation', testerConnexionRhApi?: string | null };
+export type TesterConnexionRhApiMutation = { testerConnexionRhApi: string | null };
 
 export type MesStatistiquesQueryVariables = Exact<{
-  dateDebut: Scalars['Date']['input'];
-  dateFin: Scalars['Date']['input'];
+  dateDebut: unknown;
+  dateFin: unknown;
 }>;
 
 
-export type MesStatistiquesQuery = { __typename?: 'Query', statistiques: { __typename?: 'Statistics', tempsTotal: number, parProjet: Array<{ __typename?: 'ProjectStat', tempsTotal: number, pourcentage: number, projet: { __typename?: 'Project', id: string, nom: string, code: string } }>, parActivite: Array<{ __typename?: 'ActivityStat', tempsTotal: number, pourcentage: number, activite: { __typename?: 'Activity', id: string, nom: string } }>, parJour: Array<{ __typename?: 'DayStat', date: any, tempsTotal: number, estComplet: boolean }> } };
+export type MesStatistiquesQuery = { statistiques: { tempsTotal: number, parProjet: Array<{ tempsTotal: number, pourcentage: number, projet: { id: string, nom: string, code: string } }>, parActivite: Array<{ tempsTotal: number, pourcentage: number, activite: { id: string, nom: string } }>, parJour: Array<{ date: unknown, tempsTotal: number, estComplet: boolean }> } };
 
 export type StatsGlobalesQueryVariables = Exact<{
-  dateDebut: Scalars['Date']['input'];
-  dateFin: Scalars['Date']['input'];
-  equipeId?: InputMaybe<Scalars['ID']['input']>;
+  dateDebut: unknown;
+  dateFin: unknown;
+  equipeId?: string | number | null | undefined;
 }>;
 
 
-export type StatsGlobalesQuery = { __typename?: 'Query', statistiques: { __typename?: 'Statistics', tempsTotal: number, parProjet: Array<{ __typename?: 'ProjectStat', tempsTotal: number, pourcentage: number, projet: { __typename?: 'Project', id: string, nom: string, code: string } }>, parActivite: Array<{ __typename?: 'ActivityStat', tempsTotal: number, pourcentage: number, activite: { __typename?: 'Activity', id: string, nom: string } }>, parUtilisateur: Array<{ __typename?: 'UserStat', tempsTotal: number, tauxCompletion: number, utilisateur: { __typename?: 'User', id: string, nomComplet: string } }>, parJour: Array<{ __typename?: 'DayStat', date: any, tempsTotal: number, estComplet: boolean }> } };
+export type StatsGlobalesQuery = { statistiques: { tempsTotal: number, parProjet: Array<{ tempsTotal: number, pourcentage: number, projet: { id: string, nom: string, code: string } }>, parActivite: Array<{ tempsTotal: number, pourcentage: number, activite: { id: string, nom: string } }>, parUtilisateur: Array<{ tempsTotal: number, tauxCompletion: number, utilisateur: { id: string, nomComplet: string } }>, parJour: Array<{ date: unknown, tempsTotal: number, estComplet: boolean }> } };
 
 export type StatsPeriodePrecedenteQueryVariables = Exact<{
-  dateDebut: Scalars['Date']['input'];
-  dateFin: Scalars['Date']['input'];
-  equipeId?: InputMaybe<Scalars['ID']['input']>;
+  dateDebut: unknown;
+  dateFin: unknown;
+  equipeId?: string | number | null | undefined;
 }>;
 
 
-export type StatsPeriodePrecedenteQuery = { __typename?: 'Query', statistiques: { __typename?: 'Statistics', tempsTotal: number, parUtilisateur: Array<{ __typename?: 'UserStat', tempsTotal: number, tauxCompletion: number, utilisateur: { __typename?: 'User', id: string, nomComplet: string } }> } };
+export type StatsPeriodePrecedenteQuery = { statistiques: { tempsTotal: number, parUtilisateur: Array<{ tempsTotal: number, tauxCompletion: number, utilisateur: { id: string, nomComplet: string } }> } };
 
 export type StatsProjetQueryVariables = Exact<{
-  dateDebut: Scalars['Date']['input'];
-  dateFin: Scalars['Date']['input'];
-  projetId: Scalars['ID']['input'];
+  dateDebut: unknown;
+  dateFin: unknown;
+  projetId: string | number;
 }>;
 
 
-export type StatsProjetQuery = { __typename?: 'Query', statistiques: { __typename?: 'Statistics', tempsTotal: number, parActivite: Array<{ __typename?: 'ActivityStat', tempsTotal: number, pourcentage: number, activite: { __typename?: 'Activity', id: string, nom: string } }>, parUtilisateur: Array<{ __typename?: 'UserStat', tempsTotal: number, tauxCompletion: number, utilisateur: { __typename?: 'User', id: string, nomComplet: string } }>, parJour: Array<{ __typename?: 'DayStat', date: any, tempsTotal: number, estComplet: boolean }> } };
+export type StatsProjetQuery = { statistiques: { tempsTotal: number, parActivite: Array<{ tempsTotal: number, pourcentage: number, activite: { id: string, nom: string } }>, parUtilisateur: Array<{ tempsTotal: number, tauxCompletion: number, utilisateur: { id: string, nomComplet: string } }>, parJour: Array<{ date: unknown, tempsTotal: number, estComplet: boolean }> } };
 
 export type AnomaliesQueryVariables = Exact<{
-  projetId?: InputMaybe<Scalars['ID']['input']>;
-  equipeId?: InputMaybe<Scalars['ID']['input']>;
-  userId?: InputMaybe<Scalars['ID']['input']>;
-  dateDebut: Scalars['Date']['input'];
-  dateFin: Scalars['Date']['input'];
-  types?: InputMaybe<Array<AnomalyType> | AnomalyType>;
+  projetId?: string | number | null | undefined;
+  equipeId?: string | number | null | undefined;
+  userId?: string | number | null | undefined;
+  dateDebut: unknown;
+  dateFin: unknown;
+  types?: Array<AnomalyType> | AnomalyType | null | undefined;
 }>;
 
 
-export type AnomaliesQuery = { __typename?: 'Query', anomalies: Array<{ __typename?: 'Anomaly', id: string, type: AnomalyType, date?: any | null, semaine?: string | null, detail: string, utilisateur: { __typename?: 'User', id: string, nomComplet: string, email: string, equipe?: { __typename?: 'Team', id: string, nom: string } | null }, projet?: { __typename?: 'Project', id: string, nom: string, code: string } | null }> };
+export type AnomaliesQuery = { anomalies: Array<{ id: string, type: AnomalyType, date: unknown, semaine: string | null, detail: string, utilisateur: { id: string, nomComplet: string, email: string, equipe: { id: string, nom: string } | null }, projet: { id: string, nom: string, code: string } | null }> };
 
-export type TeamFullFieldsFragment = { __typename?: 'Team', id: string, nom: string, code: string, description?: string | null, estActif: boolean, createdAt: any, membres: Array<{ __typename?: 'User', id: string, nomComplet: string }> };
+export type TeamFullFieldsFragment = { id: string, nom: string, code: string, description: string | null, estActif: boolean, createdAt: unknown, membres: Array<{ id: string, nomComplet: string }> };
 
 export type EquipesFullQueryVariables = Exact<{
-  actifSeulement?: InputMaybe<Scalars['Boolean']['input']>;
+  actifSeulement?: boolean | null | undefined;
 }>;
 
 
-export type EquipesFullQuery = { __typename?: 'Query', equipes: Array<{ __typename?: 'Team', id: string, nom: string, code: string, description?: string | null, estActif: boolean, createdAt: any, membres: Array<{ __typename?: 'User', id: string, nomComplet: string }> }> };
+export type EquipesFullQuery = { equipes: Array<{ id: string, nom: string, code: string, description: string | null, estActif: boolean, createdAt: unknown, membres: Array<{ id: string, nomComplet: string }> }> };
 
 export type EquipeQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type EquipeQuery = { __typename?: 'Query', equipe?: { __typename?: 'Team', id: string, nom: string, code: string, description?: string | null, estActif: boolean, createdAt: any, membres: Array<{ __typename?: 'User', id: string, nomComplet: string }> } | null };
+export type EquipeQuery = { equipe: { id: string, nom: string, code: string, description: string | null, estActif: boolean, createdAt: unknown, membres: Array<{ id: string, nomComplet: string }> } | null };
 
 export type CreateTeamMutationVariables = Exact<{
   input: TeamInput;
 }>;
 
 
-export type CreateTeamMutation = { __typename?: 'Mutation', createTeam: { __typename?: 'Team', id: string, nom: string, code: string, description?: string | null, estActif: boolean, createdAt: any, membres: Array<{ __typename?: 'User', id: string, nomComplet: string }> } };
+export type CreateTeamMutation = { createTeam: { id: string, nom: string, code: string, description: string | null, estActif: boolean, createdAt: unknown, membres: Array<{ id: string, nomComplet: string }> } };
 
 export type UpdateTeamMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
   input: TeamInput;
 }>;
 
 
-export type UpdateTeamMutation = { __typename?: 'Mutation', updateTeam: { __typename?: 'Team', id: string, nom: string, code: string, description?: string | null, estActif: boolean, createdAt: any, membres: Array<{ __typename?: 'User', id: string, nomComplet: string }> } };
+export type UpdateTeamMutation = { updateTeam: { id: string, nom: string, code: string, description: string | null, estActif: boolean, createdAt: unknown, membres: Array<{ id: string, nomComplet: string }> } };
 
 export type DeleteTeamMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteTeamMutation = { __typename?: 'Mutation', deleteTeam: boolean };
+export type DeleteTeamMutation = { deleteTeam: boolean };
 
-export type UserFieldsFragment = { __typename?: 'User', id: string, matricule?: string | null, nom: string, prenom: string, email: string, nomComplet: string, role: UserRole, estActif: boolean, createdAt: any, equipe?: { __typename?: 'Team', id: string, nom: string, code: string } | null };
+export type UserFieldsFragment = { id: string, matricule: string | null, nom: string, prenom: string, email: string, nomComplet: string, role: UserRole, estActif: boolean, createdAt: unknown, equipe: { id: string, nom: string, code: string } | null };
 
-export type TeamFieldsFragment = { __typename?: 'Team', id: string, nom: string, code: string, estActif: boolean };
+export type TeamFieldsFragment = { id: string, nom: string, code: string, estActif: boolean };
 
 export type UsersQueryVariables = Exact<{
-  equipeId?: InputMaybe<Scalars['ID']['input']>;
-  role?: InputMaybe<UserRole>;
-  search?: InputMaybe<Scalars['String']['input']>;
-  actifSeulement?: InputMaybe<Scalars['Boolean']['input']>;
-  page?: InputMaybe<Scalars['Int']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
+  equipeId?: string | number | null | undefined;
+  role?: UserRole | null | undefined;
+  search?: string | null | undefined;
+  actifSeulement?: boolean | null | undefined;
+  page?: number | null | undefined;
+  first?: number | null | undefined;
 }>;
 
 
-export type UsersQuery = { __typename?: 'Query', users: { __typename?: 'UserPaginator', data: Array<{ __typename?: 'User', id: string, matricule?: string | null, nom: string, prenom: string, email: string, nomComplet: string, role: UserRole, estActif: boolean, createdAt: any, equipe?: { __typename?: 'Team', id: string, nom: string, code: string } | null }>, paginatorInfo: { __typename?: 'PaginatorInfo', currentPage: number, lastPage: number, total: number, hasMorePages: boolean } } };
+export type UsersQuery = { users: { data: Array<{ id: string, matricule: string | null, nom: string, prenom: string, email: string, nomComplet: string, role: UserRole, estActif: boolean, createdAt: unknown, equipe: { id: string, nom: string, code: string } | null }>, paginatorInfo: { currentPage: number, lastPage: number, total: number, hasMorePages: boolean } } };
 
 export type UserQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type UserQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: string, matricule?: string | null, nom: string, prenom: string, email: string, nomComplet: string, role: UserRole, estActif: boolean, createdAt: any, equipe?: { __typename?: 'Team', id: string, nom: string, code: string } | null } | null };
+export type UserQuery = { user: { id: string, matricule: string | null, nom: string, prenom: string, email: string, nomComplet: string, role: UserRole, estActif: boolean, createdAt: unknown, equipe: { id: string, nom: string, code: string } | null } | null };
 
 export type EquipesQueryVariables = Exact<{
-  actifSeulement?: InputMaybe<Scalars['Boolean']['input']>;
+  actifSeulement?: boolean | null | undefined;
 }>;
 
 
-export type EquipesQuery = { __typename?: 'Query', equipes: Array<{ __typename?: 'Team', id: string, nom: string, code: string, estActif: boolean }> };
+export type EquipesQuery = { equipes: Array<{ id: string, nom: string, code: string, estActif: boolean }> };
 
 export type CreateUserMutationVariables = Exact<{
   input: CreateUserInput;
 }>;
 
 
-export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: string, matricule?: string | null, nom: string, prenom: string, email: string, nomComplet: string, role: UserRole, estActif: boolean, createdAt: any, equipe?: { __typename?: 'Team', id: string, nom: string, code: string } | null } };
+export type CreateUserMutation = { createUser: { id: string, matricule: string | null, nom: string, prenom: string, email: string, nomComplet: string, role: UserRole, estActif: boolean, createdAt: unknown, equipe: { id: string, nom: string, code: string } | null } };
 
 export type UpdateUserMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
   input: UpdateUserInput;
 }>;
 
 
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, matricule?: string | null, nom: string, prenom: string, email: string, nomComplet: string, role: UserRole, estActif: boolean, createdAt: any, equipe?: { __typename?: 'Team', id: string, nom: string, code: string } | null } };
+export type UpdateUserMutation = { updateUser: { id: string, matricule: string | null, nom: string, prenom: string, email: string, nomComplet: string, role: UserRole, estActif: boolean, createdAt: unknown, equipe: { id: string, nom: string, code: string } | null } };
 
 export type DeleteUserMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: boolean };
+export type DeleteUserMutation = { deleteUser: boolean };
 
 export type RestoreUserMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type RestoreUserMutation = { __typename?: 'Mutation', restoreUser: { __typename?: 'User', id: string, matricule?: string | null, nom: string, prenom: string, email: string, nomComplet: string, role: UserRole, estActif: boolean, createdAt: any, equipe?: { __typename?: 'Team', id: string, nom: string, code: string } | null } };
+export type RestoreUserMutation = { restoreUser: { id: string, matricule: string | null, nom: string, prenom: string, email: string, nomComplet: string, role: UserRole, estActif: boolean, createdAt: unknown, equipe: { id: string, nom: string, code: string } | null } };
 
 export type RestrictionsVisibiliteQueryVariables = Exact<{
-  projetId: Scalars['ID']['input'];
+  projetId: string | number;
 }>;
 
 
-export type RestrictionsVisibiliteQuery = { __typename?: 'Query', restrictionsVisibilite: Array<{ __typename?: 'ActivityVisibility', id: string, estVisible: boolean, activite: { __typename?: 'Activity', id: string, nom: string, chemin: string }, utilisateur: { __typename?: 'User', id: string, nomComplet: string, email: string } }> };
+export type RestrictionsVisibiliteQuery = { restrictionsVisibilite: Array<{ id: string, estVisible: boolean, activite: { id: string, nom: string, chemin: string }, utilisateur: { id: string, nomComplet: string, email: string } }> };
 
 export type HideActivityForUserMutationVariables = Exact<{
-  projetId: Scalars['ID']['input'];
-  activiteId: Scalars['ID']['input'];
-  userId: Scalars['ID']['input'];
+  projetId: string | number;
+  activiteId: string | number;
+  userId: string | number;
 }>;
 
 
-export type HideActivityForUserMutation = { __typename?: 'Mutation', hideActivityForUser: boolean };
+export type HideActivityForUserMutation = { hideActivityForUser: boolean };
 
 export type ShowActivityForUserMutationVariables = Exact<{
-  projetId: Scalars['ID']['input'];
-  activiteId: Scalars['ID']['input'];
-  userId: Scalars['ID']['input'];
+  projetId: string | number;
+  activiteId: string | number;
+  userId: string | number;
 }>;
 
 
-export type ShowActivityForUserMutation = { __typename?: 'Mutation', showActivityForUser: boolean };
+export type ShowActivityForUserMutation = { showActivityForUser: boolean };
 
 export const ActivityFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ActivityFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Activity"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"nom"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"chemin"}},{"kind":"Field","name":{"kind":"Name","value":"cheminComplet"}},{"kind":"Field","name":{"kind":"Name","value":"niveau"}},{"kind":"Field","name":{"kind":"Name","value":"ordre"}},{"kind":"Field","name":{"kind":"Name","value":"estFeuille"}},{"kind":"Field","name":{"kind":"Name","value":"estSysteme"}},{"kind":"Field","name":{"kind":"Name","value":"estActif"}}]}}]} as unknown as DocumentNode<ActivityFieldsFragment, unknown>;
 export const ActivityTreeFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ActivityTreeFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Activity"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"nom"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"chemin"}},{"kind":"Field","name":{"kind":"Name","value":"niveau"}},{"kind":"Field","name":{"kind":"Name","value":"ordre"}},{"kind":"Field","name":{"kind":"Name","value":"estFeuille"}},{"kind":"Field","name":{"kind":"Name","value":"estSysteme"}},{"kind":"Field","name":{"kind":"Name","value":"estActif"}},{"kind":"Field","name":{"kind":"Name","value":"enfants"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"nom"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"chemin"}},{"kind":"Field","name":{"kind":"Name","value":"niveau"}},{"kind":"Field","name":{"kind":"Name","value":"ordre"}},{"kind":"Field","name":{"kind":"Name","value":"estFeuille"}},{"kind":"Field","name":{"kind":"Name","value":"estSysteme"}},{"kind":"Field","name":{"kind":"Name","value":"estActif"}},{"kind":"Field","name":{"kind":"Name","value":"enfants"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"nom"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"chemin"}},{"kind":"Field","name":{"kind":"Name","value":"niveau"}},{"kind":"Field","name":{"kind":"Name","value":"ordre"}},{"kind":"Field","name":{"kind":"Name","value":"estFeuille"}},{"kind":"Field","name":{"kind":"Name","value":"estSysteme"}},{"kind":"Field","name":{"kind":"Name","value":"estActif"}},{"kind":"Field","name":{"kind":"Name","value":"enfants"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"nom"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"chemin"}},{"kind":"Field","name":{"kind":"Name","value":"niveau"}},{"kind":"Field","name":{"kind":"Name","value":"ordre"}},{"kind":"Field","name":{"kind":"Name","value":"estFeuille"}},{"kind":"Field","name":{"kind":"Name","value":"estSysteme"}},{"kind":"Field","name":{"kind":"Name","value":"estActif"}}]}}]}}]}}]}}]} as unknown as DocumentNode<ActivityTreeFieldsFragment, unknown>;
